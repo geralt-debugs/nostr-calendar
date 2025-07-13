@@ -222,6 +222,9 @@ function CalendarLayoutMonth(props: any) {
         wrap="nowrap"
       >
         {weeks[0].map((weekDay: Date, index: number) => {
+          const day = format(weekDay, "ccc").toUpperCase();
+          const isWeekend = day === "SUN" || day === "SAT";
+
           return (
             <Grid
               style={{
@@ -232,7 +235,7 @@ function CalendarLayoutMonth(props: any) {
               <div
                 style={{
                   ...styles.paperHeader,
-                  ...(index === 5 || index === 6 ? styles.paperWeekend : {}),
+                  ...(isWeekend ? styles.paperWeekend : {}),
                 }}
               >
                 <Typography style={{ ...styles.title }}>
@@ -260,6 +263,9 @@ function CalendarLayoutMonth(props: any) {
               format(day, "ddMMyyy") === format(new Date(), "ddMMyyy");
             const eventsOfDay = getEventData(day);
 
+            const dayName = format(day, "ccc").toUpperCase();
+            const isWeekend = dayName === "SUN" || dayName === "SAT";
+
             return (
               <Grid
                 style={{
@@ -270,12 +276,10 @@ function CalendarLayoutMonth(props: any) {
                 <div
                   style={{
                     ...styles.paper,
-                    ...(dayIndex === 5 || dayIndex === 6
-                      ? styles.paperWeekend
-                      : {}),
+                    ...(isWeekend ? styles.paperWeekend : {}),
                   }}
                 >
-                  <Typography style={{ ...styles.title }}>
+                  <Typography component={"div"} style={{ ...styles.title }}>
                     <DayStyle
                       spacing={theme.spacing(1)}
                       paperColour={theme.palette.background.paper}
