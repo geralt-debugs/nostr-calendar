@@ -154,7 +154,7 @@ function CalendarEventViewDialog(props: any) {
               <Typography>
                 {format(
                   new Date(calendarEvent.begin),
-                  "dddd, D MMMM YYYY ⋅ HH:mm -",
+                  "ccc, d MMMM yyyy ⋅ HH:mm -",
                   {
                     locale: locale,
                   },

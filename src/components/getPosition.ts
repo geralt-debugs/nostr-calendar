@@ -45,7 +45,7 @@ const getPosition = (eventEl: any, id: string | number) => {
         hour > 23 ? 23 : hour,
         hour > 23 ? 30 : minute,
     )
-    // console.log("eventBeginDate", format(eventBeginDate, "YYYY/MM/DD H:mm"), id)
+    // console.log("eventBeginDate", format(eventBeginDate, "yyyy/MM/dd H:mm"), id)
 
     return eventBeginDate
 }

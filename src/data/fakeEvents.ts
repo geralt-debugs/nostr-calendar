@@ -18,8 +18,8 @@ const fakeEvents = (weekBegin: Date, weekEnd: Date) => {
         event.push({
             id: getTime(datetime),
             title: `test ${hour} #1`,
-            begin: format(datetime, "YYYY/MM/DD H:mm:00"),
-            end: format(addMinutes(datetime, duration), "YYYY/MM/DD H:mm:00"),
+            begin: format(datetime, "yyyy/MM/dd H:mm:00"),
+            end: format(addMinutes(datetime, duration), "yyyy/MM/dd H:mm:00"),
             description: `description: test ${hour}`,
         })
 
@@ -29,8 +29,8 @@ const fakeEvents = (weekBegin: Date, weekEnd: Date) => {
         event.push({
             id: getTime(addSeconds(datetime, 1)),
             title: `test ${hour} #2`,
-            begin: format(begin, "YYYY/MM/DD H:mm:00"),
-            end: format(end, "YYYY/MM/DD H:mm:00"),
+            begin: format(begin, "yyyy/MM/dd H:mm:00"),
+            end: format(end, "yyyy/MM/dd H:mm:00"),
             description: `description: test ${hour}`,
         })
 
@@ -40,8 +40,8 @@ const fakeEvents = (weekBegin: Date, weekEnd: Date) => {
         event.push({
             id: getTime(addSeconds(datetime, 2)),
             title: `test ${hour} #3`,
-            begin: format(begin, "YYYY/MM/DD H:mm:00"),
-            end: format(end, "YYYY/MM/DD H:mm:00"),
+            begin: format(begin, "yyyy/MM/dd H:mm:00"),
+            end: format(end, "yyyy/MM/dd H:mm:00"),
             description: `description: test ${hour}`,
         })
 

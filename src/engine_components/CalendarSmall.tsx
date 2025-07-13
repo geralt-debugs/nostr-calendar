@@ -189,7 +189,7 @@ function CalendarSmall(props: any) {
           >
             {isDatepicker && (
               <Tooltip
-                title={`${format(new Date(), "dddd, D MMMM", { locale: locale })}`}
+                title={`${format(new Date(), "ccc, d MMMM", { locale: locale })}`}
                 style={{ ...styles.tooltip }}
               >
                 <IconButton

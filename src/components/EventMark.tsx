@@ -148,7 +148,7 @@ function EventMark(props: any) {
   };
 
   const [{ isDragging }, drag, preview] = useDrag({
-    item: { type: "box" },
+    type: "box",
     collect: (monitor) => ({
       isDragging: monitor.isDragging(),
     }),

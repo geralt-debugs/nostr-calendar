@@ -108,7 +108,7 @@ function Calendar() {
   const [runAnimation, setRunAnimation] = useState(true);
 
   // const applyLink = (newDate: Date) => {
-  //     history.push(`/d/${layout}/${format(newDate, "YYYY/MM/DD")}`)
+  //     history.push(`/d/${layout}/${format(newDate, "yyyy/MM/dd")}`)
   // }
 
   const goToToday = () => {
@@ -121,7 +121,7 @@ function Calendar() {
   const handleLayoutChange = (args: any) => {
     const { value } = args;
     setStateCalendar({ ...stateCalendar, layout: value });
-    // history.push(`/d/${value}/${format(selectedDate, "YYYY/MM/DD")}`)
+    // history.push(`/d/${value}/${format(selectedDate, "yyyy/MM/dd")}`)
   };
 
   const next = () => {

@@ -358,7 +358,7 @@ function CalendarEventDialog(props: any) {
                 onChange={onChangeBeginTime}
               /> */}
               <Typography style={{ ...styles.dayOfWeek }}>
-                {format(eventBeginDate, "dddd", { locale: locale })}
+                {format(eventBeginDate, "ccc", { locale: locale })}
               </Typography>
             </FormControl>
             <FormControl
@@ -384,7 +384,7 @@ function CalendarEventDialog(props: any) {
                 onChange={onChangeEndTime}
               /> */}
               <Typography style={{ ...styles.dayOfWeek }}>
-                {format(eventEndDate, "dddd", { locale: locale })}
+                {format(eventEndDate, "ccc", { locale: locale })}
               </Typography>
             </FormControl>
             <FormControl

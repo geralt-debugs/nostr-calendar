@@ -40,19 +40,21 @@ const DayStyle = styled("div")<{ paperColour: string; spacing: string }>`
 `;
 
 const MonthMarkerStyle = styled("div")`
-  overflow: "hidden";
+  display: flex;
+  align-items: center;
+  overflow: hidden;
   min-height: 23;
-  border: "1px solid rgba(66, 165, 245, 0.8)";
-  background-color: "rgba(66, 165, 245, 0.8)";
-  padding: "1px 3px";
-  margin-bottom: 2;
-  border-radius: 3;
-  border-top-right-radius: 3;
-  cursor: "pointer";
+  border: 1px solid rgba(66, 165, 245, 0.8);
+  background-color: rgba(66, 165, 245, 0.8);
+  padding: 1px 3px;
+  margin-bottom: 2px;
+  border-radius: 3px;
+  border-top-right-radius: 3px;
+  cursor: pointer;
   z-index: 50;
   &:hover {
     z-index: 53;
-    background-color: "rgba(66, 165, 245, 1)";
+    background-color: rgba(66, 165, 245, 1);
   }
 `;
 
@@ -82,8 +84,8 @@ const getStyles: IGetStyles = (theme: Theme) => ({
     minWidth: 64.38,
     height: "100%",
     display: "flex",
-    justifyContent: "center",
     alignItems: "center",
+    flexDirection: "column",
   },
   paperWeekend: {
     backgroundColor: theme.palette.grey[100],
@@ -103,10 +105,10 @@ const getStyles: IGetStyles = (theme: Theme) => ({
     position: "relative",
     height: "calc(100% - 25px)",
     width: "100%",
-    marginTop: theme.spacing(1),
     overflow: "hidden",
     whiteSpace: "nowrap",
     textOverflow: "ellipsis",
+    gap: "2px",
   },
 });
 
@@ -168,7 +170,7 @@ function CalendarLayoutMonth(props: any) {
       return acc;
     }, []);
 
-    // console.log("eventsByHour", eventsByHour)
+    console.log("eventsByHour", dayEvents);
 
     const markers = eventsByHour.map((evHour: any) => {
       return dayEvents
@@ -182,7 +184,7 @@ function CalendarLayoutMonth(props: any) {
             // sq={index}
             // len={evHour.len}
           >
-            test...
+            {event.title}
           </MonthMarkerStyle>
         ));
     });

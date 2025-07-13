@@ -16,7 +16,7 @@ const EventMarkGhost = memo((props: any) => {
   const { ghostProperties, calendarEvent } = stateCalendar;
 
   const newDate = new Date(
-    format(dataDate, `YYYY/MM/DD ${dataHour}:${dataMin}:s`),
+    format(dataDate, `yyyy/MM/dd ${dataHour}:${dataMin}:s`),
   );
 
   // useEffect(() => {
@@ -44,7 +44,7 @@ const EventMarkGhost = memo((props: any) => {
       >
         <p style={{ lineHeight: "8px" }}>{calendarEvent.title}</p>
         <p style={{ lineHeight: "8px" }}>
-          [{format(newDate, `YYYY/MM/DD HH:mm:ss`)}]
+          [{format(newDate, `yyyy/MM/dd HH:mm:ss`)}]
         </p>
         {/* <p style={{ lineHeight: "8px" }}>[{y}]</p> */}
       </div>
