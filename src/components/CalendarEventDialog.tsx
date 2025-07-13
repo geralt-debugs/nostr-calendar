@@ -20,7 +20,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
 import SubjectIcon from "@mui/icons-material/Subject";
 import { format, getTime } from "date-fns";
-// import TimeSelect from "../engine_components/TimeSelect";
+import TimeSelect from "../engine_components/TimeSelect";
 import Datepicker from "../engine_components/Datepicker";
 import { IGetStyles } from "../common/types";
 
@@ -348,7 +348,7 @@ function CalendarEventDialog(props: any) {
                 originalValue={new Date(eventBeginDate)}
                 onChange={onChangeBeginDate}
               />
-              {/* <TimeSelect
+              <TimeSelect
                 placeholder={""}
                 options={timeOptions}
                 originalValue={{
@@ -356,7 +356,7 @@ function CalendarEventDialog(props: any) {
                   label: eventBeginTime.label,
                 }}
                 onChange={onChangeBeginTime}
-              /> */}
+              />
               <Typography style={{ ...styles.dayOfWeek }}>
                 {format(eventBeginDate, "ccc", { locale: locale })}
               </Typography>
@@ -374,7 +374,7 @@ function CalendarEventDialog(props: any) {
                 originalValue={eventEndDate}
                 onChange={onChangeEndDate}
               />
-              {/* <TimeSelect
+              <TimeSelect
                 placeholder={""}
                 options={timeOptions}
                 originalValue={{
@@ -382,7 +382,7 @@ function CalendarEventDialog(props: any) {
                   label: eventEndTime.label,
                 }}
                 onChange={onChangeEndTime}
-              /> */}
+              />
               <Typography style={{ ...styles.dayOfWeek }}>
                 {format(eventEndDate, "ccc", { locale: locale })}
               </Typography>
