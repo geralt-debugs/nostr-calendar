@@ -245,7 +245,7 @@ function CalendarSmall(props: any) {
                 key={`small-calendar-column-header-${index}`}
               >
                 <Typography style={{ ...styles.dayHeader }}>
-                  {format(weekDay, "dd", { locale: locale }).substr(0, 1)}
+                  {format(weekDay, "ccc", { locale: locale }).substr(0, 1)}
                 </Typography>
               </Grid>
             );

@@ -11,25 +11,23 @@ import {
   subWeeks,
   subDays,
 } from "date-fns";
-import * as dateFnsPT from "date-fns/locale/pt"; // <<<< I18N   (DO NOT REMOVE!!!)
+import { pt } from "date-fns/locale/pt"; // <<<< I18N   (DO NOT REMOVE!!!)
 import { CalendarContext } from "../common/CalendarContext";
 import CalendarToolbar from "./CalendarToolbar";
 import CalendarDrawer from "./CalendarDrawer";
-// import CalendarMain from "./CalendarMain";
-// import CalendarEventDialog from "./CalendarEventDialog";
-// import CalendarEventViewDialog from "./CalendarEventViewDialog";
+import CalendarMain from "./CalendarMain";
+import CalendarEventDialog from "./CalendarEventDialog";
+import CalendarEventViewDialog from "./CalendarEventViewDialog";
 
 const layout = "week";
 
 let _locale =
   (navigator.languages && navigator.languages[0]) ||
   navigator.language ||
-  // navigator.userLanguage ||
   "en-US";
 _locale = ~Object.keys(dictionary).indexOf(_locale) ? _locale : "en-US";
-// _locale = "pt-BR"
 
-const locale = _locale === "pt-BR" ? dateFnsPT : null;
+const locale = _locale === "pt-BR" ? pt : null;
 
 const openDialog = false;
 const openViewDialog = false;
@@ -44,7 +42,7 @@ function Calendar() {
 
   const changeLanguage = (newLang: { value: string }) => {
     const i18nLocale = newLang.value;
-    const newDateFnLocale = i18nLocale === "pt-BR" ? dateFnsPT : null;
+    const newDateFnLocale = i18nLocale === "pt-BR" ? pt : null;
 
     console.group("changeLanguage");
     console.log("locale: ", newDateFnLocale);
@@ -180,10 +178,11 @@ function Calendar() {
   return (
     <CalendarContext.Provider value={{ stateCalendar, setStateCalendar }}>
       <IntlProvider locale={i18nLocale} messages={locale_dictionary}>
-        <Stack
+        <div
           style={{
             width: "100%",
             height: "100%",
+            display: "flex",
           }}
         >
           <CalendarToolbar
@@ -206,7 +205,7 @@ function Calendar() {
             locale={locale}
           />
 
-          {/* <CalendarMain
+          <CalendarMain
             // selectedDate={selectedDate}
             open={open}
             // layout={layout}
@@ -214,8 +213,8 @@ function Calendar() {
           />
 
           <CalendarEventDialog />
-          <CalendarEventViewDialog /> */}
-        </Stack>
+          <CalendarEventViewDialog />
+        </div>
       </IntlProvider>
     </CalendarContext.Provider>
   );
