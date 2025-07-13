@@ -29,11 +29,7 @@ const languageOptions = [
     label: "English",
   },
   {
-    value: "pt-BR",
-    label: "Português",
-  },
-  {
-    value: "de",
+    value: "de-DE",
     label: "Deutsch",
   },
 ];

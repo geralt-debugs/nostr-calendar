@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Stack } from "@mui/material";
 import { IntlProvider } from "react-intl";
 import { flattenMessages } from "../common/utils";
 import dictionary from "../common/dictionary";
@@ -11,7 +10,7 @@ import {
   subWeeks,
   subDays,
 } from "date-fns";
-import { pt } from "date-fns/locale/pt"; // <<<< I18N   (DO NOT REMOVE!!!)
+import { de } from "date-fns/locale/de"; // <<<< I18N   (DO NOT REMOVE!!!)
 import { CalendarContext } from "../common/CalendarContext";
 import CalendarToolbar from "./CalendarToolbar";
 import CalendarDrawer from "./CalendarDrawer";
@@ -27,7 +26,7 @@ let _locale =
   "en-US";
 _locale = ~Object.keys(dictionary).indexOf(_locale) ? _locale : "en-US";
 
-const locale = _locale === "pt-BR" ? pt : null;
+const locale = _locale === "de-DE" ? de : null;
 
 const openDialog = false;
 const openViewDialog = false;
@@ -42,7 +41,7 @@ function Calendar() {
 
   const changeLanguage = (newLang: { value: string }) => {
     const i18nLocale = newLang.value;
-    const newDateFnLocale = i18nLocale === "pt-BR" ? pt : null;
+    const newDateFnLocale = i18nLocale === "de-DE" ? de : null;
 
     console.group("changeLanguage");
     console.log("locale: ", newDateFnLocale);
