@@ -1,6 +1,6 @@
 import { useContext, useMemo } from "react";
 import { CalendarContext } from "../common/CalendarContext";
-import { Theme, useTheme } from "@mui/material/styles";
+import { styled, Theme, useTheme } from "@mui/material/styles";
 import Grid from "@mui/material/Grid";
 import { cyan } from "@mui/material/colors";
 import { DndProvider } from "react-dnd";
@@ -9,6 +9,21 @@ import CalendarHeader from "./CalendarHeader";
 import CalendarBoard from "./CalendarBoard";
 import CalendarBoardDragLayer from "./CalendarBoardDragLayer";
 import { IGetStyles } from "../common/types";
+
+const Body = styled(Grid)`
+  height: calc(100% - 150px);
+  overflow-x: scroll;
+  overflow: scroll;
+  align-items: stretch;
+  &:before {
+    background-image: linear-gradient(to right, white, rgba(255, 255, 255, 0));
+    content: "";
+    height: 2px;
+    position: absolute;
+    width: 80px;
+    z-index: 51;
+  }
+`;
 
 const getStyles: IGetStyles = (theme: Theme) => ({
   hide: {
@@ -24,20 +39,6 @@ const getStyles: IGetStyles = (theme: Theme) => ({
     overflow: "hidden",
     paddingTop: 1,
     backgroundColor: theme.palette.background.paper,
-  },
-  body: {
-    height: "calc(100% - 150px)",
-    overflowX: "scroll",
-    overflow: "scroll",
-    alignItems: "stretch",
-    "&:before": {
-      backgroundImage: "linear-gradient(to right,white,rgba(255,255,255,0))",
-      content: "",
-      height: 2,
-      position: "absolute",
-      width: 80,
-      zIndex: 51,
-    },
   },
   timeColumnContainer: {
     color: theme.palette.text.secondary,
@@ -70,6 +71,7 @@ const getStyles: IGetStyles = (theme: Theme) => ({
     overflowY: "scroll",
     display: "flex",
     alignItems: "flex-start",
+    width: "calc(100% - 40px)",
     // backgroundColor: 'rgba(245, 245, 220, 0.30)',
     // height: '100%',
   },
@@ -141,13 +143,12 @@ function CalendarLayoutDayWeek(props: any) {
           selectedWeek={selectedWeek}
         />
 
-        <Grid
+        <Body
           container
           spacing={0}
           direction="row"
           justifyContent="center"
           alignItems="stretch"
-          style={{ ...styles.body }}
         >
           <Grid size={1} style={{ ...styles.timeColumnContainer }}>
             <div style={{ ...styles.timeColumn }}>
@@ -155,7 +156,7 @@ function CalendarLayoutDayWeek(props: any) {
               {Array.from(Array(23).keys()).map((index) => {
                 return (
                   <div
-                    style={{ ...styles.timeColumnContainer }}
+                    style={{ ...styles.timeColumnElement }}
                     key={`time-${index}`}
                   >
                     <span>{index + 1}</span>
@@ -176,7 +177,7 @@ function CalendarLayoutDayWeek(props: any) {
               <CalendarBoardDragLayer />
             </DndProvider>
           </Grid>
-        </Grid>
+        </Body>
       </div>
     );
     // ....

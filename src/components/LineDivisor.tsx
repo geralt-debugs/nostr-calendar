@@ -1,5 +1,18 @@
-import { useTheme } from "@mui/material/styles";
+import { styled, useTheme } from "@mui/material/styles";
 import { IGetStyles } from "../common/types";
+
+const LineDivisorStyle = styled("div")`
+  height: 60px;
+  &:after {
+    content: "";
+    border-bottom: 1px solid #dadce0;
+    position: absolute;
+    width: 100%;
+    margin-top: -1px;
+    z-index: 3;
+    pointer-events: none;
+  }
+`;
 
 const getStyles: IGetStyles = () => ({
   lineDivisorContainer: {
@@ -32,9 +45,8 @@ function LineDivisor(props: any) {
   return (
     <div style={{ ...styles.lineDivisorContainer }}>
       {Array.from(Array(24).keys()).map((_: any, ix: number) => (
-        <div
+        <LineDivisorStyle
           key={`time-line-divisor-${ix}`}
-          style={{ ...styles.lineDivisor }}
           data-group="time-line"
         />
       ))}
