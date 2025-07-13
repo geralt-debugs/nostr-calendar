@@ -59,8 +59,7 @@ const getStyles: IGetStyles = (theme: Theme) => ({
   currentTimeLine: {
     position: "absolute",
     zIndex: 51,
-    borderColor: "rgb(226, 57, 43)",
-    borderTop: "2px solid",
+    borderTop: "2px solid rgb(226, 57, 43)",
     left: 0,
     right: -1,
   },
@@ -152,8 +151,11 @@ function CalendarBoard(props: any) {
     const { marginTop = -1000 } = props;
     return (
       <>
-        <div style={{ marginTop: marginTop - 5, ...styles.currentTimeDot }} />
-        <div style={{ marginTop: marginTop, ...styles.currentTimeDot }} />
+        <div
+          className="currentTime"
+          style={{ ...styles.currentTimeDot, marginTop: marginTop - 5 }}
+        />
+        <div style={{ ...styles.currentTimeLine, marginTop: marginTop }} />
       </>
     );
   };

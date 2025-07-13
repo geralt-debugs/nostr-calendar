@@ -15,14 +15,6 @@ const Body = styled(Grid)`
   overflow-x: scroll;
   overflow: scroll;
   align-items: stretch;
-  &:before {
-    background-image: linear-gradient(to right, white, rgba(255, 255, 255, 0));
-    content: "";
-    height: 2px;
-    position: absolute;
-    width: 80px;
-    z-index: 51;
-  }
 `;
 
 const getStyles: IGetStyles = (theme: Theme) => ({
