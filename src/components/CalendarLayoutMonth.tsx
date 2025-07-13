@@ -2,12 +2,12 @@ import { useContext } from "react";
 import { CalendarContext } from "../common/CalendarContext";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
-import { makeStyles, Theme, useTheme } from "@mui/material/styles";
+import { styled, Theme, useTheme } from "@mui/material";
 import { lightBlue } from "@mui/material/colors";
-import clsx from "clsx";
 import { format } from "date-fns";
 import createEditEvent from "./createEditEvent";
 import { IGetStyles } from "../common/types";
+import clsx from "clsx";
 // import EventMark from './EventMark'
 
 type event = {
@@ -17,6 +17,44 @@ type event = {
   begin: string;
   end: string;
 };
+
+const DayStyle = styled("div")<{ paperColour: string; spacing: string }>`
+  width: 36px;
+  height: 36px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  &.today {
+    color: ${({ paperColour }) => paperColour};
+    background-color: ${lightBlue[700]};
+    border-radius: 50%;
+    padding: ${({ spacing }) => spacing};
+    cursor: pointer;
+    transition: background-color 0.1s ease; /* Add transition for smoother hover */
+
+    &:hover {
+      background-color: ${lightBlue[800]};
+    }
+  }
+`;
+
+const MonthMarkerStyle = styled("div")`
+  overflow: "hidden";
+  min-height: 23;
+  border: "1px solid rgba(66, 165, 245, 0.8)";
+  background-color: "rgba(66, 165, 245, 0.8)";
+  padding: "1px 3px";
+  margin-bottom: 2;
+  border-radius: 3;
+  border-top-right-radius: 3;
+  cursor: "pointer";
+  z-index: 50;
+  &:hover {
+    z-index: 53;
+    background-color: "rgba(66, 165, 245, 1)";
+  }
+`;
 
 const getStyles: IGetStyles = (theme: Theme) => ({
   paperHeader: {
@@ -43,6 +81,9 @@ const getStyles: IGetStyles = (theme: Theme) => ({
     borderRadius: 0,
     minWidth: 64.38,
     height: "100%",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
   },
   paperWeekend: {
     backgroundColor: theme.palette.grey[100],
@@ -51,17 +92,6 @@ const getStyles: IGetStyles = (theme: Theme) => ({
   centerContent: {
     display: "flex",
     justifyContent: "center",
-  },
-
-  today: {
-    color: theme.palette.background.paper,
-    backgroundColor: lightBlue[700],
-    borderRadius: "50%",
-    padding: theme.spacing(1),
-    cursor: "pointer",
-    "&:hover": {
-      backgroundColor: lightBlue[800],
-    },
   },
 
   eventsContainer: {
@@ -77,22 +107,6 @@ const getStyles: IGetStyles = (theme: Theme) => ({
     overflow: "hidden",
     whiteSpace: "nowrap",
     textOverflow: "ellipsis",
-  },
-  monthMarker: {
-    overflow: "hidden",
-    minHeight: 23,
-    border: "1px solid rgba(66, 165, 245, 0.8)",
-    backgroundColor: "rgba(66, 165, 245, 0.8)",
-    padding: "1px 3px",
-    marginBottom: 2,
-    borderRadius: 3,
-    borderTopRightRadius: 3,
-    cursor: "pointer",
-    zIndex: 50,
-    "&:hover": {
-      zIndex: 53,
-      backgroundColor: "rgba(66, 165, 245, 1)",
-    },
   },
 });
 
@@ -162,15 +176,14 @@ function CalendarLayoutMonth(props: any) {
           (event: any) => new Date(event.begin).getHours() === evHour.hour,
         )
         .map((event: any, index: number) => (
-          <div
+          <MonthMarkerStyle
             key={`event-${event.id}`}
-            style={{ ...styles.monthMarker }}
             // calendarEvent={event}
             // sq={index}
             // len={evHour.len}
           >
             test...
-          </div>
+          </MonthMarkerStyle>
         ));
     });
     return markers;
@@ -210,7 +223,12 @@ function CalendarLayoutMonth(props: any) {
       >
         {weeks[0].map((weekDay: Date, index: number) => {
           return (
-            <Grid key={`calendar-column-header-label-${index}`}>
+            <Grid
+              style={{
+                flexGrow: "1",
+              }}
+              key={`calendar-column-header-label-${index}`}
+            >
               <div
                 style={{
                   ...styles.paperHeader,
@@ -218,7 +236,7 @@ function CalendarLayoutMonth(props: any) {
                 }}
               >
                 <Typography style={{ ...styles.title }}>
-                  {format(weekDay, "ddd", { locale: locale })}
+                  {format(weekDay, "ccc", { locale: locale })}
                 </Typography>
               </div>
             </Grid>
@@ -243,29 +261,35 @@ function CalendarLayoutMonth(props: any) {
             const eventsOfDay = getEventData(day);
 
             return (
-              <Grid key={`calendar-main-line-${weekIndex}-column-${dayIndex}`}>
+              <Grid
+                style={{
+                  flexGrow: "1",
+                }}
+                key={`calendar-main-line-${weekIndex}-column-${dayIndex}`}
+              >
                 <div
                   style={{
-                    ...styles.paperHeader,
+                    ...styles.paper,
                     ...(dayIndex === 5 || dayIndex === 6
                       ? styles.paperWeekend
                       : {}),
                   }}
                 >
                   <Typography style={{ ...styles.title }}>
-                    <span
-                      style={{
-                        ...(isToday ? styles.today : {}),
-                      }}
+                    <DayStyle
+                      spacing={theme.spacing(1)}
+                      paperColour={theme.palette.background.paper}
+                      className={clsx({ today: isToday })}
                     >
                       {day.getDate()}
-                    </span>
-
-                    {day.getDate() === 1
-                      ? format(new Date(day), " MMM", {
-                          locale: locale,
-                        })
-                      : null}
+                    </DayStyle>
+                    <div>
+                      {day.getDate() === 1
+                        ? format(new Date(day), " MMM", {
+                            locale: locale,
+                          })
+                        : null}
+                    </div>
                   </Typography>
 
                   {eventsOfDay && eventsOfDay.length > 0 && (
