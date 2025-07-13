@@ -1,19 +1,14 @@
 import { useContext } from "react";
 import { CalendarContext } from "../common/CalendarContext";
-import { styled, Theme, useTheme } from "@mui/material";
+import { Theme, useTheme } from "@mui/material";
 import getWeekDays from "../common/getWeekDays";
 import getSelectedWeekIndex from "../common/getSelectedWeekIndex";
 import CalendarLayoutMonth from "./CalendarLayoutMonth";
 import CalendarLayoutDayWeek from "./CalendarLayoutDayWeek";
 import { IGetStyles } from "../common/types";
+import { DrawerHeader } from "./DrawerHeader";
 
 const drawerWidth = 260;
-const DrawerHeader = styled("div")(({ theme }: { theme: Theme }) => ({
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "flex-center",
-  ...theme.mixins.toolbar,
-}));
 
 const getStyles: IGetStyles = (theme: Theme) => ({
   content: {
@@ -42,7 +37,6 @@ function CalendarMain(props: any) {
   const styles = getStyles(theme);
   const { stateCalendar } = useContext(CalendarContext);
   const { selectedDate, locale, layout } = stateCalendar;
-  console.log(theme.mixins.toolbar);
   const { open, runAnimation } = props;
 
   const weeks = getWeekDays(selectedDate, 7);
@@ -56,7 +50,7 @@ function CalendarMain(props: any) {
         ...(open ? styles.contentShift : {}),
       }}
     >
-      <DrawerHeader />
+      <DrawerHeader style={{ justifyContent: "center" }} />
 
       {layout === "month" && (
         <CalendarLayoutMonth

@@ -20,7 +20,6 @@ const HeaderContainer = styled(Grid)`
 `;
 
 const DayLabel = styled("span")<{ isToday: boolean; paperColour: string }>`
-  height: 100%;
   vertical-align: top;
   overflow: hidden;
   position: relative;

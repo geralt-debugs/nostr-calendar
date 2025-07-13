@@ -21,13 +21,6 @@ const getStyles = (
   drawerPaper: {
     width: drawerWidth,
   },
-  drawerHeader: {
-    display: "flex",
-    alignItems: "center",
-    padding: "0 8px",
-    ...theme.mixins.toolbar,
-    justifyContent: "flex-end",
-  },
   calendarSmall: {
     marginTop: theme.spacing(4),
     marginRight: theme.spacing(1),

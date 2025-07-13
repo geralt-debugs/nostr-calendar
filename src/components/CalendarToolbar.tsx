@@ -32,6 +32,10 @@ const languageOptions = [
     value: "pt-BR",
     label: "Português",
   },
+  {
+    value: "de",
+    label: "Deutsch",
+  },
 ];
 
 function CalendarToolbar(props) {
