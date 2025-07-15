@@ -3,7 +3,6 @@ import { CalendarContext } from "../common/CalendarContext";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
 import { styled, Theme, useTheme } from "@mui/material";
-import { lightBlue } from "@mui/material/colors";
 import { format } from "date-fns";
 import createEditEvent from "./createEditEvent";
 import { IGetStyles } from "../common/types";
@@ -11,15 +10,12 @@ import clsx from "clsx";
 import { useTimeBasedEvents } from "../stores/events";
 // import EventMark from './EventMark'
 
-type event = {
-  id: string | number;
-  title: string;
-  description: string;
-  begin: string;
-  end: string;
-};
-
-const DayStyle = styled("div")<{ paperColour: string; spacing: string }>`
+const DayStyle = styled("div")<{
+  paperColour: string;
+  spacing: string;
+  primaryColour: string;
+  hoverColour: string;
+}>`
   width: 36px;
   height: 36px;
   display: flex;
@@ -28,25 +24,29 @@ const DayStyle = styled("div")<{ paperColour: string; spacing: string }>`
 
   &.today {
     color: ${({ paperColour }) => paperColour};
-    background-color: ${lightBlue[700]};
+    background-color: ${({ primaryColour }) => primaryColour};
     border-radius: 50%;
     padding: ${({ spacing }) => spacing};
     cursor: pointer;
     transition: background-color 0.1s ease; /* Add transition for smoother hover */
 
     &:hover {
-      background-color: ${lightBlue[800]};
+      background-color: ${({ hoverColour }) => hoverColour};
     }
   }
 `;
 
-const MonthMarkerStyle = styled("div")`
+const MonthMarkerStyle = styled("div")<{
+  borderColour: string;
+  primaryColour: string;
+  hoverColour: string;
+}>`
   display: flex;
   align-items: center;
   overflow: hidden;
   min-height: 23;
-  border: 1px solid rgba(66, 165, 245, 0.8);
-  background-color: rgba(66, 165, 245, 0.8);
+  border: ${({ borderColour }) => `1px solid ${borderColour}`};
+  background-color: ${({ primaryColour }) => `${primaryColour}`};
   padding: 1px 3px;
   margin-bottom: 2px;
   border-radius: 3px;
@@ -55,7 +55,7 @@ const MonthMarkerStyle = styled("div")`
   z-index: 50;
   &:hover {
     z-index: 53;
-    background-color: rgba(66, 165, 245, 1);
+    background-color: ${({ hoverColour }) => `${hoverColour}`};
   }
 `;
 
@@ -171,6 +171,9 @@ function CalendarLayoutMonth(props: any) {
         .filter((event) => new Date(event.begin).getHours() === evHour.hour)
         .map((event) => (
           <MonthMarkerStyle
+            primaryColour={theme.palette.primary.main}
+            borderColour={theme.palette.primary.dark}
+            hoverColour={theme.palette.primary.light}
             key={`event-${event.id}`}
             // calendarEvent={event}
             // sq={index}
@@ -275,6 +278,8 @@ function CalendarLayoutMonth(props: any) {
                 >
                   <Typography component={"div"} style={{ ...styles.title }}>
                     <DayStyle
+                      primaryColour={theme.palette.primary.main}
+                      hoverColour={theme.palette.primary.dark}
                       spacing={theme.spacing(1)}
                       paperColour={theme.palette.background.paper}
                       className={clsx({ today: isToday })}

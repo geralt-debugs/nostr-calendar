@@ -33,7 +33,6 @@ const getStyles: IGetStyles = (theme: Theme) => ({
     borderRight: "1px solid #dadce0",
   },
   dayContainer: {
-    // backgroundColor: lightBlue[50],
     borderRight: "1px solid #dadce0",
     position: "relative",
     paddingRight: 12,

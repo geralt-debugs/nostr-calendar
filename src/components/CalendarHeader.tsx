@@ -3,7 +3,7 @@ import { CalendarContext } from "../common/CalendarContext";
 import { styled, Theme, useTheme } from "@mui/material/styles";
 import { format, differenceInMinutes } from "date-fns";
 import Grid from "@mui/material/Grid";
-import { grey, lightBlue } from "@mui/material/colors";
+import { grey } from "@mui/material/colors";
 import { IGetStyles } from "../common/types";
 
 const HeaderContainer = styled(Grid)`
@@ -19,23 +19,28 @@ const HeaderContainer = styled(Grid)`
   }
 `;
 
-const DayLabel = styled("span")<{ isToday: boolean; paperColour: string }>`
+const DayLabel = styled("span")<{
+  isToday: boolean;
+  paperColour: string;
+  primaryColour: string;
+  hoverColour: string;
+}>`
   vertical-align: top;
   overflow: hidden;
   position: relative;
   width: 45px;
   height: 45px;
   line-height: 45px;
-  border-color: ${({ isToday }) => (isToday ? lightBlue[700] : "transparent")};
-  background-color:${({ isToday, paperColour }) => (isToday ? lightBlue[700] : paperColour)};
+  border-color: ${({ isToday, primaryColour }) => (isToday ? primaryColour : "transparent")};
+  background-color:${({ isToday, paperColour, primaryColour }) => (isToday ? primaryColour : paperColour)};
   color: ${({ isToday }) => (isToday ? "#fff" : "inherit")};
   border: ${({ isToday }) => (isToday ? "1px solid" : "none")};
   border-radius: 100%;
   text-align: center;
   cursor: pointer;
   &:hover {
-    border-color: ${({ isToday }) => (isToday ? lightBlue[800] : "transparent")};
-    background-color:${({ isToday }) => (isToday ? lightBlue[700] : grey[200])};
+    border-color: ${({ isToday, hoverColour }) => (isToday ? hoverColour : "transparent")};
+    background-color:${({ isToday, primaryColour }) => (isToday ? primaryColour : grey[200])};
   },
 
 `;
@@ -205,6 +210,8 @@ function CalendarHeader(props: any) {
                   </div>
                   <div style={{ ...styles.headerLabelsSecond }}>
                     <DayLabel
+                      primaryColour={theme.palette.primary.main}
+                      hoverColour={theme.palette.primary.dark}
                       paperColour={theme.palette.background.paper}
                       onClick={handleDayClick}
                       isToday={isToday}
