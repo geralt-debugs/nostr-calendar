@@ -8,6 +8,7 @@ import { format } from "date-fns";
 import createEditEvent from "./createEditEvent";
 import { IGetStyles } from "../common/types";
 import clsx from "clsx";
+import { useTimeBasedEvents } from "../stores/events";
 // import EventMark from './EventMark'
 
 type event = {
@@ -116,6 +117,8 @@ function CalendarLayoutMonth(props: any) {
   const theme = useTheme();
   const styles = getStyles(theme);
 
+  const events = useTimeBasedEvents((state) => state.events);
+
   const { weeks } = props;
 
   const { stateCalendar, setStateCalendar } = useContext(CalendarContext);
@@ -136,48 +139,37 @@ function CalendarLayoutMonth(props: any) {
   };
 
   const getEventData = (day: Date) => {
-    const localStorageMarckers = window.localStorage.getItem("markers");
-    const monthEvents =
-      (localStorageMarckers &&
-        JSON.parse(localStorageMarckers).sort((a: event, b: event) => {
-          return new Date(a.begin).getTime() - new Date(b.begin).getTime();
-        })) ||
-      [];
-
-    // const weekBegin = new Date(format(day, "yyy/MM/dd 00:00"))
-    // const weekEnd = new Date(format(day, "yyy/MM/dd 24:00"))
-    // const monthEvents = fakeEvents(weekBegin, weekEnd)
-
-    const dayEvents = monthEvents.filter(
-      (event: any) =>
+    const dayEvents = events.filter(
+      (event) =>
         format(new Date(event.begin), "yyyMMdd") === format(day, "yyyMMdd"),
     );
 
     // console.log("dayEvents", dayEvents)
 
     const dayHoursEvents = dayEvents
-      .map((event: any) => new Date(event.begin).getHours())
+      .map((event) => new Date(event.begin).getHours())
       .sort((numberA: number, numberB: number) => numberA - numberB);
     // console.log("dayHoursEvents", dayHoursEvents)
 
-    const eventsByHour = dayHoursEvents.reduce((acc: any[], hour: number) => {
-      const len = dayHoursEvents.filter(
-        (eventHour: number) => eventHour === hour,
-      ).length;
-      if (!acc.some((accItem: any) => accItem.hour === hour)) {
-        acc.push({ hour, len });
-      }
-      return acc;
-    }, []);
+    const eventsByHour = dayHoursEvents.reduce<{ hour: number; len: number }[]>(
+      (acc, hour) => {
+        const len = dayHoursEvents.filter(
+          (eventHour) => eventHour === hour,
+        ).length;
+        if (!acc.some((accItem) => accItem.hour === hour)) {
+          acc.push({ hour, len });
+        }
+        return acc;
+      },
+      [],
+    );
 
     console.log("eventsByHour", dayEvents);
 
-    const markers = eventsByHour.map((evHour: any) => {
+    const markers = eventsByHour.map((evHour) => {
       return dayEvents
-        .filter(
-          (event: any) => new Date(event.begin).getHours() === evHour.hour,
-        )
-        .map((event: any, index: number) => (
+        .filter((event) => new Date(event.begin).getHours() === evHour.hour)
+        .map((event) => (
           <MonthMarkerStyle
             key={`event-${event.id}`}
             // calendarEvent={event}
