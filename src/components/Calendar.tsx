@@ -213,7 +213,7 @@ function Calendar() {
             runAnimation={runAnimation}
           />
 
-          <CalendarEventDialog />
+          {/* <CalendarEventDialog /> */}
           <CalendarEventViewDialog />
         </div>
       </IntlProvider>
