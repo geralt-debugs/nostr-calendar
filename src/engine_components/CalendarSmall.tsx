@@ -17,7 +17,6 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import TodayOutlinedIcon from "@mui/icons-material/TodayOutlined";
 import Typography from "@mui/material/Typography";
-import { lightBlue } from "@mui/material/colors";
 import getWeekDays from "../common/getWeekDays";
 
 const getStyles = (
@@ -36,7 +35,7 @@ const getStyles = (
   dayHeader: {
     textAlign: "center",
     fontSize: 12,
-    color: lightBlue[800],
+    color: theme.palette.primary.main,
     lineHeight: "26px",
     padding: theme.spacing(0.2),
     borderColor: theme.palette.background.paper,
@@ -63,10 +62,7 @@ const getStyles = (
     background: theme.palette.background.paper,
     borderColor: theme.palette.background.paper,
     borderStyle: "solid",
-    backgroundColor: lightBlue[700],
-    // "&:hover": {
-    //   backgroundColor: lightBlue[800],
-    // },
+    backgroundColor: theme.palette.primary.main,
   },
   notToday: {
     background: theme.palette.background.paper,
@@ -80,11 +76,7 @@ const getStyles = (
     color: "#ffffff",
     borderColor: theme.palette.background.paper,
     borderStyle: "solid",
-    backgroundColor: lightBlue[500],
-    // "&:hover": {
-    //   color: "#ffffff",
-    //   backgroundColor: lightBlue[600],
-    // },
+    backgroundColor: theme.palette.primary.light,
   },
   notCurrentMonth: {
     color: theme.palette.grey[500],

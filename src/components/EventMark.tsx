@@ -10,8 +10,8 @@ const getBaseStyles: IGetStyles = (theme: Theme) => ({
   marker: {
     overflow: "hidden",
     position: "absolute",
-    border: "1px solid rgba(66, 165, 245, 0.8)",
-    backgroundColor: "rgba(66, 165, 245, 0.8)",
+    border: `1px solid ${theme.palette.primary.dark}`,
+    backgroundColor: theme.palette.primary.main,
     padding: "1px 3px",
     borderRadius: 3,
     borderTopRightRadius: 3,
@@ -19,7 +19,7 @@ const getBaseStyles: IGetStyles = (theme: Theme) => ({
     zIndex: 50,
     "&:hover": {
       zIndex: 53,
-      backgroundColor: "rgba(66, 165, 245, 1)",
+      backgroundColor: theme.palette.primary.light,
     },
     minHeight: 24,
   },

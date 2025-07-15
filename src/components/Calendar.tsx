@@ -17,6 +17,7 @@ import CalendarDrawer from "./CalendarDrawer";
 import CalendarMain from "./CalendarMain";
 import CalendarEventDialog from "./CalendarEventDialog";
 import CalendarEventViewDialog from "./CalendarEventViewDialog";
+import { useTimeBasedEvents } from "../stores/events";
 
 const layout = "week";
 
@@ -38,7 +39,8 @@ function Calendar() {
   // const theme = useTheme()
   const i18nLocale = _locale;
   const locale_dictionary = flattenMessages(dictionary[i18nLocale]);
-
+  const fetchEvents = useTimeBasedEvents((state) => state.fetchEvents);
+  fetchEvents();
   const changeLanguage = (newLang: { value: string }) => {
     const i18nLocale = newLang.value;
     const newDateFnLocale = i18nLocale === "de-DE" ? de : null;

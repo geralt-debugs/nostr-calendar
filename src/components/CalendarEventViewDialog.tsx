@@ -113,7 +113,7 @@ function CalendarEventViewDialog(props: any) {
           </div>
         </DialogTitle>
         <DialogContent style={{ ...styles.dialogContent }}>
-          <FormControl style={{ ...styles.optionsBar }}>
+          {/* <FormControl style={{ ...styles.optionsBar }}>
             <Tooltip title="Edit">
               <IconButton
                 size="medium"
@@ -145,7 +145,7 @@ function CalendarEventViewDialog(props: any) {
                 <DeleteIcon />
               </IconButton>
             </Tooltip>
-          </FormControl>
+          </FormControl> */}
           <FormControl
             style={{ ...styles.formControl, ...styles.formControlFlex }}
           >

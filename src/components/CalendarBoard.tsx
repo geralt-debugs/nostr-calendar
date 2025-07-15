@@ -8,6 +8,7 @@ import LineDivisor from "./LineDivisor";
 import createEditEvent from "./createEditEvent";
 import EventMark from "./EventMark";
 import { IGetStyles } from "../common/types";
+import { useTimeBasedEvents } from "../stores/events";
 
 type event = {
   id: string | number;
@@ -32,7 +33,6 @@ const getStyles: IGetStyles = (theme: Theme) => ({
     borderRight: "1px solid #dadce0",
   },
   dayContainer: {
-    // backgroundColor: lightBlue[50],
     borderRight: "1px solid #dadce0",
     position: "relative",
     paddingRight: 12,
@@ -70,6 +70,8 @@ function CalendarBoard(props: any) {
   const styles = getStyles(theme);
 
   const { selectedWeekIndex, selectedWeek } = props;
+  const events = useTimeBasedEvents((state) => state.events);
+  console.log(events);
 
   const { stateCalendar, setStateCalendar } = useContext(CalendarContext);
   const { selectedDate, layout, defaultEventDuration, draggingEventId } =
@@ -91,49 +93,42 @@ function CalendarBoard(props: any) {
   );
 
   const localStorageMarkers = window.localStorage.getItem("markers");
-  const getEventData = (day: Date) => {
-    console.log("getting events...");
-    const monthEvents =
-      (localStorageMarkers &&
-        JSON.parse(localStorageMarkers).sort((a: event, b: event) => {
-          return new Date(a.begin).getTime() - new Date(b.begin).getTime();
-        })) ||
-      [];
-
-    // const weekBegin = new Date(format(day, "yyyy/MM/dd 00:00"))
-    // const weekEnd = new Date(format(day, "yyyy/MM/dd 24:00"))
-    // const monthEvents = fakeEvents(weekBegin, weekEnd)
-
-    const dayEvents = monthEvents.filter(
-      (event: any) =>
+  const getEventData: {
+    begin: string;
+    description: string;
+    end: string;
+    id: string;
+    title: string;
+  } = (day: Date) => {
+    const dayEvents = events.filter(
+      (event) =>
         format(new Date(event.begin), "yyyyMMdd") === format(day, "yyyyMMdd"),
     );
 
-    // console.log("dayEvents", dayEvents)
+    console.log(dayEvents, day);
 
     const dayHoursEvents = dayEvents
-      .map((event: any) => new Date(event.begin).getHours())
+      .map((event) => new Date(event.begin).getHours())
       .sort((numberA: number, numberB: number) => numberA - numberB);
-    // console.log("dayHoursEvents", dayHoursEvents)
+    // // console.log("dayHoursEvents", dayHoursEvents)
 
-    const eventsByHour = dayHoursEvents.reduce((acc: any[], hour: number) => {
-      const len = dayHoursEvents.filter(
-        (eventHour: number) => eventHour === hour,
-      ).length;
-      if (!acc.some((accItem: any) => accItem.hour === hour)) {
-        acc.push({ hour, len });
-      }
-      return acc;
-    }, []);
+    const eventsByHour = dayHoursEvents.reduce<{ hour: number; len: number }[]>(
+      (acc, hour: number) => {
+        const len = dayHoursEvents.filter(
+          (eventHour: number) => eventHour === hour,
+        ).length;
+        if (!acc.some((accItem) => accItem.hour === hour)) {
+          acc.push({ hour, len });
+        }
+        return acc;
+      },
+      [],
+    );
 
-    // console.log("eventsByHour", eventsByHour)
-
-    const markers = eventsByHour.map((evHour: any) => {
+    const markers = eventsByHour.map((evHour) => {
       return dayEvents
-        .filter(
-          (event: any) => new Date(event.begin).getHours() === evHour.hour,
-        )
-        .map((event: any, index: number) => (
+        .filter((event) => new Date(event.begin).getHours() === evHour.hour)
+        .map((event, index: number) => (
           <EventMark
             key={`event-${event.id}`}
             calendarEvent={event}
@@ -212,7 +207,6 @@ function CalendarBoard(props: any) {
       const isToday =
         format(day, "ddMMyyyy") === format(new Date(), "ddMMyyyy");
       const eventsOfDay = getEventData(day);
-
       return (
         <Grid
           id={`day${index + 1}`}

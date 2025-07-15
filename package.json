@@ -18,12 +18,15 @@
     "date-fns": "^4.1.0",
     "eslint-config-prettier": "^10.1.5",
     "eslint-plugin-prettier": "^5.5.1",
+    "nostr-login": "^1.7.11",
+    "nostr-tools": "^2.15.0",
     "react": "^19.1.0",
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^19.1.0",
     "react-intl": "^7.1.11",
-    "react-select": "^5.10.2"
+    "react-select": "^5.10.2",
+    "zustand": "^5.0.6"
   },
   "devDependencies": {
     "@eslint/js": "^9.30.1",

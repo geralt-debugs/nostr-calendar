@@ -3,22 +3,19 @@ import { CalendarContext } from "../common/CalendarContext";
 import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
 import { styled, Theme, useTheme } from "@mui/material";
-import { lightBlue } from "@mui/material/colors";
 import { format } from "date-fns";
 import createEditEvent from "./createEditEvent";
 import { IGetStyles } from "../common/types";
 import clsx from "clsx";
+import { useTimeBasedEvents } from "../stores/events";
 // import EventMark from './EventMark'
 
-type event = {
-  id: string | number;
-  title: string;
-  description: string;
-  begin: string;
-  end: string;
-};
-
-const DayStyle = styled("div")<{ paperColour: string; spacing: string }>`
+const DayStyle = styled("div")<{
+  paperColour: string;
+  spacing: string;
+  primaryColour: string;
+  hoverColour: string;
+}>`
   width: 36px;
   height: 36px;
   display: flex;
@@ -27,25 +24,29 @@ const DayStyle = styled("div")<{ paperColour: string; spacing: string }>`
 
   &.today {
     color: ${({ paperColour }) => paperColour};
-    background-color: ${lightBlue[700]};
+    background-color: ${({ primaryColour }) => primaryColour};
     border-radius: 50%;
     padding: ${({ spacing }) => spacing};
     cursor: pointer;
     transition: background-color 0.1s ease; /* Add transition for smoother hover */
 
     &:hover {
-      background-color: ${lightBlue[800]};
+      background-color: ${({ hoverColour }) => hoverColour};
     }
   }
 `;
 
-const MonthMarkerStyle = styled("div")`
+const MonthMarkerStyle = styled("div")<{
+  borderColour: string;
+  primaryColour: string;
+  hoverColour: string;
+}>`
   display: flex;
   align-items: center;
   overflow: hidden;
   min-height: 23;
-  border: 1px solid rgba(66, 165, 245, 0.8);
-  background-color: rgba(66, 165, 245, 0.8);
+  border: ${({ borderColour }) => `1px solid ${borderColour}`};
+  background-color: ${({ primaryColour }) => `${primaryColour}`};
   padding: 1px 3px;
   margin-bottom: 2px;
   border-radius: 3px;
@@ -54,7 +55,7 @@ const MonthMarkerStyle = styled("div")`
   z-index: 50;
   &:hover {
     z-index: 53;
-    background-color: rgba(66, 165, 245, 1);
+    background-color: ${({ hoverColour }) => `${hoverColour}`};
   }
 `;
 
@@ -116,6 +117,8 @@ function CalendarLayoutMonth(props: any) {
   const theme = useTheme();
   const styles = getStyles(theme);
 
+  const events = useTimeBasedEvents((state) => state.events);
+
   const { weeks } = props;
 
   const { stateCalendar, setStateCalendar } = useContext(CalendarContext);
@@ -136,49 +139,41 @@ function CalendarLayoutMonth(props: any) {
   };
 
   const getEventData = (day: Date) => {
-    const localStorageMarckers = window.localStorage.getItem("markers");
-    const monthEvents =
-      (localStorageMarckers &&
-        JSON.parse(localStorageMarckers).sort((a: event, b: event) => {
-          return new Date(a.begin).getTime() - new Date(b.begin).getTime();
-        })) ||
-      [];
-
-    // const weekBegin = new Date(format(day, "yyy/MM/dd 00:00"))
-    // const weekEnd = new Date(format(day, "yyy/MM/dd 24:00"))
-    // const monthEvents = fakeEvents(weekBegin, weekEnd)
-
-    const dayEvents = monthEvents.filter(
-      (event: any) =>
+    const dayEvents = events.filter(
+      (event) =>
         format(new Date(event.begin), "yyyMMdd") === format(day, "yyyMMdd"),
     );
 
     // console.log("dayEvents", dayEvents)
 
     const dayHoursEvents = dayEvents
-      .map((event: any) => new Date(event.begin).getHours())
+      .map((event) => new Date(event.begin).getHours())
       .sort((numberA: number, numberB: number) => numberA - numberB);
     // console.log("dayHoursEvents", dayHoursEvents)
 
-    const eventsByHour = dayHoursEvents.reduce((acc: any[], hour: number) => {
-      const len = dayHoursEvents.filter(
-        (eventHour: number) => eventHour === hour,
-      ).length;
-      if (!acc.some((accItem: any) => accItem.hour === hour)) {
-        acc.push({ hour, len });
-      }
-      return acc;
-    }, []);
+    const eventsByHour = dayHoursEvents.reduce<{ hour: number; len: number }[]>(
+      (acc, hour) => {
+        const len = dayHoursEvents.filter(
+          (eventHour) => eventHour === hour,
+        ).length;
+        if (!acc.some((accItem) => accItem.hour === hour)) {
+          acc.push({ hour, len });
+        }
+        return acc;
+      },
+      [],
+    );
 
     console.log("eventsByHour", dayEvents);
 
-    const markers = eventsByHour.map((evHour: any) => {
+    const markers = eventsByHour.map((evHour) => {
       return dayEvents
-        .filter(
-          (event: any) => new Date(event.begin).getHours() === evHour.hour,
-        )
-        .map((event: any, index: number) => (
+        .filter((event) => new Date(event.begin).getHours() === evHour.hour)
+        .map((event) => (
           <MonthMarkerStyle
+            primaryColour={theme.palette.primary.main}
+            borderColour={theme.palette.primary.dark}
+            hoverColour={theme.palette.primary.light}
             key={`event-${event.id}`}
             // calendarEvent={event}
             // sq={index}
@@ -283,6 +278,8 @@ function CalendarLayoutMonth(props: any) {
                 >
                   <Typography component={"div"} style={{ ...styles.title }}>
                     <DayStyle
+                      primaryColour={theme.palette.primary.main}
+                      hoverColour={theme.palette.primary.dark}
                       spacing={theme.spacing(1)}
                       paperColour={theme.palette.background.paper}
                       className={clsx({ today: isToday })}
