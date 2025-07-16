@@ -1,7 +1,6 @@
 import { HTMLAttributes, useContext, useMemo } from "react";
 import { CalendarContext } from "../common/CalendarContext";
-import clsx from "clsx";
-import { injectIntl, useIntl } from "react-intl";
+import { useIntl } from "react-intl";
 import { i18nPreviousLabel, i18nNextLabel } from "../common/i18nLabels";
 import Toolbar from "@mui/material/Toolbar";
 import Tooltip from "@mui/material/Tooltip";
@@ -20,6 +19,7 @@ import { format } from "date-fns";
 import getWeekDays from "../common/getWeekDays";
 import getSelectedWeekIndex from "../common/getSelectedWeekIndex";
 import { useTheme } from "@mui/material";
+import { UserMenu } from "./UserMenu";
 
 const drawerWidth = 260;
 
@@ -244,6 +244,7 @@ function CalendarToolbar(props) {
             })}
             onChange={changeLanguage}
           />
+          <UserMenu />
         </Toolbar>
       </div>
     );

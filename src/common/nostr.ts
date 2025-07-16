@@ -17,12 +17,6 @@ export const getRelays = () => {
   return defaultRelays;
 };
 
-export function checkWindowNostr() {
-  if (!window?.nostr) {
-    throw Error("No method provided to access nostr");
-  }
-}
-
 export async function getUserPublicKey() {
   return await window.nostr.getPublicKey();
 }

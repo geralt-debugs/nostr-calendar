@@ -15,7 +15,6 @@ import { CalendarContext } from "../common/CalendarContext";
 import CalendarToolbar from "./CalendarToolbar";
 import CalendarDrawer from "./CalendarDrawer";
 import CalendarMain from "./CalendarMain";
-import CalendarEventDialog from "./CalendarEventDialog";
 import CalendarEventViewDialog from "./CalendarEventViewDialog";
 import { useTimeBasedEvents } from "../stores/events";
 
