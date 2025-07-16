@@ -32,6 +32,9 @@ importers:
       eslint-plugin-prettier:
         specifier: ^5.5.1
         version: 5.5.1(eslint-config-prettier@10.1.5(eslint@9.30.1))(eslint@9.30.1)(prettier@3.6.2)
+      normal-store:
+        specifier: ^1.3.0
+        version: 1.3.0
       nostr-login:
         specifier: ^1.7.11
         version: 1.7.11(typescript@5.8.3)
@@ -1302,6 +1305,9 @@ packages:
 
   node-releases@2.0.19:
     resolution: {integrity: sha512-xxOWJsBKtzAq7DY0J+DTzuz58K8e7sJbdgwkbMWQe8UYB6ekmsQ45q0M/tJDsGaZmbC+l7n57UV8Hl5tHxO9uw==}
+
+  normal-store@1.3.0:
+    resolution: {integrity: sha512-HxU29adue02CpgUOvSkbxcD6fu8H/Uljw7yGiB818TmF77Vq8+xOJ2raQ2ryrNsweHFx9kLQDo9KS0zc0MvTlQ==}
 
   nostr-login@1.7.11:
     resolution: {integrity: sha512-9fK4tqOhqU8vrj4pK9bPokJlgn5dImLriDWpssz0yio1CSZqI+DOF+7ibWzKnBPzyRB3+lgSgf+Bav3oZDvQYw==}
@@ -2860,6 +2866,8 @@ snapshots:
   natural-compare@1.4.0: {}
 
   node-releases@2.0.19: {}
+
+  normal-store@1.3.0: {}
 
   nostr-login@1.7.11(typescript@5.8.3):
     dependencies:
