@@ -1,9 +1,9 @@
 import { Theme } from "@mui/material";
+import { UnsignedEvent, Event } from "nostr-tools";
 
 export interface IGetStyles {
   (theme: Theme): Record<string, HTMLAttributes<HTMLDivElement>["style"]>;
 }
-
 
 declare global {
   // TODO: make this better
@@ -15,9 +15,7 @@ declare global {
     };
     nostr: {
       getPublicKey: () => Promise<string>;
-      signEvent: <Event>(
-        event: Event,
-      ) => Promise<Event & { id: string; sig: string }>;
+      signEvent: (event: UnsignedEvent) => Promise<Event>;
       nip04: {
         encrypt: (pubKey: string, message: string) => Promise<string>;
         decrypt: (pubkey: string, message: string) => Promise<string>;

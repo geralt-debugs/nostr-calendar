@@ -42,6 +42,7 @@ const getStyles: IGetStyles = (theme: Theme) => ({
   dialogContent: {
     display: "flex",
     flexDirection: "column",
+    gap: "16px",
     // margin: "auto",
     // marginTop: -30,
     // width: 'fit-content',
@@ -165,6 +166,7 @@ function CalendarEventViewDialog(props: any) {
               </Typography>
             )}
           </FormControl>
+          <Typography>{calendarEvent.description}</Typography>
         </DialogContent>
         <DialogActions />
       </Dialog>

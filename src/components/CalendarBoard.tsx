@@ -1,7 +1,7 @@
-import { useState, useEffect, useContext, useMemo } from "react";
+import { useState, useEffect, useContext, useMemo, JSX } from "react";
 import { CalendarContext } from "../common/CalendarContext";
-import { Theme, useTheme } from "@mui/material/styles";
-import { format, differenceInMinutes, addMinutes } from "date-fns";
+import { useTheme } from "@mui/material/styles";
+import { format, differenceInMinutes } from "date-fns";
 import Grid from "@mui/material/Grid";
 import { useDrop } from "react-dnd";
 import LineDivisor from "./LineDivisor";
@@ -9,16 +9,9 @@ import createEditEvent from "./createEditEvent";
 import EventMark from "./EventMark";
 import { IGetStyles } from "../common/types";
 import { useTimeBasedEvents } from "../stores/events";
+import { useEventDetails } from "../stores/eventDetails";
 
-type event = {
-  id: string | number;
-  title: string;
-  description: string;
-  begin: string;
-  end: string;
-};
-
-const getStyles: IGetStyles = (theme: Theme) => ({
+const getStyles: IGetStyles = () => ({
   board: {
     minWidth: "100%",
     height: "100%",
@@ -65,15 +58,21 @@ const getStyles: IGetStyles = (theme: Theme) => ({
   },
 });
 
-function CalendarBoard(props: any) {
+function CalendarBoard({
+  selectedWeek,
+  selectedWeekIndex,
+}: {
+  selectedWeek: Date[];
+  selectedWeekIndex: number;
+}) {
   const theme = useTheme();
   const styles = getStyles(theme);
 
-  const { selectedWeekIndex, selectedWeek } = props;
-  const events = useTimeBasedEvents((state) => state.events);
-  console.log(events);
+  const openEventDetails = useEventDetails((state) => state.updateEvent);
 
-  const { stateCalendar, setStateCalendar } = useContext(CalendarContext);
+  const events = useTimeBasedEvents((state) => state.events);
+
+  const { stateCalendar } = useContext(CalendarContext);
   const { selectedDate, layout, defaultEventDuration, draggingEventId } =
     stateCalendar;
 
@@ -93,24 +92,15 @@ function CalendarBoard(props: any) {
   );
 
   const localStorageMarkers = window.localStorage.getItem("markers");
-  const getEventData: {
-    begin: string;
-    description: string;
-    end: string;
-    id: string;
-    title: string;
-  } = (day: Date) => {
+  const getEventData: (day: Date) => JSX.Element[][] = (day) => {
     const dayEvents = events.filter(
       (event) =>
         format(new Date(event.begin), "yyyyMMdd") === format(day, "yyyyMMdd"),
     );
 
-    console.log(dayEvents, day);
-
     const dayHoursEvents = dayEvents
       .map((event) => new Date(event.begin).getHours())
       .sort((numberA: number, numberB: number) => numberA - numberB);
-    // // console.log("dayHoursEvents", dayHoursEvents)
 
     const eventsByHour = dayHoursEvents.reduce<{ hour: number; len: number }[]>(
       (acc, hour: number) => {
@@ -142,8 +132,7 @@ function CalendarBoard(props: any) {
 
   // }, [localStorageMarkers])
 
-  const CurrentTimeMark = (props: any) => {
-    const { marginTop = -1000 } = props;
+  const CurrentTimeMark = ({ marginTop = -1000 }: { marginTop?: number }) => {
     return (
       <>
         <div
@@ -155,43 +144,43 @@ function CalendarBoard(props: any) {
     );
   };
 
-  const onDrop = (eventEl: any) => {
+  const onDrop = () => {
     const eventID = draggingEventId;
 
-    const eventMarkGhost: any = document.querySelector("[data-ghost]");
-    if (!eventMarkGhost) return false;
+    const eventMarkGhost =
+      document.querySelector<HTMLDivElement>("[data-ghost]");
+    if (!eventMarkGhost || !eventMarkGhost.dataset.date) return false;
 
     const eventBeginDate = new Date(eventMarkGhost.dataset.date);
-    if (!eventBeginDate) return;
 
     const localStorageMarkers = window.localStorage.getItem("markers");
     const markers =
       (localStorageMarkers && JSON.parse(localStorageMarkers)) || [];
 
-    const draggedEvent = markers.find(
-      (markEvent: any) => markEvent.id === eventID,
-    );
+    // const draggedEvent = markers.find(
+    //   (markEvent: any) => markEvent.id === eventID,
+    // );
 
-    const duration = differenceInMinutes(
-      new Date(draggedEvent.end),
-      new Date(draggedEvent.begin),
-    );
+    // const duration = differenceInMinutes(
+    //   new Date(draggedEvent.end),
+    //   new Date(draggedEvent.begin),
+    // );
 
-    const marker = {
-      ...draggedEvent,
-      begin: format(eventBeginDate, "yyyy/MM/dd HH:mm"),
-      end: format(addMinutes(eventBeginDate, duration), "yyyy/MM/dd HH:mm"),
-    };
+    // const marker = {
+    //   ...draggedEvent,
+    //   begin: format(eventBeginDate, "yyyy/MM/dd HH:mm"),
+    //   end: format(addMinutes(eventBeginDate, duration), "yyyy/MM/dd HH:mm"),
+    // };
 
-    window.localStorage.setItem(
-      "markers",
-      JSON.stringify([
-        ...markers.filter((markEvent: any) => markEvent.id !== eventID),
-        marker,
-      ]),
-    );
+    // window.localStorage.setItem(
+    //   "markers",
+    //   JSON.stringify([
+    //     ...markers.filter((markEvent: any) => markEvent.id !== eventID),
+    //     marker,
+    //   ]),
+    // );
 
-    setStateCalendar({ ...stateCalendar, draggingEventId: -1 });
+    // setStateCalendar({ ...stateCalendar, draggingEventId: -1 });
   };
 
   const [, drop] = useDrop({
@@ -214,14 +203,16 @@ function CalendarBoard(props: any) {
           data-date={day}
           style={{ ...styles.dayContainer }}
           key={`board-day-column-${layout}-${selectedWeekIndex}-${day}-${index}`}
-          onClick={(eventEl: any) =>
-            createEditEvent({
-              eventEl,
+          onClick={(event) => {
+            const tempEvent = createEditEvent({
+              event,
               defaultEventDuration,
-              stateCalendar,
-              setStateCalendar,
-            })
-          }
+            });
+            if (!tempEvent) {
+              return;
+            }
+            openEventDetails(tempEvent, "create");
+          }}
         >
           {isToday && <CurrentTimeMark marginTop={currentTimePosition} />}
 

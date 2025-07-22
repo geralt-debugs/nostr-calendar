@@ -15,6 +15,10 @@ const dictionary: NestedObject = {
       week: "Week",
       month: "Month",
       year: "Year",
+      login: "Log In",
+      logout: "Log Out",
+      save: "Save",
+      timeSelectorPlaceholder: "Time",
     },
   },
   "de-DE": {
@@ -32,6 +36,10 @@ const dictionary: NestedObject = {
       week: "Woche",
       month: "Monat",
       year: "Jahr",
+      login: "anmelden",
+      logout: "abmelden",
+      timeSelectorPlaceholder: "Zeit",
+      save: "speichern",
     },
   },
 };

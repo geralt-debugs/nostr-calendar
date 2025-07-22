@@ -194,15 +194,16 @@ function EventMark(props: any) {
         ...styles.marker,
         ...getStyles(left, position / 57 - 2, isDragging, partOfStyle),
       }}
-      onClick={(eventEl: any) =>
+      onClick={(eventEl) => {
+        eventEl.stopPropagation();
         viewEvent({
           eventEl,
           calendarEvent,
           defaultEventDuration,
           stateCalendar,
           setStateCalendar,
-        })
-      }
+        });
+      }}
     >
       <div style={{ ...styles.markerText }}>{calendarEvent.title}</div>
       <div style={{ ...styles.beginEnd }}>

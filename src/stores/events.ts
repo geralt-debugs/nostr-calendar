@@ -55,7 +55,7 @@ export const useTimeBasedEvents = create<{
           !isValid(new Date(parsedEvent.begin)) ||
           !isValid(new Date(parsedEvent.end))
         ) {
-          console.warn("invalid date", parsedEvent);
+          console.warn("invalid date", parsedEvent, event);
           return { events, eventById };
         }
         if (store.allKeys.includes(parsedEvent.id)) {
