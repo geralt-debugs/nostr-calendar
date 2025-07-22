@@ -46,7 +46,7 @@ export const publishToRelays = (
   event: Event,
   onAcceptedRelays: (url: string) => void = _onAcceptedRelays,
 ) => {
-  return Promise.all(
+  return Promise.any(
     getRelays()
       .map(normalizeURL)
       .map(async (url) => {
@@ -112,5 +112,5 @@ export const publishCalendarEvent = async (
     created_at: Math.floor(Date.now() / 1000),
   };
   const fullEvent = await window.nostr.signEvent(baseEvent);
-  await publishToRelays(fullEvent, onAcceptedRelays);
+  return publishToRelays(fullEvent, onAcceptedRelays);
 };

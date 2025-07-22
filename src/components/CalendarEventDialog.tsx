@@ -26,6 +26,7 @@ import { IGetStyles } from "../common/types";
 import { useIntl } from "react-intl";
 import { useEventDetails } from "../stores/eventDetails";
 import { publishCalendarEvent } from "../common/nostr";
+import { useTimeBasedEvents } from "../stores/events";
 
 const getStyles: IGetStyles = (theme: Theme) => ({
   divTitleButton: {
@@ -120,6 +121,9 @@ function CalendarEventDialog() {
   // const { stateCalendar, setStateCalendar } = useContext(CalendarContext)
   const { stateCalendar } = useContext(CalendarContext);
   const { locale } = stateCalendar;
+  const [processing, updateProcessing] = useState(false);
+
+  const refetchEvents = useTimeBasedEvents((state) => state.fetchEvents);
 
   const intl = useIntl();
 
@@ -145,9 +149,11 @@ function CalendarEventDialog() {
     setFullScreen(!fullScreen);
   };
 
-  const handleOk = () => {
-    publishCalendarEvent(eventDetails);
-
+  const handleOk = async () => {
+    updateProcessing(true);
+    await publishCalendarEvent(eventDetails);
+    refetchEvents();
+    updateProcessing(false);
     closeDialog();
   };
 
@@ -200,6 +206,7 @@ function CalendarEventDialog() {
 
   // const buttonDisabled = titleTF.length <= 0 || eventBeginDate > eventEndDate
   const buttonDisabled = !(
+    !processing &&
     eventDetails.title &&
     eventDetails.begin &&
     eventDetails.end &&
@@ -327,7 +334,9 @@ function CalendarEventDialog() {
       </DialogContent>
       <DialogActions>
         <Button onClick={handleOk} color="primary" disabled={buttonDisabled}>
-          {intl.formatMessage({ id: "navigation.save" })}
+          {processing
+            ? "Publishing"
+            : intl.formatMessage({ id: "navigation.save" })}
         </Button>
       </DialogActions>
     </Dialog>
