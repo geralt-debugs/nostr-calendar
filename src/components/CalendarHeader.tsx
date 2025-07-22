@@ -34,7 +34,7 @@ const DayLabel = styled("span")<{
   border-color: ${({ isToday, primaryColour }) => (isToday ? primaryColour : "transparent")};
   background-color:${({ isToday, paperColour, primaryColour }) => (isToday ? primaryColour : paperColour)};
   color: ${({ isToday }) => (isToday ? "#fff" : "inherit")};
-  border: ${({ isToday }) => (isToday ? "1px solid" : "none")};
+  border: ${({ isToday, primaryColour }) => (isToday ? `1px solid ${primaryColour}` : "none")};
   border-radius: 100%;
   text-align: center;
   cursor: pointer;

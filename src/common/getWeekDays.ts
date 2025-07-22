@@ -8,7 +8,7 @@ import {
   differenceInDays,
 } from "date-fns";
 
-function getWeekDays(selectedDate: any, size: number) {
+function getWeekDays(selectedDate: Date, size: number) {
   function getMonthWeeks(date: Date, { forceSixWeeks = false } = {}) {
     const monthFirstDate = startOfMonth(date);
     const monthLastDate = endOfMonth(date);
@@ -28,12 +28,12 @@ function getWeekDays(selectedDate: any, size: number) {
   }
 
   const days = getMonthWeeks(selectedDate, { forceSixWeeks: true }).map(
-    (date: Date, index: number) => date,
+    (date: Date) => date,
   );
 
-  const weekly = (_month: any, _size: number) =>
-    _month.reduce(
-      (a: any[], b: any[], index: number, group: any[]) =>
+  const weekly = (_month: Date[], _size: number) =>
+    _month.reduce<Date[][]>(
+      (a, _b, index, group) =>
         !(index % _size) ? a.concat([group.slice(index, index + _size)]) : a,
       [],
     );

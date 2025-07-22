@@ -4,8 +4,6 @@ import { fetchCalendarEvents } from "../common/nostr";
 import { isValid } from "date-fns";
 import { appendOne, denormalize, normalize, removeOne } from "normal-store";
 
-let areEventsFetching = false;
-
 export interface ICalendarEvent {
   begin: number;
   description: string;
@@ -24,10 +22,6 @@ export const useTimeBasedEvents = create<{
   eventIds: [],
   eventById: {},
   fetchEvents: () => {
-    if (areEventsFetching) {
-      return;
-    }
-    areEventsFetching = true;
     fetchCalendarEvents((event: Event) => {
       set(({ events, eventById }) => {
         let store = normalize(events);
@@ -55,7 +49,7 @@ export const useTimeBasedEvents = create<{
           !isValid(new Date(parsedEvent.begin)) ||
           !isValid(new Date(parsedEvent.end))
         ) {
-          console.warn("invalid date", parsedEvent);
+          console.warn("invalid date", parsedEvent, event);
           return { events, eventById };
         }
         if (store.allKeys.includes(parsedEvent.id)) {

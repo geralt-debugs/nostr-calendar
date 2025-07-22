@@ -27,6 +27,7 @@
     "react-dom": "^19.1.0",
     "react-intl": "^7.1.11",
     "react-select": "^5.10.2",
+    "uuid": "^11.1.0",
     "zustand": "^5.0.6"
   },
   "devDependencies": {
