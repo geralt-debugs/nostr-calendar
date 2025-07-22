@@ -4,7 +4,12 @@ import App from "./App";
 import "./main.css";
 import { init as initNostrLogin } from "nostr-login";
 
-initNostrLogin({});
+initNostrLogin({
+  darkMode: false,
+  title: "Calendar by Formstr",
+  noBanner: true,
+  description: "Login to manage your events",
+});
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
