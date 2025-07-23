@@ -11,6 +11,13 @@ export interface ICalendarEvent {
   id: string;
   title: string;
   createdAt: number;
+  categories: string[];
+  reference: string[];
+  image?: string;
+  location: string[];
+  geoHash: string[];
+  website: string;
+  user: string;
 }
 
 export const useTimeBasedEvents = create<{
@@ -25,23 +32,50 @@ export const useTimeBasedEvents = create<{
     fetchCalendarEvents((event: Event) => {
       set(({ events, eventById }) => {
         let store = normalize(events);
-        const parsedEvent = {
+        const parsedEvent: ICalendarEvent = {
           description: event.content,
+          user: event.pubkey,
           begin: 0,
           end: 0,
           id: "",
           title: "",
           createdAt: event.created_at,
+          categories: [],
+          reference: [],
+          website: "",
+          location: [],
+          geoHash: [],
         };
+
         event.tags.forEach(([key, value]) => {
-          if (key === "start") {
-            parsedEvent.begin = Number(value) * 1000;
-          } else if (key === "end") {
-            parsedEvent.end = Number(value) * 1000;
-          } else if (key === "d") {
-            parsedEvent.id = value;
-          } else if (key === "name") {
-            parsedEvent.title = value;
+          switch (key) {
+            case "start":
+              parsedEvent.begin = Number(value) * 1000;
+              break;
+            case "end":
+              parsedEvent.end = Number(value) * 1000;
+              break;
+            case "d":
+              parsedEvent.id = value;
+              break;
+            case "name":
+              parsedEvent.title = value;
+              break;
+            case "r":
+              parsedEvent.reference.push(value);
+              break;
+            case "image":
+              parsedEvent.image = value;
+              break;
+            case "t":
+              parsedEvent.categories.push(value);
+              break;
+            case "location":
+              parsedEvent.location.push(value);
+              break;
+            case "g":
+              parsedEvent.geoHash.push(value);
+              break;
           }
         });
 

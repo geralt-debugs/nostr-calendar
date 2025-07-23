@@ -8,6 +8,7 @@ import createEditEvent from "./createEditEvent";
 import { IGetStyles } from "../common/types";
 import clsx from "clsx";
 import { useTimeBasedEvents } from "../stores/events";
+import { useEventDetails } from "../stores/eventDetails";
 // import EventMark from './EventMark'
 
 const DayStyle = styled("div")<{
@@ -113,18 +114,17 @@ const getStyles: IGetStyles = (theme: Theme) => ({
   },
 });
 
-function CalendarLayoutMonth(props: any) {
+function CalendarLayoutMonth({ weeks }: { weeks: Date[][] }) {
   const theme = useTheme();
   const styles = getStyles(theme);
 
   const events = useTimeBasedEvents((state) => state.events);
 
-  const { weeks } = props;
-
-  const { stateCalendar, setStateCalendar } = useContext(CalendarContext);
+  const { stateCalendar } = useContext(CalendarContext);
   const { locale, defaultEventDuration } = stateCalendar;
+  const updateEvent = useEventDetails((state) => state.updateEvent);
 
-  const maxHeight = (weeks: any[]) => {
+  const maxHeight = (weeks: Date[][]) => {
     const size = weeks.length;
 
     if (size === 5) {
@@ -144,12 +144,9 @@ function CalendarLayoutMonth(props: any) {
         format(new Date(event.begin), "yyyMMdd") === format(day, "yyyMMdd"),
     );
 
-    // console.log("dayEvents", dayEvents)
-
     const dayHoursEvents = dayEvents
       .map((event) => new Date(event.begin).getHours())
       .sort((numberA: number, numberB: number) => numberA - numberB);
-    // console.log("dayHoursEvents", dayHoursEvents)
 
     const eventsByHour = dayHoursEvents.reduce<{ hour: number; len: number }[]>(
       (acc, hour) => {
@@ -163,8 +160,6 @@ function CalendarLayoutMonth(props: any) {
       },
       [],
     );
-
-    console.log("eventsByHour", dayEvents);
 
     const markers = eventsByHour.map((evHour) => {
       return dayEvents
@@ -244,7 +239,7 @@ function CalendarLayoutMonth(props: any) {
         })}
       </Grid>
 
-      {weeks.map((week: any, weekIndex: number) => (
+      {weeks.map((week, weekIndex) => (
         <Grid
           container
           spacing={0}
@@ -255,7 +250,7 @@ function CalendarLayoutMonth(props: any) {
           key={`calendar-main-line-${weekIndex}`}
           style={maxHeight(weeks)}
         >
-          {week.map((day: any, dayIndex: number) => {
+          {week.map((day, dayIndex: number) => {
             const isToday =
               format(day, "ddMMyyy") === format(new Date(), "ddMMyyy");
             const eventsOfDay = getEventData(day);
@@ -299,14 +294,15 @@ function CalendarLayoutMonth(props: any) {
                     <div
                       style={{ ...styles.eventsContainer }}
                       data-date={day}
-                      onClick={(eventEl: any) =>
-                        createEditEvent({
-                          eventEl,
+                      onClick={(event) => {
+                        const calendarEvent = createEditEvent({
+                          event,
                           defaultEventDuration,
-                          stateCalendar,
-                          setStateCalendar,
-                        })
-                      }
+                        });
+                        if (calendarEvent) {
+                          updateEvent(calendarEvent);
+                        }
+                      }}
                     >
                       {eventsOfDay}
                     </div>

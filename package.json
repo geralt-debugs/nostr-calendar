@@ -26,7 +26,9 @@
     "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^19.1.0",
     "react-intl": "^7.1.11",
+    "react-markdown": "^10.1.0",
     "react-select": "^5.10.2",
+    "remark-gfm": "^4.0.1",
     "uuid": "^11.1.0",
     "zustand": "^5.0.6"
   },

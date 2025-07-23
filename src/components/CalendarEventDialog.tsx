@@ -217,7 +217,6 @@ function CalendarEventDialog() {
     <Dialog
       fullScreen={false}
       fullWidth={true}
-      maxWidth={"md"}
       open={open}
       onClose={handleOnClose}
       aria-labelledby="max-width-dialog-title"

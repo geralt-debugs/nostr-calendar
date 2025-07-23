@@ -5,16 +5,17 @@ import { format, differenceInMinutes } from "date-fns";
 import { useDrag } from "react-dnd";
 import { getEmptyImage } from "react-dnd-html5-backend";
 import { IGetStyles } from "../common/types";
+import { useEventDetails } from "../stores/eventDetails";
+import { ICalendarEvent } from "../stores/events";
 
 const getBaseStyles: IGetStyles = (theme: Theme) => ({
   marker: {
     overflow: "hidden",
     position: "absolute",
     border: `1px solid ${theme.palette.primary.dark}`,
+    borderRadius: "4px",
     backgroundColor: theme.palette.primary.main,
     padding: "1px 3px",
-    borderRadius: 3,
-    borderTopRightRadius: 3,
     cursor: "pointer",
     zIndex: 50,
     "&:hover": {
@@ -89,26 +90,7 @@ function EventMark(props: any) {
   const theme = useTheme();
   const styles = getBaseStyles(theme);
   const { stateCalendar, setStateCalendar } = useContext(CalendarContext);
-  const {
-    defaultEventDuration,
-    // modal = false,
-    // eventDialogMaxWidth = "md",
-    // fullscreen = false,
-    // allowFullScreen = false,
-    // withCloseIcon = true,
-    // title,
-    // content,
-    // actions,
-    // openDialog,
-    // handleCloseDialog,
-    // eventBeginDate,
-    // eventBeginTime,
-    // eventEndDate,
-    // eventEndTime,
-    // minutes,
-    // locale,
-  } = stateCalendar;
-
+  const { updateEvent } = useEventDetails((state) => state);
   const { calendarEvent, len, sq } = props;
   // console.log(calendarEvent)
 
@@ -130,21 +112,8 @@ function EventMark(props: any) {
 
   const duration = differenceInMinutes(endDate, beginDate) - 3;
 
-  const viewEvent = (props: any) => {
-    const { calendarEvent } = props;
-
-    // const eeBeginDate = new Date(calendarEvent.begin)
-    // const eeEndDate = new Date(calendarEvent.end)
-
-    // const eeBeginTime = format(eeBeginDate, "H:mm")
-    // const eeEndTime = format(eeEndDate, "H:mm")
-    // const eeDuration = differenceInMinutes(eeEndDate, eeBeginDate)
-
-    setStateCalendar({
-      ...stateCalendar,
-      openViewDialog: true,
-      calendarEvent,
-    });
+  const viewEvent = () => {
+    updateEvent(calendarEvent);
   };
 
   const [{ isDragging }, drag, preview] = useDrag({
@@ -172,8 +141,12 @@ function EventMark(props: any) {
     marginLeft: `calc(100% / ${len} * ${sq})`,
   };
 
-  const onDragStart = (eventEl: any, calendarEvent: any) => {
-    const width = eventEl.currentTarget.parentElement.parentElement.offsetWidth;
+  const onDragStart = (
+    eventEl: React.DragEvent<HTMLDivElement>,
+    calendarEvent: ICalendarEvent,
+  ) => {
+    const width =
+      eventEl.currentTarget.parentElement?.parentElement?.offsetWidth;
     const height = eventEl.currentTarget.clientHeight + 5;
 
     setStateCalendar({
@@ -189,20 +162,14 @@ function EventMark(props: any) {
     <div
       id={calendarEvent.id}
       ref={drag}
-      onDragStart={(eventEl: any) => onDragStart(eventEl, calendarEvent)}
+      onDragStart={(eventEl) => onDragStart(eventEl, calendarEvent)}
       style={{
         ...styles.marker,
         ...getStyles(left, position / 57 - 2, isDragging, partOfStyle),
       }}
       onClick={(eventEl) => {
         eventEl.stopPropagation();
-        viewEvent({
-          eventEl,
-          calendarEvent,
-          defaultEventDuration,
-          stateCalendar,
-          setStateCalendar,
-        });
+        viewEvent();
       }}
     >
       <div style={{ ...styles.markerText }}>{calendarEvent.title}</div>

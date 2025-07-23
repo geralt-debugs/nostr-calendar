@@ -1,4 +1,4 @@
-import { getYear, getMonth, getDate, addMinutes, format } from "date-fns";
+import { getYear, getMonth, getDate, addMinutes } from "date-fns";
 import { ICalendarEvent } from "../stores/events";
 import { TEMP_CALENDAR_ID } from "../stores/eventDetails";
 

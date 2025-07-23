@@ -29,7 +29,20 @@ export const theme = createTheme({
     },
   },
   typography: {
+    subtitle1: {
+      fontWeight: "bold",
+    },
+    body2: {
+      color: "hsl(215.4 16.3% 46.9%)",
+    },
+    h5: {
+      fontWeight: "bold",
+    },
     fontFamily: [
+      "Menlo",
+      "Monaco",
+      "Consolas",
+      "Liberation Mono",
       "system-ui",
       "Avenir",
       "Helvetica",

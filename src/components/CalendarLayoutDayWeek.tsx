@@ -117,11 +117,15 @@ const getStyles: IGetStyles = (theme: Theme) => ({
   },
 });
 
-function CalendarLayoutDayWeek(props: any) {
+function CalendarLayoutDayWeek({
+  selectedWeekIndex,
+  selectedWeek,
+}: {
+  selectedWeekIndex: number;
+  selectedWeek: Date[];
+}) {
   const theme = useTheme();
   const styles = getStyles(theme);
-
-  const { selectedWeekIndex, selectedWeek } = props;
 
   const { stateCalendar } = useContext(CalendarContext);
   const { selectedDate, locale, layout, defaultEventDuration } = stateCalendar;

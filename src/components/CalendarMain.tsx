@@ -36,8 +36,8 @@ function CalendarMain(props: any) {
   const theme = useTheme();
   const styles = getStyles(theme);
   const { stateCalendar } = useContext(CalendarContext);
-  const { selectedDate, locale, layout } = stateCalendar;
-  const { open, runAnimation } = props;
+  const { selectedDate, layout } = stateCalendar;
+  const { open } = props;
 
   const weeks = getWeekDays(selectedDate, 7);
   const selectedWeekIndex = getSelectedWeekIndex(selectedDate, weeks, 0);
@@ -52,13 +52,7 @@ function CalendarMain(props: any) {
     >
       <DrawerHeader style={{ justifyContent: "center" }} />
 
-      {layout === "month" && (
-        <CalendarLayoutMonth
-          weeks={weeks}
-          runAnimation={runAnimation}
-          locale={locale}
-        />
-      )}
+      {layout === "month" && <CalendarLayoutMonth weeks={weeks} />}
 
       {(layout === "week" || layout === "day") && (
         <CalendarLayoutDayWeek

@@ -19,6 +19,8 @@ const dictionary: NestedObject = {
       logout: "Log Out",
       save: "Save",
       timeSelectorPlaceholder: "Time",
+      description: "Desciption",
+      location: "Location",
     },
   },
   "de-DE": {
@@ -40,6 +42,8 @@ const dictionary: NestedObject = {
       logout: "abmelden",
       timeSelectorPlaceholder: "Zeit",
       save: "speichern",
+      description: "Beschreibung",
+      location: "Ort",
     },
   },
 };
