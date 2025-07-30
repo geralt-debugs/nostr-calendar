@@ -86,9 +86,6 @@ function CalendarEventViewDialog() {
       keepMounted={false}
     >
       <DialogTitle>
-        {calendarEvent.image && (
-          <img style={{ width: "100%" }} src={calendarEvent.image}></img>
-        )}
         <Typography variant="h5">{calendarEvent.title || ""}</Typography>
         <div style={{ ...styles.divTitleButton }}>
           <IconButton aria-label="Close" onClick={handleCloseViewDialog}>
@@ -97,6 +94,9 @@ function CalendarEventViewDialog() {
         </div>
       </DialogTitle>
       <DialogContent style={{ ...styles.dialogContent }}>
+        {calendarEvent.image && (
+          <img style={{ width: "100%" }} src={calendarEvent.image}></img>
+        )}
         <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
           <AccessTimeIcon />
           {calendarEvent.begin && (

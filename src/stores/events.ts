@@ -3,6 +3,7 @@ import { create } from "zustand";
 import { fetchCalendarEvents } from "../common/nostr";
 import { isValid } from "date-fns";
 import { appendOne, denormalize, normalize, removeOne } from "normal-store";
+import { SubCloser } from "nostr-tools/abstract-pool";
 
 export interface ICalendarEvent {
   begin: number;
@@ -20,6 +21,8 @@ export interface ICalendarEvent {
   user: string;
 }
 
+let subscriptionCloser: SubCloser | undefined;
+
 export const useTimeBasedEvents = create<{
   events: ICalendarEvent[];
   eventById: Record<string, ICalendarEvent>;
@@ -29,7 +32,11 @@ export const useTimeBasedEvents = create<{
   eventIds: [],
   eventById: {},
   fetchEvents: () => {
-    fetchCalendarEvents((event: Event) => {
+    if (subscriptionCloser) {
+      console.log("closing previous subscription");
+      subscriptionCloser.close();
+    }
+    subscriptionCloser = fetchCalendarEvents((event: Event) => {
       set(({ events, eventById }) => {
         let store = normalize(events);
         const parsedEvent: ICalendarEvent = {
