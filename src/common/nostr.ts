@@ -76,18 +76,15 @@ export const publishToRelays = (
   );
 };
 
-export const fetchCalendarEvents = async (
-  onEvent: (event: Event) => void,
-): Promise<void> => {
+export const fetchCalendarEvents = (onEvent: (event: Event) => void) => {
   const relayList = getRelays();
   const filter = {
     kinds: [31923],
   };
 
-  const subCloer = pool.subscribeMany(relayList, [filter], {
+  return pool.subscribeMany(relayList, [filter], {
     onevent: (event: Event) => {
       onEvent(event);
-      subCloer.close();
     },
   });
 };

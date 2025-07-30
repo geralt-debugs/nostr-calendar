@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from "react";
 import { CalendarContext } from "../common/CalendarContext";
-import { Theme, useTheme } from "@mui/material/styles";
+import { styled, Theme, useTheme } from "@mui/material/styles";
 import { format, differenceInMinutes } from "date-fns";
 import { useDrag } from "react-dnd";
 import { getEmptyImage } from "react-dnd-html5-backend";
@@ -8,22 +8,33 @@ import { IGetStyles } from "../common/types";
 import { useEventDetails } from "../stores/eventDetails";
 import { ICalendarEvent } from "../stores/events";
 
-const getBaseStyles: IGetStyles = (theme: Theme) => ({
-  marker: {
-    overflow: "hidden",
-    position: "absolute",
-    border: `1px solid ${theme.palette.primary.dark}`,
-    borderRadius: "4px",
-    backgroundColor: theme.palette.primary.main,
-    padding: "1px 3px",
-    cursor: "pointer",
-    zIndex: 50,
-    "&:hover": {
-      zIndex: 53,
-      backgroundColor: theme.palette.primary.light,
-    },
-    minHeight: 24,
+const MarkerStyle = styled("div")<{
+  position: number;
+  duration: number;
+  len: number;
+  sq: number;
+}>(({ theme, position, duration, len, sq }) => ({
+  marginTop: position,
+  height: duration,
+  width: `calc((100% / ${len}) - 2px)`,
+  marginLeft: `calc(100% / ${len} * ${sq})`,
+  overflow: "hidden",
+  position: "absolute",
+  border: `1px solid ${theme.palette.primary.dark}`,
+  borderRadius: "12px",
+  backgroundColor: theme.palette.primary.main,
+  padding: "4px 8px",
+  cursor: "pointer",
+  boxShadow: "4px 4px 4px 0px rgba(0,0,0,0.25)",
+  zIndex: 50,
+  "&:hover": {
+    zIndex: 53,
+    backgroundColor: theme.palette.primary.light,
   },
+  minHeight: 24,
+}));
+
+const getBaseStyles: IGetStyles = (theme: Theme) => ({
   markerText: {
     whiteSpace: "nowrap",
     overflow: "hidden",
@@ -70,7 +81,6 @@ function getStyles(
   left: number,
   top: number,
   isDragging: boolean,
-  partOfStyle: React.CSSProperties,
 ): React.CSSProperties {
   const transform = `translate3d(${left}px, ${top}px, 0)`;
 
@@ -82,17 +92,21 @@ function getStyles(
     // because IE will ignore our custom "empty image" drag preview.
     opacity: isDragging ? 0 : 1,
     height: isDragging ? 0 : "",
-    ...partOfStyle,
   };
 }
 
-function EventMark(props: any) {
+function EventMark({
+  calendarEvent,
+  sq,
+  len,
+}: {
+  calendarEvent: ICalendarEvent;
+  sq: number;
+  len: number;
+}) {
   const theme = useTheme();
   const styles = getBaseStyles(theme);
-  const { stateCalendar, setStateCalendar } = useContext(CalendarContext);
   const { updateEvent } = useEventDetails((state) => state);
-  const { calendarEvent, len, sq } = props;
-  // console.log(calendarEvent)
 
   const beginDate = new Date(calendarEvent.begin);
   const endDate = new Date(calendarEvent.end);
@@ -134,13 +148,6 @@ function EventMark(props: any) {
 
   const left = (100 / len) * sq + 1;
 
-  const partOfStyle: React.CSSProperties = {
-    marginTop: position,
-    height: duration,
-    width: `calc((100% / ${len}) - 2px)`,
-    marginLeft: `calc(100% / ${len} * ${sq})`,
-  };
-
   const onDragStart = (
     eventEl: React.DragEvent<HTMLDivElement>,
     calendarEvent: ICalendarEvent,
@@ -148,40 +155,35 @@ function EventMark(props: any) {
     const width =
       eventEl.currentTarget.parentElement?.parentElement?.offsetWidth;
     const height = eventEl.currentTarget.clientHeight + 5;
-
-    setStateCalendar({
-      ...stateCalendar,
-      startDragging: true,
-      draggingEventId: calendarEvent.id,
-      calendarEvent,
-      ghostProperties: { width, height },
-    });
+    console.log(width, height);
   };
 
   return (
-    <div
+    <MarkerStyle
       id={calendarEvent.id}
-      ref={drag}
+      position={position}
+      duration={duration}
+      len={len}
+      sq={sq}
       onDragStart={(eventEl) => onDragStart(eventEl, calendarEvent)}
+      onDragEnd={(eventEl) => onDragStart(eventEl, calendarEvent)}
       style={{
-        ...styles.marker,
-        ...getStyles(left, position / 57 - 2, isDragging, partOfStyle),
+        ...getStyles(left, position / 57 - 2, isDragging),
       }}
       onClick={(eventEl) => {
         eventEl.stopPropagation();
         viewEvent();
       }}
     >
-      <div style={{ ...styles.markerText }}>{calendarEvent.title}</div>
+      <div style={{ ...styles.markerText }}>
+        {calendarEvent.title || calendarEvent.description}
+      </div>
       <div style={{ ...styles.beginEnd }}>
         <span>{beginDateFormatted}</span>
         <span> - </span>
         <span>{endDateFormatted}</span>
       </div>
-      <div
-        style={{ ...styles.extraInfo, ...styles.markerText }}
-      >{`[${calendarEvent.id}]`}</div>
-    </div>
+    </MarkerStyle>
   );
 }
 
