@@ -10,6 +10,7 @@ import EventMark from "./EventMark";
 import { IGetStyles } from "../common/types";
 import { useTimeBasedEvents } from "../stores/events";
 import { useEventDetails } from "../stores/eventDetails";
+import { useSettings } from "../stores/settings";
 
 const getStyles: IGetStyles = () => ({
   board: {
@@ -71,10 +72,9 @@ function CalendarBoard({
   const openEventDetails = useEventDetails((state) => state.updateEvent);
 
   const events = useTimeBasedEvents((state) => state.events);
-
+  const { layout } = useSettings((state) => state.settings);
   const { stateCalendar } = useContext(CalendarContext);
-  const { selectedDate, layout, defaultEventDuration, draggingEventId } =
-    stateCalendar;
+  const { selectedDate, defaultEventDuration, draggingEventId } = stateCalendar;
 
   const [currentTimePosition, setCurrentTimePosition] = useState<number>();
 
@@ -91,7 +91,6 @@ function CalendarBoard({
     Array(layout === "week" ? 7 : layout === "day" ? 1 : 0).keys(),
   );
 
-  const localStorageMarkers = window.localStorage.getItem("markers");
   const getEventData: (day: Date) => JSX.Element[][] = (day) => {
     const dayEvents = events.filter(
       (event) =>
@@ -190,54 +189,38 @@ function CalendarBoard({
     },
   });
 
-  const viewLayoutEl = useMemo(() => {
-    return viewLayout.map((index) => {
-      const day = layout === "week" ? selectedWeek[index] : selectedDate;
-      const isToday =
-        format(day, "ddMMyyyy") === format(new Date(), "ddMMyyyy");
-      const eventsOfDay = getEventData(day);
-      return (
-        <Grid
-          id={`day${index + 1}`}
-          data-group="day-column"
-          data-date={day}
-          style={{ ...styles.dayContainer }}
-          key={`board-day-column-${layout}-${selectedWeekIndex}-${day}-${index}`}
-          onClick={(event) => {
-            const tempEvent = createEditEvent({
-              event,
-              defaultEventDuration,
-            });
-            if (!tempEvent) {
-              return;
-            }
-            openEventDetails(tempEvent, "create");
-          }}
-        >
-          {isToday && <CurrentTimeMark marginTop={currentTimePosition} />}
+  const viewLayoutEl = viewLayout.map((index) => {
+    const day = layout === "week" ? selectedWeek[index] : selectedDate;
+    const isToday = format(day, "ddMMyyyy") === format(new Date(), "ddMMyyyy");
+    const eventsOfDay = getEventData(day);
+    return (
+      <Grid
+        id={`day${index + 1}`}
+        data-group="day-column"
+        data-date={day}
+        style={{ ...styles.dayContainer }}
+        key={`board-day-column-${layout}-${selectedWeekIndex}-${day}-${index}`}
+        onClick={(event) => {
+          const tempEvent = createEditEvent({
+            event,
+            defaultEventDuration,
+          });
+          if (!tempEvent) {
+            return;
+          }
+          openEventDetails(tempEvent, "create");
+        }}
+      >
+        {isToday && <CurrentTimeMark marginTop={currentTimePosition} />}
 
-          {eventsOfDay && eventsOfDay.length > 0 && (
-            <div style={{ ...styles.eventsContainer }} data-date={day}>
-              {eventsOfDay}
-            </div>
-          )}
-        </Grid>
-      );
-    });
-    // ....
-    // ....
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    // currentTimePosition,
-    defaultEventDuration,
-    getEventData,
-    layout,
-    selectedDate,
-    selectedWeek,
-    selectedWeekIndex,
-    viewLayout,
-    localStorageMarkers,
-  ]);
+        {eventsOfDay && eventsOfDay.length > 0 && (
+          <div style={{ ...styles.eventsContainer }} data-date={day}>
+            {eventsOfDay}
+          </div>
+        )}
+      </Grid>
+    );
+  });
 
   return (
     <Grid

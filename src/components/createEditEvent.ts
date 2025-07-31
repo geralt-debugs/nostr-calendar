@@ -54,5 +54,11 @@ export default function createEditEvent({
     title: "",
     createdAt: Date.now(),
     description: "",
+    location: [],
+    categories: [],
+    reference: [],
+    geoHash: [],
+    website: "",
+    user: "",
   };
 }

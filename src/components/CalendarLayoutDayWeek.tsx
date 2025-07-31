@@ -1,5 +1,3 @@
-import { useContext, useMemo } from "react";
-import { CalendarContext } from "../common/CalendarContext";
 import { styled, Theme, useTheme } from "@mui/material/styles";
 import Grid from "@mui/material/Grid";
 import { cyan } from "@mui/material/colors";
@@ -9,12 +7,12 @@ import CalendarHeader from "./CalendarHeader";
 import CalendarBoard from "./CalendarBoard";
 import CalendarBoardDragLayer from "./CalendarBoardDragLayer";
 import { IGetStyles } from "../common/types";
+import { isMobile } from "../common/utils";
 
 const Body = styled(Grid)`
-  height: calc(100% - 150px);
-  overflow-x: scroll;
   overflow: scroll;
   align-items: stretch;
+  height: calc(100% - 155px);
 `;
 
 const getStyles: IGetStyles = (theme: Theme) => ({
@@ -127,65 +125,55 @@ function CalendarLayoutDayWeek({
   const theme = useTheme();
   const styles = getStyles(theme);
 
-  const { stateCalendar } = useContext(CalendarContext);
-  const { selectedDate, locale, layout, defaultEventDuration } = stateCalendar;
+  return (
+    <div
+      style={{
+        ...styles.root,
+        width: isMobile ? "100vw" : "calc(100vw - 257px)",
+      }}
+    >
+      <CalendarHeader
+        selectedWeekIndex={selectedWeekIndex}
+        selectedWeek={selectedWeek}
+      />
 
-  return useMemo(() => {
-    return (
-      <div style={{ ...styles.root }}>
-        <CalendarHeader
-          selectedWeekIndex={selectedWeekIndex}
-          selectedWeek={selectedWeek}
-        />
+      <Body
+        container
+        spacing={0}
+        direction="row"
+        justifyContent="center"
+        alignItems="stretch"
+      >
+        <Grid size={1} style={{ ...styles.timeColumnContainer }}>
+          <div style={{ ...styles.timeColumn }}>
+            <div style={{ ...styles.timeColumnElement }} />
+            {Array.from(Array(23).keys()).map((index) => {
+              return (
+                <div
+                  style={{ ...styles.timeColumnElement }}
+                  key={`time-${index}`}
+                >
+                  <span>{index + 1}</span>
+                </div>
+              );
+            })}
+            <div style={{ ...styles.timeColumnContainer }} />
+          </div>
+        </Grid>
 
-        <Body
-          container
-          spacing={0}
-          direction="row"
-          justifyContent="center"
-          alignItems="stretch"
-        >
-          <Grid size={1} style={{ ...styles.timeColumnContainer }}>
-            <div style={{ ...styles.timeColumn }}>
-              <div style={{ ...styles.timeColumnElement }} />
-              {Array.from(Array(23).keys()).map((index) => {
-                return (
-                  <div
-                    style={{ ...styles.timeColumnElement }}
-                    key={`time-${index}`}
-                  >
-                    <span>{index + 1}</span>
-                  </div>
-                );
-              })}
-              <div style={{ ...styles.timeColumnContainer }} />
-            </div>
-          </Grid>
-
-          <Grid style={{ ...styles.boardContainer }}>
-            <DndProvider backend={HTML5Backend}>
-              {/* <Container /> */}
-              <CalendarBoard
-                selectedWeekIndex={selectedWeekIndex}
-                selectedWeek={selectedWeek}
-              />
-              <CalendarBoardDragLayer />
-            </DndProvider>
-          </Grid>
-        </Body>
-      </div>
-    );
-    // ....
-    // ....
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    selectedDate,
-    locale,
-    layout,
-    defaultEventDuration,
-    selectedWeek,
-    selectedWeekIndex,
-  ]);
+        <Grid style={{ ...styles.boardContainer }}>
+          <DndProvider backend={HTML5Backend}>
+            {/* <Container /> */}
+            <CalendarBoard
+              selectedWeekIndex={selectedWeekIndex}
+              selectedWeek={selectedWeek}
+            />
+            <CalendarBoardDragLayer />
+          </DndProvider>
+        </Grid>
+      </Body>
+    </div>
+  );
 }
 
 export default CalendarLayoutDayWeek;

@@ -7,6 +7,7 @@ import CalendarLayoutMonth from "./CalendarLayoutMonth";
 import CalendarLayoutDayWeek from "./CalendarLayoutDayWeek";
 import { IGetStyles } from "../common/types";
 import { DrawerHeader } from "./DrawerHeader";
+import { useSettings } from "../stores/settings";
 
 const drawerWidth = 260;
 
@@ -36,13 +37,13 @@ function CalendarMain(props: any) {
   const theme = useTheme();
   const styles = getStyles(theme);
   const { stateCalendar } = useContext(CalendarContext);
-  const { selectedDate, layout } = stateCalendar;
+  const { selectedDate } = stateCalendar;
   const { open } = props;
+  const { layout } = useSettings((state) => state.settings);
 
   const weeks = getWeekDays(selectedDate, 7);
   const selectedWeekIndex = getSelectedWeekIndex(selectedDate, weeks, 0);
   const selectedWeek = weeks[selectedWeekIndex];
-
   return (
     <div
       style={{

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { IntlProvider } from "react-intl";
-import { flattenMessages } from "../common/utils";
+import { flattenMessages, isMobile } from "../common/utils";
 import dictionary from "../common/dictionary";
 import {
   addMonths,
@@ -18,8 +18,7 @@ import CalendarMain from "./CalendarMain";
 import CalendarEventViewDialog from "./CalendarEventViewDialog";
 import CalendarEventDialog from "./CalendarEventDialog";
 import { useTimeBasedEvents } from "../stores/events";
-
-const layout = "week";
+import { useSettings } from "../stores/settings";
 
 let _locale =
   (navigator.languages && navigator.languages[0]) ||
@@ -70,7 +69,6 @@ function Calendar() {
     selectedDate,
     locale,
     i18nLocale: _locale,
-    layout,
     openDialog,
     openViewDialog,
     eventBeginDate: null,
@@ -102,6 +100,8 @@ function Calendar() {
 
   const [open, setOpen] = useState(true);
 
+  const { layout } = useSettings((state) => state.settings);
+
   const handleDrawerOpen = () => {
     setOpen(true);
   };
@@ -123,17 +123,11 @@ function Calendar() {
     // applyLink(newDate)
   };
 
-  const handleLayoutChange = (args: any) => {
-    const { value } = args;
-    setStateCalendar({ ...stateCalendar, layout: value });
-    // history.push(`/d/${value}/${format(selectedDate, "yyyy/MM/dd")}`)
-  };
-
   const next = () => {
     setRunAnimation(false);
     let newDate;
 
-    switch (stateCalendar.layout) {
+    switch (layout) {
       case "week":
         newDate = addWeeks(stateCalendar.selectedDate, 1);
         break;
@@ -155,7 +149,7 @@ function Calendar() {
     setRunAnimation(false);
     let newDate;
 
-    switch (stateCalendar.layout) {
+    switch (layout) {
       case "week":
         newDate = subWeeks(stateCalendar.selectedDate, 1);
         break;
@@ -197,18 +191,19 @@ function Calendar() {
             open={open}
             handleDrawerOpen={handleDrawerOpen}
             handleDrawerClose={handleDrawerClose}
-            handleLayoutChange={handleLayoutChange}
             changeLanguage={changeLanguage}
           />
-          <CalendarDrawer
-            selectedDate={selectedDate}
-            next={next}
-            previous={previous}
-            open={open}
-            handleDrawerClose={handleDrawerClose}
-            layout={"month"}
-            locale={locale}
-          />
+          {!isMobile && (
+            <CalendarDrawer
+              selectedDate={selectedDate}
+              next={next}
+              previous={previous}
+              open={open}
+              handleDrawerClose={handleDrawerClose}
+              layout={"month"}
+              locale={locale}
+            />
+          )}
 
           <CalendarMain
             // selectedDate={selectedDate}
