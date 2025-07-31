@@ -170,11 +170,14 @@ function CalendarEventDialog() {
     const newEnd = new Date(
       `${format(newDate, "yyyy/MM/dd")} ${currentEndHour}:${currentEndMinutes}`,
     );
-    updateEvent({
-      ...eventDetails,
-      begin: newBegin.getTime(),
-      end: newEnd.getTime(),
-    });
+    updateEvent(
+      {
+        ...eventDetails,
+        begin: newBegin.getTime(),
+        end: newEnd.getTime(),
+      },
+      "create",
+    );
   };
   const onChangeEndDate = (newDate: Date) => {
     const currentEndTime = new Date(eventDetails.end);
