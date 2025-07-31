@@ -5,6 +5,7 @@ import { format, differenceInMinutes } from "date-fns";
 import Grid from "@mui/material/Grid";
 import { grey } from "@mui/material/colors";
 import { IGetStyles } from "../common/types";
+import { useSettings } from "../stores/settings";
 
 const HeaderContainer = styled(Grid)`
   height: 100px;
@@ -138,9 +139,10 @@ function CalendarHeader(props: any) {
   const styles = getStyles(theme);
 
   const { selectedWeekIndex, selectedWeek } = props;
+  const { layout } = useSettings((state) => state.settings);
 
   const { stateCalendar, setStateCalendar } = useContext(CalendarContext);
-  const { selectedDate, locale, layout, defaultEventDuration } = stateCalendar;
+  const { selectedDate, locale, defaultEventDuration } = stateCalendar;
   const [currentTimePosition, setCurrentTimePosition] = useState<number>();
 
   useEffect(() => {

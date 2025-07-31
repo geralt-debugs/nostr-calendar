@@ -36,7 +36,6 @@ function CalendarDrawer(props: any) {
   const { open, handleDrawerClose } = props;
   const theme = useTheme();
   const styles = getStyles(theme);
-
   return (
     <Drawer
       style={{ ...styles.drawer, ...styles.drawerPaper }}

@@ -170,9 +170,9 @@ function CalendarLayoutMonth({ weeks }: { weeks: Date[][] }) {
             borderColour={theme.palette.primary.dark}
             hoverColour={theme.palette.primary.light}
             key={`event-${event.id}`}
-            // calendarEvent={event}
-            // sq={index}
-            // len={evHour.len}
+            onClick={() => {
+              updateEvent(event);
+            }}
           >
             {event.title}
           </MonthMarkerStyle>
@@ -291,19 +291,7 @@ function CalendarLayoutMonth({ weeks }: { weeks: Date[][] }) {
                   </Typography>
 
                   {eventsOfDay && eventsOfDay.length > 0 && (
-                    <div
-                      style={{ ...styles.eventsContainer }}
-                      data-date={day}
-                      onClick={(event) => {
-                        const calendarEvent = createEditEvent({
-                          event,
-                          defaultEventDuration,
-                        });
-                        if (calendarEvent) {
-                          updateEvent(calendarEvent);
-                        }
-                      }}
-                    >
+                    <div style={{ ...styles.eventsContainer }} data-date={day}>
                       {eventsOfDay}
                     </div>
                   )}

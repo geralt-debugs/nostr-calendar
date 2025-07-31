@@ -20,6 +20,8 @@ import getWeekDays from "../common/getWeekDays";
 import getSelectedWeekIndex from "../common/getSelectedWeekIndex";
 import { useTheme } from "@mui/material";
 import { UserMenu } from "./UserMenu";
+import { ISettings, useSettings } from "../stores/settings";
+import { isMobile } from "../common/utils";
 
 const drawerWidth = 260;
 
@@ -36,6 +38,10 @@ const languageOptions = [
 
 function CalendarToolbar(props) {
   const theme = useTheme();
+  const {
+    settings: { layout },
+    updateSetting,
+  } = useSettings((state) => state);
   const styles: Record<string, HTMLAttributes<HTMLDivElement>["style"]> = {
     root: {
       flexGrow: 1,
@@ -95,57 +101,56 @@ function CalendarToolbar(props) {
 
   const intl = useIntl();
 
-  const { stateCalendar, setStateCalendar } = useContext(CalendarContext);
-  const { selectedDate, locale, i18nLocale, layout } = stateCalendar;
+  const { stateCalendar } = useContext(CalendarContext);
+  const { selectedDate, locale, i18nLocale } = stateCalendar;
 
-  return useMemo(() => {
-    const setLayout = (props: any) => {
-      const { option } = props;
-      setStateCalendar({ ...stateCalendar, layout: option });
-    };
+  const setLayout = (newLayout: ISettings["layout"]) => {
+    updateSetting("layout", newLayout);
+  };
 
-    const weeks = getWeekDays(selectedDate, 7);
-    const selectedWeekIndex = getSelectedWeekIndex(selectedDate, weeks, 0);
-    const selectedWeek = weeks[selectedWeekIndex];
+  const weeks = getWeekDays(selectedDate, 7);
+  const selectedWeekIndex = getSelectedWeekIndex(selectedDate, weeks, 0);
+  const selectedWeek = weeks[selectedWeekIndex];
 
-    const firstDayOfWeekMonth = format(selectedWeek[0], "MMM", {
-      locale: locale,
-    });
-    const lastDayOfWeekMonth = format(selectedWeek[6], "MMM", {
-      locale: locale,
-    });
-    const firstDayOfWeekYear = format(selectedWeek[0], "yyyy", {
-      locale: locale,
-    });
-    const lastDayOfWeekYear = format(selectedWeek[6], "yyyy", {
-      locale: locale,
-    });
+  const firstDayOfWeekMonth = format(selectedWeek[0], "MMM", {
+    locale: locale,
+  });
+  const lastDayOfWeekMonth = format(selectedWeek[6], "MMM", {
+    locale: locale,
+  });
+  const firstDayOfWeekYear = format(selectedWeek[0], "yyyy", {
+    locale: locale,
+  });
+  const lastDayOfWeekYear = format(selectedWeek[6], "yyyy", {
+    locale: locale,
+  });
 
-    const showMonthsAndYears =
-      layout === "week" &&
-      firstDayOfWeekMonth !== lastDayOfWeekMonth &&
-      firstDayOfWeekYear !== lastDayOfWeekYear
-        ? `${firstDayOfWeekMonth} ${firstDayOfWeekYear} - ${lastDayOfWeekMonth} ${lastDayOfWeekYear}`
-        : false;
-    const showMonthsAndYear =
-      !showMonthsAndYears &&
-      layout === "week" &&
-      firstDayOfWeekMonth !== lastDayOfWeekMonth
-        ? `${firstDayOfWeekMonth} - ${lastDayOfWeekMonth} ${firstDayOfWeekYear}`
-        : false;
-    const showMonthAndYear = !showMonthsAndYear
-      ? format(selectedDate, "MMMM yyyy", { locale: locale })
+  const showMonthsAndYears =
+    layout === "week" &&
+    firstDayOfWeekMonth !== lastDayOfWeekMonth &&
+    firstDayOfWeekYear !== lastDayOfWeekYear
+      ? `${firstDayOfWeekMonth} ${firstDayOfWeekYear} - ${lastDayOfWeekMonth} ${lastDayOfWeekYear}`
       : false;
+  const showMonthsAndYear =
+    !showMonthsAndYears &&
+    layout === "week" &&
+    firstDayOfWeekMonth !== lastDayOfWeekMonth
+      ? `${firstDayOfWeekMonth} - ${lastDayOfWeekMonth} ${firstDayOfWeekYear}`
+      : false;
+  const showMonthAndYear = !showMonthsAndYear
+    ? format(selectedDate, "MMMM", { locale: locale })
+    : false;
 
-    return (
-      <div
-        style={{
-          ...styles.root,
-          ...styles.appBar,
-        }}
-      >
-        <Toolbar>
-          {/* <IconButton
+  return (
+    <div
+      style={{
+        ...styles.root,
+        ...styles.appBar,
+        width: "100vw",
+      }}
+    >
+      <Toolbar>
+        {/* <IconButton
                         color='inherit'
                         aria-label='Open drawer'
                         onClick={open ? handleDrawerClose : handleDrawerOpen}
@@ -155,113 +160,103 @@ function CalendarToolbar(props) {
                         <MenuIcon />
                     </IconButton> */}
 
-          <Tooltip
-            title={`${format(new Date(), "dddd, d MMMM", { locale: locale })}`}
-            style={{ ...styles.tooltip }}
+        <Tooltip
+          title={`${format(new Date(), "dddd, d MMMM", { locale: locale })}`}
+          style={{ ...styles.tooltip }}
+        >
+          <IconButton
+            color="inherit"
+            aria-label="Today"
+            onClick={goToToday}
+            edge="start"
+            style={{ ...styles.menuButton }}
           >
-            <IconButton
-              color="inherit"
-              aria-label="Today"
-              onClick={goToToday}
-              edge="start"
-              style={{ ...styles.menuButton }}
+            <TodayIcon />
+          </IconButton>
+        </Tooltip>
+
+        <Tooltip
+          title={intl.formatMessage({ id: i18nPreviousLabel(layout) })}
+          style={{ ...styles.tooltip }}
+        >
+          <IconButton onClick={previous}>
+            <ChevronLeftIcon />
+          </IconButton>
+        </Tooltip>
+
+        <Tooltip
+          title={intl.formatMessage({ id: i18nNextLabel(layout) })}
+          style={{ ...styles.tooltip }}
+        >
+          <IconButton onClick={next}>
+            <ChevronRightIcon />
+          </IconButton>
+        </Tooltip>
+
+        <Typography style={{ ...styles.title }}>
+          {showMonthsAndYears || showMonthsAndYear || showMonthAndYear}
+        </Typography>
+
+        {!isMobile && (
+          <>
+            <Tooltip
+              title={intl.formatMessage({ id: "navigation.day" })}
+              style={{ ...styles.tooltip }}
             >
-              <TodayIcon />
-            </IconButton>
-          </Tooltip>
+              <IconButton
+                color="inherit"
+                aria-label="Day View"
+                onClick={() => setLayout("day")}
+                edge="start"
+                style={{ ...styles.menuButton }}
+              >
+                <CalendarViewDayIcon />
+              </IconButton>
+            </Tooltip>
 
-          <Tooltip
-            title={intl.formatMessage({ id: i18nPreviousLabel(layout) })}
-            style={{ ...styles.tooltip }}
-          >
-            <IconButton onClick={previous}>
-              <ChevronLeftIcon />
-            </IconButton>
-          </Tooltip>
-
-          <Tooltip
-            title={intl.formatMessage({ id: i18nNextLabel(layout) })}
-            style={{ ...styles.tooltip }}
-          >
-            <IconButton onClick={next}>
-              <ChevronRightIcon />
-            </IconButton>
-          </Tooltip>
-
-          <Typography style={{ ...styles.title }}>
-            {showMonthsAndYears || showMonthsAndYear || showMonthAndYear}
-          </Typography>
-
-          <Tooltip
-            title={intl.formatMessage({ id: "navigation.day" })}
-            style={{ ...styles.tooltip }}
-          >
-            <IconButton
-              color="inherit"
-              aria-label="Day View"
-              onClick={(e) => setLayout({ e, option: "day" })}
-              edge="start"
-              style={{ ...styles.menuButton }}
+            <Tooltip
+              title={intl.formatMessage({ id: "navigation.week" })}
+              style={{ ...styles.tooltip }}
             >
-              <CalendarViewDayIcon />
-            </IconButton>
-          </Tooltip>
+              <IconButton
+                color="inherit"
+                aria-label="Week View"
+                onClick={() => setLayout("week")}
+                edge="start"
+                style={{ ...styles.menuButton }}
+              >
+                <ViewWeekIcon />
+              </IconButton>
+            </Tooltip>
 
-          <Tooltip
-            title={intl.formatMessage({ id: "navigation.week" })}
-            style={{ ...styles.tooltip }}
-          >
-            <IconButton
-              color="inherit"
-              aria-label="Week View"
-              onClick={(e) => setLayout({ e, option: "week" })}
-              edge="start"
-              style={{ ...styles.menuButton }}
+            <Tooltip
+              title={intl.formatMessage({ id: "navigation.month" })}
+              style={{ ...styles.tooltip }}
             >
-              <ViewWeekIcon />
-            </IconButton>
-          </Tooltip>
+              <IconButton
+                color="inherit"
+                aria-label="Month View"
+                onClick={() => setLayout("month")}
+                edge="start"
+                style={{ ...styles.menuButton }}
+              >
+                <ViewModuleIcon />
+              </IconButton>
+            </Tooltip>
+          </>
+        )}
 
-          <Tooltip
-            title={intl.formatMessage({ id: "navigation.month" })}
-            style={{ ...styles.tooltip }}
-          >
-            <IconButton
-              color="inherit"
-              aria-label="Month View"
-              onClick={(e) => setLayout({ e, option: "month" })}
-              edge="start"
-              style={{ ...styles.menuButton }}
-            >
-              <ViewModuleIcon />
-            </IconButton>
-          </Tooltip>
-
-          <Select
-            options={languageOptions}
-            defaultValue={languageOptions.find((option: any) => {
-              return option.value === i18nLocale;
-            })}
-            onChange={changeLanguage}
-          />
-          <UserMenu />
-        </Toolbar>
-      </div>
-    );
-    // ....
-    // for stateCalendar and setStateCalendar
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    selectedDate,
-    layout,
-    intl,
-    locale,
-    i18nLocale,
-    goToToday,
-    next,
-    previous,
-    changeLanguage,
-  ]);
+        <Select
+          options={languageOptions}
+          defaultValue={languageOptions.find((option) => {
+            return option.value === i18nLocale;
+          })}
+          onChange={changeLanguage}
+        />
+        <UserMenu />
+      </Toolbar>
+    </div>
+  );
 }
 
 export default CalendarToolbar;

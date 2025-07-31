@@ -23,3 +23,5 @@ export function flattenMessages(
     )
   );
 }
+
+export const isMobile = window.innerWidth <= 800 && window.innerHeight <= 1000;
