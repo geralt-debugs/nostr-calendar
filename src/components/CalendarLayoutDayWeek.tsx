@@ -10,9 +10,9 @@ import { IGetStyles } from "../common/types";
 import { isMobile } from "../common/utils";
 
 const Body = styled(Grid)`
-  overflow-x: scroll;
   overflow: scroll;
   align-items: stretch;
+  height: calc(100% - 155px);
 `;
 
 const getStyles: IGetStyles = (theme: Theme) => ({

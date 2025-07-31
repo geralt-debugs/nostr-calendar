@@ -121,7 +121,7 @@ function CalendarLayoutMonth({ weeks }: { weeks: Date[][] }) {
   const events = useTimeBasedEvents((state) => state.events);
 
   const { stateCalendar } = useContext(CalendarContext);
-  const { locale, defaultEventDuration } = stateCalendar;
+  const { locale } = stateCalendar;
   const updateEvent = useEventDetails((state) => state.updateEvent);
 
   const maxHeight = (weeks: Date[][]) => {

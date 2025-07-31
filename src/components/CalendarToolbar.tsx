@@ -161,7 +161,7 @@ function CalendarToolbar(props) {
                     </IconButton> */}
 
         <Tooltip
-          title={`${format(new Date(), "dddd, d MMMM", { locale: locale })}`}
+          title={`${format(new Date(), "ccc, d MMMM", { locale: locale })}`}
           style={{ ...styles.tooltip }}
         >
           <IconButton
