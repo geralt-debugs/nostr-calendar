@@ -1,0 +1,126 @@
+import {
+  EventTemplate,
+  UnsignedEvent,
+  NostrEvent,
+  getEventHash,
+  generateSecretKey,
+  finalizeEvent,
+} from "nostr-tools";
+import { getConversationKey, encrypt } from "nostr-tools/nip44";
+import { Seal } from "nostr-tools/kinds";
+
+type Rumor = UnsignedEvent & { id: string };
+
+const TWO_DAYS = 2 * 24 * 60 * 60;
+
+const now = () => Math.round(Date.now() / 1000);
+const randomNow = () => Math.round(now() - Math.random() * TWO_DAYS);
+
+const nip44ConversationKey = (privateKey: Uint8Array, publicKey: string) =>
+  getConversationKey(privateKey, publicKey);
+
+const nip44Encrypt = (
+  data: EventTemplate,
+  privateKey: Uint8Array,
+  publicKey: string,
+) => encrypt(JSON.stringify(data), nip44ConversationKey(privateKey, publicKey));
+
+const nip44Decrypt = async (data: NostrEvent) =>
+  JSON.parse(
+    await window.nostr.nip44.decrypt(data.pubkey, data.content),
+  ) as NostrEvent;
+
+export async function getUserPublicKey() {
+  return await window.nostr.getPublicKey();
+}
+
+export async function createRumor(event: Partial<UnsignedEvent>) {
+  const rumor: Rumor = {
+    created_at: now(),
+    content: "",
+    kind: 52,
+    tags: [],
+    ...event,
+    id: "",
+    pubkey: await getUserPublicKey(),
+  };
+
+  rumor.id = getEventHash(rumor);
+
+  return rumor;
+}
+
+export async function createSeal(rumor: Rumor, recipientPublicKey: string) {
+  return window.nostr.signEvent({
+    kind: Seal,
+    content: await window.nostr.nip44.encrypt(
+      recipientPublicKey,
+      JSON.stringify(rumor),
+    ),
+    created_at: randomNow(),
+    tags: [],
+    pubkey: await getUserPublicKey(),
+  });
+}
+
+export function createWrap(seal: NostrEvent, recipientPublicKey: string) {
+  const randomKey = generateSecretKey();
+
+  return finalizeEvent(
+    {
+      kind: 1052,
+      content: nip44Encrypt(seal, randomKey, recipientPublicKey),
+      created_at: randomNow(),
+      tags: [["p", recipientPublicKey]],
+    },
+    randomKey,
+  );
+}
+
+export async function wrapEvent(
+  event: Partial<UnsignedEvent>,
+  recipientPublicKey: string,
+) {
+  const rumor = await createRumor(event);
+
+  const seal = await createSeal(rumor, recipientPublicKey);
+  return createWrap(seal, recipientPublicKey);
+}
+
+export async function wrapManyEvents(
+  event: Partial<UnsignedEvent>,
+  recipientsPublicKeys: string[],
+) {
+  if (!recipientsPublicKeys || recipientsPublicKeys.length === 0) {
+    throw new Error("At least one recipient is required.");
+  }
+
+  const senderPublicKey = await getUserPublicKey();
+
+  const wrappeds = [wrapEvent(event, senderPublicKey)];
+
+  recipientsPublicKeys.forEach((recipientPublicKey) => {
+    wrappeds.push(wrapEvent(event, recipientPublicKey));
+  });
+
+  return wrappeds;
+}
+
+export async function unwrapEvent(wrap: NostrEvent) {
+  const unwrappedSeal = await nip44Decrypt(wrap);
+  return nip44Decrypt(unwrappedSeal);
+}
+
+export async function unwrapManyEvents(wrappedEvents: NostrEvent[]) {
+  const unwrappedEventsPromise: Promise<Rumor>[] = [];
+
+  wrappedEvents.forEach((e) => {
+    unwrappedEventsPromise.push(unwrapEvent(e));
+  });
+
+  const unwrappedEvents = await Promise.all(unwrappedEventsPromise);
+
+  unwrappedEvents.sort((a, b) => a.created_at - b.created_at);
+
+  return unwrappedEvents;
+}
