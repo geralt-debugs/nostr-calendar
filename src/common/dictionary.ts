@@ -47,6 +47,8 @@ const dictionary: NestedObject = {
       description: "Beschreibung",
       location: "Ort",
       participants: "Teilnehmer",
+      addParticipants:
+        "Teilnehmer-öffentlichen Schlüssel Hex oder NPub hinzüfugen",
     },
   },
 };
