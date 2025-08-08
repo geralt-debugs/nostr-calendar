@@ -13,6 +13,7 @@ export interface ICalendarEvent {
   title: string;
   createdAt: number;
   categories: string[];
+  participants: string[];
   reference: string[];
   image?: string;
   location: string[];
@@ -52,6 +53,7 @@ export const useTimeBasedEvents = create<{
           website: "",
           location: [],
           geoHash: [],
+          participants: [],
         };
 
         event.tags.forEach(([key, value]) => {
@@ -79,6 +81,9 @@ export const useTimeBasedEvents = create<{
               break;
             case "location":
               parsedEvent.location.push(value);
+              break;
+            case "p":
+              parsedEvent.participants.push(value);
               break;
             case "g":
               parsedEvent.geoHash.push(value);

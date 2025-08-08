@@ -1,9 +1,6 @@
-import React, { useContext, useState, useMemo, useRef, useEffect } from "react";
+import React, { useContext, useState } from "react";
 import { CalendarContext } from "../common/CalendarContext";
 import { Theme, useTheme } from "@mui/material";
-import Slide from "@mui/material/Slide";
-import { TransitionProps } from "@mui/material/transitions";
-// import red from "@mui/material/colors/red"
 import { grey } from "@mui/material/colors";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
@@ -27,6 +24,9 @@ import { useIntl } from "react-intl";
 import { useEventDetails } from "../stores/eventDetails";
 import { publishCalendarEvent } from "../common/nostr";
 import { useTimeBasedEvents } from "../stores/events";
+import { ParticipantAdd } from "./ParticipantAdd";
+import { Participant } from "./Participant";
+import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
 
 const getStyles: IGetStyles = (theme: Theme) => ({
   divTitleButton: {
@@ -63,7 +63,7 @@ const getStyles: IGetStyles = (theme: Theme) => ({
     // minWidth: 120,
   },
   formControlFlex: {
-    display: "inline-flex",
+    display: "flex",
     alignItems: "center",
     flexDirection: "row",
     justifyContent: "flex-start",
@@ -258,14 +258,22 @@ function CalendarEventDialog() {
               onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
                 updateEventDetails("title", event.target.value);
               }}
-              onKeyDown={(event: React.KeyboardEvent<HTMLInputElement>) => {
-                if (event.key === "Enter" && !buttonDisabled) {
-                  handleOk();
-                }
-              }}
-              margin="normal"
-              required={true}
+              required
             />
+
+            <FormControl style={{ ...styles.formControl }}>
+              <TextField
+                style={{ ...styles.title }}
+                fullWidth={true}
+                placeholder="Image Url"
+                name="image"
+                value={eventDetails.image}
+                onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
+                  updateEventDetails("image", event.target.value);
+                }}
+                margin="normal"
+              />
+            </FormControl>
           </FormControl>
           <FormControl
             style={{
@@ -314,6 +322,46 @@ function CalendarEventDialog() {
             <Typography style={{ ...styles.dayOfWeek }}>
               {format(eventDetails.end, "ccc", { locale: locale })}
             </Typography>
+          </FormControl>
+          <FormControl
+            style={{
+              ...styles.formControl,
+              ...styles.formControlFlex,
+              flexDirection: "column",
+              alignItems: "start",
+              gap: "8px",
+            }}
+          >
+            <ParticipantAdd
+              onAdd={(pubKey) => {
+                const newParticipants = Array.from(
+                  new Set([...eventDetails.participants, pubKey]),
+                );
+                updateEventDetails("participants", newParticipants);
+              }}
+            />
+            {eventDetails.participants.map((participant) => (
+              <div
+                key={participant}
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  width: "100%",
+                }}
+              >
+                <Participant pubKey={participant} />
+                <IconButton
+                  onClick={() => {
+                    const newParticipants = eventDetails.participants.filter(
+                      (pubKey) => pubKey !== participant,
+                    );
+                    updateEventDetails("participants", newParticipants);
+                  }}
+                >
+                  <PersonRemoveIcon />
+                </IconButton>
+              </div>
+            ))}
           </FormControl>
           <FormControl
             style={{

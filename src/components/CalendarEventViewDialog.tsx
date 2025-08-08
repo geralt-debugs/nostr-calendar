@@ -16,6 +16,7 @@ import Markdown from "react-markdown";
 import { useIntl } from "react-intl";
 import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
 import remarkGfm from "remark-gfm";
+import { Participant } from "./Participant";
 
 const getStyles: IGetStyles = (theme: Theme) => ({
   divTitleButton: {
@@ -62,13 +63,11 @@ function CalendarEventViewDialog() {
   if (!calendarEvent || action === "create") {
     return null;
   }
-  console.log(calendarEvent);
   const { locale } = stateCalendar;
 
   const handleCloseViewDialog = () => {
     closeEventDetails();
   };
-  console.log(calendarEvent);
 
   return (
     <Dialog
@@ -124,6 +123,18 @@ function CalendarEventViewDialog() {
             </Markdown>
           </Typography>
         </div>
+        {calendarEvent.participants.length > 0 && (
+          <div>
+            <Typography variant="subtitle1">
+              {formatMessage({ id: "navigation.participants" })}
+            </Typography>
+            <Typography variant="body2">
+              {calendarEvent.participants.map((participant) => (
+                <Participant pubKey={participant} />
+              ))}
+            </Typography>
+          </div>
+        )}
         {calendarEvent.location.length > 0 && (
           <div>
             <Typography variant="subtitle1">

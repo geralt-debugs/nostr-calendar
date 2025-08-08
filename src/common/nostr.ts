@@ -8,6 +8,7 @@ import {
   getPublicKey,
   nip19,
   getEventHash,
+  Filter,
 } from "nostr-tools";
 import { normalizeURL } from "nostr-tools/utils";
 import { v4 as uuid } from "uuid";
@@ -217,6 +218,15 @@ export const publishCalendarEvent = async (
     ["start", String(Math.floor(event.begin / 1000))],
     ["end", String(Math.floor(event.end / 1000))],
   ];
+  if (event.image) {
+    tags.push(["image", event.image]);
+  }
+
+  if (event.participants.length > 0) {
+    event.participants.forEach((participant) => {
+      tags.push(["p", participant]);
+    });
+  }
   const baseEvent: UnsignedEvent = {
     kind: 31923,
     pubkey: pubKey,
@@ -225,5 +235,23 @@ export const publishCalendarEvent = async (
     created_at: Math.floor(Date.now() / 1000),
   };
   const fullEvent = await window.nostr.signEvent(baseEvent);
+  fullEvent.id = getEventHash(baseEvent);
   return publishToRelays(fullEvent, onAcceptedRelays);
+};
+
+export const fetchUserInfo = (
+  userPublicKeys: string[],
+  onEvent: (event: Event) => void,
+) => {
+  const relayList = getRelays();
+  const filter: Filter = {
+    kinds: [0],
+    authors: userPublicKeys,
+  };
+
+  return pool.subscribeMany(relayList, [filter], {
+    onevent: (event: Event) => {
+      onEvent(event);
+    },
+  });
 };
