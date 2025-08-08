@@ -22,7 +22,7 @@ const dictionary: NestedObject = {
       description: "Desciption",
       location: "Location",
       participants: "Participants",
-      addParticipants: "Enter Participant Public Key has or NPub",
+      addParticipants: "Enter participant nPub",
     },
   },
   "de-DE": {
@@ -47,8 +47,7 @@ const dictionary: NestedObject = {
       description: "Beschreibung",
       location: "Ort",
       participants: "Teilnehmer",
-      addParticipants:
-        "Teilnehmer-öffentlichen Schlüssel Hex oder NPub hinzüfugen",
+      addParticipants: "Teilnehmer-öffentlichen Schlüssel nPub hinzüfugen",
     },
   },
 };
