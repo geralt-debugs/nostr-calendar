@@ -1,9 +1,11 @@
 import { Skeleton } from "@mui/material";
 import { useGetParticipant } from "../stores/participants";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import { nip19 } from "nostr-tools";
 
 export const Participant = ({ pubKey }: { pubKey: string }) => {
   const { participant, loading } = useGetParticipant({ pubKey });
+  const nip19PubKey = nip19.npubEncode(participant.publicKey);
   return (
     <div
       style={{
@@ -34,7 +36,7 @@ export const Participant = ({ pubKey }: { pubKey: string }) => {
           maxWidth: "100%%",
         }}
       >
-        {participant.name || participant.publicKey}
+        {participant.name || nip19PubKey}
       </div>
     </div>
   );
