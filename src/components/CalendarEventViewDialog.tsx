@@ -113,16 +113,6 @@ function CalendarEventViewDialog() {
             </Typography>
           )}
         </div>
-        <div>
-          <Typography variant="subtitle1">
-            {formatMessage({ id: "navigation.description" })}
-          </Typography>
-          <Typography variant="body2">
-            <Markdown remarkPlugins={[remarkGfm]}>
-              {calendarEvent.description}
-            </Markdown>
-          </Typography>
-        </div>
         {calendarEvent.participants.length > 0 && (
           <div>
             <Typography variant="subtitle1">
@@ -135,6 +125,16 @@ function CalendarEventViewDialog() {
             </Typography>
           </div>
         )}
+        <div>
+          <Typography variant="subtitle1">
+            {formatMessage({ id: "navigation.description" })}
+          </Typography>
+          <Typography variant="body2">
+            <Markdown remarkPlugins={[remarkGfm]}>
+              {calendarEvent.description}
+            </Markdown>
+          </Typography>
+        </div>
         {calendarEvent.location.length > 0 && (
           <div>
             <Typography variant="subtitle1">

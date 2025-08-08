@@ -1,25 +1,31 @@
+import { Skeleton } from "@mui/material";
 import { useGetParticipant } from "../stores/participants";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 
 export const Participant = ({ pubKey }: { pubKey: string }) => {
-  const { participant } = useGetParticipant({ pubKey });
+  const { participant, loading } = useGetParticipant({ pubKey });
   return (
     <div
       style={{
         display: "flex",
         maxWidth: "92%",
         alignItems: "center",
-        gap: "8px",
+        gap: "12px",
       }}
     >
       <object
         style={{
           width: "24px",
           height: "24px",
+          borderRadius: "100%",
         }}
         data={participant.picture}
       >
-        <AccountCircleIcon />
+        {loading ? (
+          <Skeleton variant="circular" width={"24px"} height={"24px"} />
+        ) : (
+          <AccountCircleIcon />
+        )}
       </object>
       <div
         style={{

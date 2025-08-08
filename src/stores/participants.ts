@@ -1,11 +1,13 @@
 import { create } from "zustand";
 import { fetchUserInfo } from "../common/nostr";
 import { SubCloser } from "nostr-tools/abstract-pool";
+import { useState } from "react";
 
 export interface IParticipant {
   publicKey: string;
   picture?: string;
   name?: string;
+  createdAt: number;
 }
 
 export const useParticipants = create<{
@@ -25,13 +27,20 @@ export const useParticipants = create<{
             name: string;
             picture: string;
           };
-          newParticipants[event.pubkey] = {
-            name: parsedContent.name,
-            publicKey: event.pubkey,
-            picture: parsedContent.picture,
-          };
+          if (
+            !newParticipants?.[event.pubkey]?.createdAt ||
+            newParticipants?.[event.pubkey]?.createdAt < event.created_at
+          ) {
+            newParticipants[event.pubkey] = {
+              name: parsedContent.name,
+              publicKey: event.pubkey,
+              picture: parsedContent.picture,
+              createdAt: event.created_at,
+            };
+          }
         });
         if (participantPubKeys.length === Object.keys(newParticipants).length) {
+          closer?.close();
           resolve();
         }
       }),
@@ -56,10 +65,15 @@ export const useParticipants = create<{
 
 export const useGetParticipant = ({ pubKey }: { pubKey: string }) => {
   const { participants, fetchParticipants } = useParticipants((state) => state);
-  if (!participants[pubKey]) {
-    fetchParticipants([pubKey]);
+  const isParticipantInCache = !!participants[pubKey];
+  const [loading, updateLoading] = useState(!isParticipantInCache);
+  if (!isParticipantInCache) {
+    fetchParticipants([pubKey]).then(() => {
+      updateLoading(false);
+    });
   }
   return {
     participant: participants[pubKey] ?? { publicKey: pubKey },
+    loading,
   };
 };
