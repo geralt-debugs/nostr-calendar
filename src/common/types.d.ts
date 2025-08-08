@@ -22,7 +22,7 @@ declare global {
       };
       nip44: {
         encrypt: (pubKey: string, message: string) => Promise<string>;
-        decrypt: (pubkey: string, mssage: string) => Promise<string>;
+        decrypt: (pubkey: string, message: string) => Promise<string>;
       };
     };
   }

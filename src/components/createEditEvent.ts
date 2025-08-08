@@ -1,8 +1,9 @@
 import { getYear, getMonth, getDate, addMinutes } from "date-fns";
 import { ICalendarEvent } from "../stores/events";
 import { TEMP_CALENDAR_ID } from "../stores/eventDetails";
+import { getUserPublicKey } from "../common/nostr";
 
-export default function createEditEvent({
+export default async function createEditEvent({
   calendarEvent,
   defaultEventDuration,
   event,
@@ -10,7 +11,7 @@ export default function createEditEvent({
   calendarEvent?: ICalendarEvent;
   defaultEventDuration: number;
   event: React.MouseEvent<HTMLDivElement>;
-}): ICalendarEvent | null {
+}): Promise<ICalendarEvent | null> {
   if (calendarEvent) {
     return {
       ...calendarEvent,
@@ -47,6 +48,7 @@ export default function createEditEvent({
     hour > 23 ? 30 : minute,
   );
   const eventEndDate = addMinutes(eventBeginDate, defaultEventDuration);
+  const self = await getUserPublicKey();
   return {
     begin: eventBeginDate.getTime(),
     end: eventEndDate.getTime(),
@@ -58,6 +60,7 @@ export default function createEditEvent({
     categories: [],
     reference: [],
     geoHash: [],
+    participants: [self],
     website: "",
     user: "",
   };

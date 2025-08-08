@@ -200,8 +200,9 @@ function CalendarBoard({
         data-date={day}
         style={{ ...styles.dayContainer }}
         key={`board-day-column-${layout}-${selectedWeekIndex}-${day}-${index}`}
-        onClick={(event) => {
-          const tempEvent = createEditEvent({
+        onClick={async (event) => {
+          event.persist();
+          const tempEvent = await createEditEvent({
             event,
             defaultEventDuration,
           });

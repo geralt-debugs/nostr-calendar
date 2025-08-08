@@ -21,6 +21,8 @@ const dictionary: NestedObject = {
       timeSelectorPlaceholder: "Time",
       description: "Desciption",
       location: "Location",
+      participants: "Participants",
+      addParticipants: "Enter Participant Public Key has or NPub",
     },
   },
   "de-DE": {
@@ -44,6 +46,9 @@ const dictionary: NestedObject = {
       save: "speichern",
       description: "Beschreibung",
       location: "Ort",
+      participants: "Teilnehmer",
+      addParticipants:
+        "Teilnehmer-öffentlichen Schlüssel Hex oder NPub hinzüfugen",
     },
   },
 };
