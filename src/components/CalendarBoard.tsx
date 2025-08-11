@@ -70,13 +70,12 @@ function CalendarBoard({
   const styles = getStyles(theme);
 
   const openEventDetails = useEventDetails((state) => state.updateEvent);
-  const { filters } = useSettings((state) => state.settings);
+  const { filters, layout } = useSettings((state) => state.settings);
 
   let events = useTimeBasedEvents((state) => state.events);
-  if (!filters.showPublicEvents) {
+  if (!filters?.showPublicEvents) {
     events = events.filter((event) => event.isPrivateEvent);
   }
-  const { layout } = useSettings((state) => state.settings);
   const { stateCalendar } = useContext(CalendarContext);
   const { selectedDate, defaultEventDuration, draggingEventId } = stateCalendar;
 
