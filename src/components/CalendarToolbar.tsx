@@ -150,7 +150,7 @@ function CalendarToolbar(props) {
       }}
     >
       <Toolbar>
-        {isMobile && (
+        {/* {isMobile && (
           <IconButton
             color="inherit"
             aria-label="Open drawer"
@@ -162,7 +162,7 @@ function CalendarToolbar(props) {
           >
             <MenuIcon />
           </IconButton>
-        )}
+        )} */}
 
         <Tooltip
           title={`${format(new Date(), "ccc, d MMMM", { locale: locale })}`}
