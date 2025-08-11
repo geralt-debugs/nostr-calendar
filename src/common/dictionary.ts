@@ -23,6 +23,12 @@ const dictionary: NestedObject = {
       location: "Location",
       participants: "Participants",
       addParticipants: "Enter participant nPub",
+      privateEvent: "Private Event",
+      privateEventCaption:
+        "Private events are only visible to you and the invited participants",
+    },
+    filters: {
+      showPublicEvents: "Show Public Events",
     },
   },
   "de-DE": {
@@ -47,7 +53,13 @@ const dictionary: NestedObject = {
       description: "Beschreibung",
       location: "Ort",
       participants: "Teilnehmer",
-      addParticipants: "Teilnehmer-öffentlichen Schlüssel nPub hinzüfugen",
+      addParticipants: "Teilnehmer nPub eingeben",
+      privateEvent: "Privat Ereignis",
+      privateEventCaption:
+        "Privat Ereignis sind nur für Sie und die eingeladenen Teilnehmer sichtbar",
+    },
+    filters: {
+      showPublicEvents: "shau öffentlichen Ereignisse",
     },
   },
 };

@@ -1,4 +1,4 @@
-import { HTMLAttributes, useContext, useMemo } from "react";
+import { HTMLAttributes, useContext } from "react";
 import { CalendarContext } from "../common/CalendarContext";
 import { useIntl } from "react-intl";
 import { i18nPreviousLabel, i18nNextLabel } from "../common/i18nLabels";
@@ -6,7 +6,7 @@ import Toolbar from "@mui/material/Toolbar";
 import Tooltip from "@mui/material/Tooltip";
 import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
-// import MenuIcon from "@mui/icons-material/Menu"
+import MenuIcon from "@mui/icons-material/Menu";
 import TodayIcon from "@mui/icons-material/Today";
 import ViewWeekIcon from "@mui/icons-material/ViewWeek";
 import CalendarViewDayIcon from "@mui/icons-material/CalendarViewDay";
@@ -89,9 +89,9 @@ function CalendarToolbar(props) {
     },
   };
   const {
-    // open,
-    // handleDrawerOpen,
-    // handleDrawerClose,
+    open,
+    handleDrawerOpen,
+    handleDrawerClose,
     changeLanguage,
     goToToday,
     next,
@@ -150,15 +150,19 @@ function CalendarToolbar(props) {
       }}
     >
       <Toolbar>
-        {/* <IconButton
-                        color='inherit'
-                        aria-label='Open drawer'
-                        onClick={open ? handleDrawerClose : handleDrawerOpen}
-                        edge='start'
-                        className={classes.menuButton}
-                    >
-                        <MenuIcon />
-                    </IconButton> */}
+        {isMobile && (
+          <IconButton
+            color="inherit"
+            aria-label="Open drawer"
+            onClick={open ? handleDrawerClose : handleDrawerOpen}
+            edge="start"
+            style={{
+              ...styles.menuButton,
+            }}
+          >
+            <MenuIcon />
+          </IconButton>
+        )}
 
         <Tooltip
           title={`${format(new Date(), "ccc, d MMMM", { locale: locale })}`}

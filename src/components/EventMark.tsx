@@ -1,5 +1,4 @@
-import React, { useContext, useEffect } from "react";
-import { CalendarContext } from "../common/CalendarContext";
+import React, { useEffect } from "react";
 import { styled, Theme, useTheme } from "@mui/material/styles";
 import { format, differenceInMinutes } from "date-fns";
 import { useDrag } from "react-dnd";
@@ -7,29 +6,31 @@ import { getEmptyImage } from "react-dnd-html5-backend";
 import { IGetStyles } from "../common/types";
 import { useEventDetails } from "../stores/eventDetails";
 import { ICalendarEvent } from "../stores/events";
+import { teal } from "@mui/material/colors";
 
 const MarkerStyle = styled("div")<{
   position: number;
   duration: number;
   len: number;
   sq: number;
-}>(({ theme, position, duration, len, sq }) => ({
+  isPrivateEvent: boolean;
+}>(({ theme, position, duration, len, sq, isPrivateEvent }) => ({
   marginTop: position,
   height: duration,
   width: `calc((100% / ${len}) - 2px)`,
   marginLeft: `calc(100% / ${len} * ${sq})`,
   overflow: "hidden",
   position: "absolute",
-  border: `1px solid ${theme.palette.primary.dark}`,
+  border: `1px solid ${isPrivateEvent ? teal[200] : theme.palette.primary.dark}`,
   borderRadius: "12px",
-  backgroundColor: theme.palette.primary.main,
+  backgroundColor: isPrivateEvent ? teal[100] : theme.palette.primary.main,
   padding: "4px 8px",
   cursor: "pointer",
   boxShadow: "4px 4px 4px 0px rgba(0,0,0,0.25)",
   zIndex: 50,
   "&:hover": {
     zIndex: 53,
-    backgroundColor: theme.palette.primary.light,
+    backgroundColor: isPrivateEvent ? teal[50] : theme.palette.primary.light,
   },
   minHeight: 24,
 }));
@@ -165,6 +166,7 @@ function EventMark({
       duration={duration}
       len={len}
       sq={sq}
+      isPrivateEvent={calendarEvent.isPrivateEvent}
       onDragStart={(eventEl) => onDragStart(eventEl, calendarEvent)}
       onDragEnd={(eventEl) => onDragStart(eventEl, calendarEvent)}
       style={{

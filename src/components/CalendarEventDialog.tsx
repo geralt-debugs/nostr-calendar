@@ -1,6 +1,13 @@
 import React, { useContext, useState } from "react";
 import { CalendarContext } from "../common/CalendarContext";
-import { Theme, useTheme } from "@mui/material";
+import {
+  FormControlLabel,
+  FormGroup,
+  Switch,
+  Theme,
+  Tooltip,
+  useTheme,
+} from "@mui/material";
 import { grey } from "@mui/material/colors";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
@@ -22,11 +29,14 @@ import Datepicker from "../engine_components/Datepicker";
 import { IGetStyles } from "../common/types";
 import { useIntl } from "react-intl";
 import { useEventDetails } from "../stores/eventDetails";
-import { publishCalendarEvent } from "../common/nostr";
-import { useTimeBasedEvents } from "../stores/events";
+import {
+  publishPrivateCalendarEvent,
+  publishPublicCalendarEvent,
+} from "../common/nostr";
 import { ParticipantAdd } from "./ParticipantAdd";
 import { Participant } from "./Participant";
 import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
+import InfoIcon from "@mui/icons-material/Info";
 
 const getStyles: IGetStyles = (theme: Theme) => ({
   divTitleButton: {
@@ -122,8 +132,9 @@ function CalendarEventDialog() {
   const { stateCalendar } = useContext(CalendarContext);
   const { locale } = stateCalendar;
   const [processing, updateProcessing] = useState(false);
-
-  const refetchEvents = useTimeBasedEvents((state) => state.fetchEvents);
+  const [eventMetaDetails, updateEventMetaDetails] = useState<{
+    type: "public" | "private";
+  }>({ type: "private" });
 
   const intl = useIntl();
 
@@ -151,8 +162,11 @@ function CalendarEventDialog() {
 
   const handleOk = async () => {
     updateProcessing(true);
-    await publishCalendarEvent(eventDetails);
-    refetchEvents();
+    if (eventMetaDetails.type === "private") {
+      await publishPrivateCalendarEvent(eventDetails);
+    } else {
+      await publishPublicCalendarEvent(eventDetails);
+    }
     updateProcessing(false);
     closeDialog();
   };
@@ -382,7 +396,41 @@ function CalendarEventDialog() {
           </FormControl>
         </form>
       </DialogContent>
-      <DialogActions>
+      <DialogActions
+        style={{
+          justifyContent: "space-between",
+        }}
+      >
+        <FormGroup style={{ flexDirection: "row" }}>
+          <FormControlLabel
+            control={
+              <Switch
+                onChange={(event) => {
+                  updateEventMetaDetails((details) => ({
+                    ...details,
+                    type: event.target.checked ? "private" : "public",
+                  }));
+                }}
+                checked={eventMetaDetails.type === "private"}
+              ></Switch>
+            }
+            labelPlacement="end"
+            slotProps={{
+              typography: {
+                variant: "button",
+              },
+            }}
+            label={intl.formatMessage({ id: "navigation.privateEvent" })}
+          />
+          <Tooltip
+            placement="top"
+            title={intl.formatMessage({ id: "navigation.privateEventCaption" })}
+          >
+            <IconButton>
+              <InfoIcon />
+            </IconButton>
+          </Tooltip>
+        </FormGroup>
         <Button onClick={handleOk} color="primary" disabled={buttonDisabled}>
           {processing
             ? "Publishing"

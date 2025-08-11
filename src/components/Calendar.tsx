@@ -36,8 +36,14 @@ const defaultEventDuration = 60; // in minutes
 function Calendar() {
   // const { history, match } = props
   // const theme = useTheme()
-  const fetchEvents = useTimeBasedEvents((state) => state.fetchEvents);
-  fetchEvents();
+  const {
+    settings: { layout, filters },
+  } = useSettings((state) => state);
+  const events = useTimeBasedEvents((state) => state);
+  if (filters.showPublicEvents) {
+    events.fetchEvents();
+  }
+  events.fetchPrivateEvents();
   const changeLanguage = (newLang: { value: string }) => {
     const i18nLocale = newLang.value;
     const newDateFnLocale = i18nLocale === "de-DE" ? de : null;
@@ -99,8 +105,6 @@ function Calendar() {
   };
 
   const [open, setOpen] = useState(true);
-
-  const { layout } = useSettings((state) => state.settings);
 
   const handleDrawerOpen = () => {
     setOpen(true);
