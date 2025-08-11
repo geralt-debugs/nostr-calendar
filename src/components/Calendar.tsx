@@ -40,7 +40,7 @@ function Calendar() {
     settings: { layout, filters },
   } = useSettings((state) => state);
   const events = useTimeBasedEvents((state) => state);
-  if (filters.showPublicEvents) {
+  if (filters?.showPublicEvents) {
     events.fetchEvents();
   }
   events.fetchPrivateEvents();
