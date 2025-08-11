@@ -6,6 +6,7 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import { HTMLAttributes } from "react";
 import CalendarSmall from "../engine_components/CalendarSmall";
+import { Filters } from "./Filters";
 
 const drawerWidth = 260;
 const getStyles = (
@@ -55,6 +56,7 @@ function CalendarDrawer(props: any) {
       <Divider />
       <div style={{ ...styles.calendarSmall }}>{<CalendarSmall />}</div>
       <Divider />
+      <Filters />
     </Drawer>
   );
 }

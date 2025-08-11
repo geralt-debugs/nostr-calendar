@@ -63,5 +63,6 @@ export default async function createEditEvent({
     participants: [self],
     website: "",
     user: "",
+    isPrivateEvent: true,
   };
 }

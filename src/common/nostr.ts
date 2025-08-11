@@ -55,20 +55,20 @@ export const ensureRelay = async (
   return relay;
 };
 
-export async function createPrivateEvent(
-  title: string,
-  description: string,
-  start: number,
-  end: number,
-  participants: string[],
-) {
+export async function publishPrivateCalendarEvent({
+  title,
+  description,
+  begin: start,
+  end,
+  participants,
+}: ICalendarEvent) {
   const viewSecretKey = generateSecretKey();
   const uniqueCalId = uuid();
   const eventData = [
     ["title", title],
     ["description", description],
-    ["start", start],
-    ["end", end],
+    ["start", start / 1000],
+    ["end", end / 1000],
     ["d", uniqueCalId],
   ];
 
@@ -88,7 +88,7 @@ export async function createPrivateEvent(
     kind: 32678,
     content: eventContent,
     tags: [
-      ["d", "unique_event_id"], // Replace with a unique id for the event
+      ["d", uniqueCalId], // Replace with a unique id for the event
     ],
   };
 
@@ -97,7 +97,7 @@ export async function createPrivateEvent(
   signedEvent.id = evtId;
 
   // Publish the private event to a relay
-  //   await publishToRelays(signedEvent);
+  await publishToRelays(signedEvent);
   const giftWraps: Event[] = [];
   const ownGift = await nip59.wrapEvent(
     {
@@ -131,13 +131,18 @@ export async function createPrivateEvent(
     giftWrap.kind = 1052;
     giftWraps.push(giftWrap);
   }
+  await Promise.all(
+    giftWraps.map((gift) => {
+      return publishToRelays(gift);
+    }),
+  );
   return {
     calendarEvent: signedEvent,
     giftWraps,
   };
 }
 
-export async function viewPrivateEvent(calendarEvent: Event, giftWrap: Event) {
+export async function getDetailsFromGiftWrap(giftWrap: Event) {
   const rumor = await nip59.unwrapEvent(giftWrap);
   const aTag = rumor.tags.find((tag) => tag[0] === "a");
   if (!aTag) {
@@ -147,16 +152,61 @@ export async function viewPrivateEvent(calendarEvent: Event, giftWrap: Event) {
   const eventId = aTag[1].split(":")[2]; // Extract event id from the tag
   const viewKey = rumor.tags.find((tag) => tag[0] === "viewKey")?.[1];
   if (!viewKey) {
-    console.log(rumor);
-    throw new Error("invalid rumor. a tag not found");
+    throw new Error("invalid rumor: viewKey not found");
   }
+  return {
+    eventId,
+    viewKey,
+  };
+}
+
+export const fetchCalendarGiftWraps = (
+  { participants }: { participants: string[] },
+  onEvent: (event: { eventId: string; viewKey: string }) => void,
+) => {
+  const relayList = getRelays();
+  const filter = {
+    kinds: [1052],
+    "#p": participants,
+  };
+
+  return pool.subscribeMany(relayList, [filter], {
+    onevent: async (event: Event) => {
+      const unWrappedEvent = await getDetailsFromGiftWrap(event);
+      onEvent(unWrappedEvent);
+    },
+  });
+};
+
+export async function viewPrivateEvent(calendarEvent: Event, viewKey: string) {
   const viewPrivateKey = nip19.decode(viewKey as NSec).data;
   const decryptedContent = nip44.decrypt(
     calendarEvent.content,
     nip44.getConversationKey(viewPrivateKey, getPublicKey(viewPrivateKey)),
   );
 
-  return JSON.parse(decryptedContent); // Return the decrypted event details
+  return {
+    ...calendarEvent,
+    tags: JSON.parse(decryptedContent),
+  }; // Return the decrypted event details
+}
+
+export async function fetchPrivateCalendarEvents(
+  { eventIds }: { eventIds: string[] },
+  onEvent: (event: Event) => void,
+) {
+  const relayList = getRelays();
+  const filter = {
+    kinds: [32678],
+    "#d": eventIds,
+  };
+
+  const closer = pool.subscribeMany(relayList, [filter], {
+    onevent: async (event: Event) => {
+      onEvent(event);
+      closer.close();
+    },
+  });
 }
 
 export const publishToRelays = (
@@ -206,7 +256,7 @@ export const fetchCalendarEvents = (onEvent: (event: Event) => void) => {
   });
 };
 
-export const publishCalendarEvent = async (
+export const publishPublicCalendarEvent = async (
   event: ICalendarEvent,
   onAcceptedRelays?: (url: string) => void,
 ) => {
