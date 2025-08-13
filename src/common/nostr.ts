@@ -55,6 +55,65 @@ export const ensureRelay = async (
   return relay;
 };
 
+export async function publishRSVPEvent({
+  eventKind, // 31923 or 32678
+  eventId, // The dtag of the event
+  participants, // List of participant public keys
+}: {
+  eventKind: number;
+  eventId: string;
+  participants: string[]; // List of participant public keys
+}) {
+  const uniqueRSVPId = uuid();
+  const viewSecretKey = generateSecretKey();
+  const viewPublicKey = getPublicKey(viewSecretKey);
+  const userPublicKey = await getUserPublicKey();
+  const eventData = [
+    ["a", `${eventKind}:${userPublicKey}:${eventId}`],
+    ["L", "status"],
+    ["l", "", "status"],  // Placeholder for RSVP status such as accepted, declined, or tentative
+    ["L", "freebusy"],
+    ["l", "", "freebusy"] // Placeholder for free/busy status
+  ];
+
+  const eventContent = nip44.encrypt(
+    JSON.stringify(eventData),
+    nip44.getConversationKey(viewSecretKey, viewPublicKey),
+  );
+
+  const unsignedRSVPEvent: UnsignedEvent = {
+    pubkey: userPublicKey, // Your public key here
+    created_at: Math.floor(Date.now() / 1000),
+    kind: 32069,
+    content: eventContent,
+    tags: [
+      ["d" , uniqueRSVPId], // Unique identifier for the RSVP event
+    ],
+  };
+
+  const signedRSVPEvent = await window.nostr.signEvent(unsignedRSVPEvent);
+  signedRSVPEvent.id = getEventHash(unsignedRSVPEvent);
+
+  const giftWraps: Event[] = [];
+  for (const participant of participants) {
+    // Create a rumor
+    const giftWrap = await nip59.wrapRSVPEvent(
+      signedRSVPEvent,
+      participant,
+      1055, // RSVP kind
+    );
+    giftWraps.push(giftWrap);
+  }
+  await Promise.all(
+    giftWraps.map((gift) => {
+      return publishToRelays(gift);
+    }),
+  );
+  return {
+    rsvpEvent: signedRSVPEvent,
+    giftWraps,
+  };
+}
 export async function publishPrivateCalendarEvent({
   title,
   description,
@@ -174,6 +233,97 @@ export const fetchCalendarGiftWraps = (
     onevent: async (event: Event) => {
       const unWrappedEvent = await getDetailsFromGiftWrap(event);
       onEvent(unWrappedEvent);
+    },
+  });
+};
+
+export async function getDetailsFromRSVPGiftWrap(giftWrap: Event) {
+  const rumor = await nip59.unwrapEvent(giftWrap);
+  const aTag = rumor.tags.find((tag) => tag[0] === "a");
+  if (!aTag || !aTag[1]) {
+    console.log(rumor);
+    throw new Error("invalid rumor. a tag not found or malformed");
+  }
+
+
+  const parts = aTag[1].split(":");
+  if (parts.length < 3) {
+    throw new Error("invalid a tag format");
+  }
+  const eventPubkey = parts[1]; 
+  const eventId = parts[2];
+
+  const viewKey = rumor.tags.find((tag) => tag[0] === "viewKey")?.[1];
+  if (!viewKey) {
+    throw new Error("invalid rumor: viewKey not found");
+  }
+
+  // Fetch the RSVP event using the a tag reference
+  const relayList = getRelays();
+  const filter: Filter = {
+    kinds: [32069], // RSVP event kind
+    authors: [eventPubkey],
+    "#d": [eventId], // Match the dtag
+  };
+
+  return new Promise((resolve, reject) => {
+    const closer = pool.subscribeMany(relayList, [filter], {
+      onevent: async (rsvpEvent: Event) => {
+        try {
+
+          const viewPrivateKey = nip19.decode(viewKey as NSec).data;
+          const decryptedContent = nip44.decrypt(
+            rsvpEvent.content,
+            nip44.getConversationKey(viewPrivateKey, getPublicKey(viewPrivateKey)),
+          );
+
+          const eventData = JSON.parse(decryptedContent);
+          
+          closer.close();
+          resolve({
+            rsvpEvent: {
+              ...rsvpEvent,
+              decryptedData: eventData, 
+            },
+            eventId,
+            viewKey,
+            aTag: aTag[1], 
+          });
+        } catch (error : any) {
+          closer.close();
+          reject(new Error(`Failed to decrypt RSVP event: ${error.message}`));
+        }
+      },
+      oneose: () => {
+        closer.close();
+        reject(new Error(`RSVP event not found for eventId: ${eventId}`));
+      }
+    });
+    setTimeout(() => {
+      closer.close();
+      reject(new Error('Timeout: RSVP event fetch timed out'));
+    }, 10000);
+  });
+}
+
+export const fetchAndDecryptRSVPEvents = (
+  { participants }: { participants: string[] },
+  onEvent: (decryptedRSVP: any) => void,
+) => {
+  const relayList = getRelays();
+  const filter = {
+    kinds: [1055], // Gift wrap kind for RSVP
+    "#p": participants,
+  };
+
+  return pool.subscribeMany(relayList, [filter], {
+    onevent: async (giftWrap: Event) => {
+      try {
+        const decryptedRSVP = await getDetailsFromRSVPGiftWrap(giftWrap);
+        onEvent(decryptedRSVP);
+      } catch (error) {
+        console.error('Failed to process RSVP gift wrap:', error);
+      }
     },
   });
 };
