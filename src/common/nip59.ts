@@ -63,12 +63,12 @@ export async function createSeal(rumor: Rumor, recipientPublicKey: string) {
   });
 }
 
-export function createWrap(seal: NostrEvent, recipientPublicKey: string) {
+export function createWrap(seal: NostrEvent, recipientPublicKey: string, kind : number = 1052) {
   const randomKey = generateSecretKey();
 
   return finalizeEvent(
     {
-      kind: 1052,
+      kind,
       content: nip44Encrypt(seal, randomKey, recipientPublicKey),
       created_at: randomNow(),
       tags: [["p", recipientPublicKey]],
@@ -85,6 +85,17 @@ export async function wrapEvent(
 
   const seal = await createSeal(rumor, recipientPublicKey);
   return createWrap(seal, recipientPublicKey);
+}
+
+export async function wrapRSVPEvent(
+  event: Partial<UnsignedEvent>,
+  recipientPublicKey: string,
+  kind: number
+) {
+  const rumor = await createRumor(event);
+
+  const seal = await createSeal(rumor, recipientPublicKey);
+  return createWrap(seal, recipientPublicKey , kind);
 }
 
 export async function wrapManyEvents(
