@@ -55,14 +55,12 @@ export const ensureRelay = async (
   return relay;
 };
 
-export async function publishRSVPEvent({
-  eventKind, // 31923 or 32678
+export async function publishPrivateRSVPEvent({
   authorpubKey, // Public key of the event author
   eventId, // The dtag of the event
   status, // Status of the RSVP event
   participants, // List of participant public keys
 }: {
-  eventKind: number;
   eventId: string;
   authorpubKey: string; 
   status: string;
@@ -71,146 +69,129 @@ export async function publishRSVPEvent({
   const uniqueRSVPId = uuid();
   const userPublicKey = await getUserPublicKey();
 
-  if (eventKind === 32678){ // Private calendar event
-    const viewSecretKey = generateSecretKey();
-    const viewPublicKey = getPublicKey(viewSecretKey);
-    // Encrypt the RSVP data
-    const eventData = [
-      ["a", `${eventKind}:${authorpubKey}:${eventId}`],
+  const viewSecretKey = generateSecretKey();
+  const viewPublicKey = getPublicKey(viewSecretKey);
+  // Encrypt the RSVP data
+  const eventData = [
+    ["a", `32678:${authorpubKey}:${eventId}`],
+    ["d" , uniqueRSVPId],
+    ["L", "status"],
+    ["l", `${status}`, "status"],
+    ["L", "freebusy"],
+    ["l", "free", "freebusy"]
+  ];
+  const eventContent = nip44.encrypt(
+    JSON.stringify(eventData),
+    nip44.getConversationKey(viewSecretKey, viewPublicKey),
+  );
+  const unsignedRSVPEvent: UnsignedEvent = {
+    pubkey: userPublicKey, // Your public key here
+    created_at: Math.floor(Date.now() / 1000),
+    kind: 32069,
+    content: eventContent,
+    tags: [
+      ["d" , uniqueRSVPId], // Unique identifier for the RSVP event
+    ],
+  };
+  const signedRSVPEvent = await window.nostr.signEvent(unsignedRSVPEvent);
+  signedRSVPEvent.id = getEventHash(unsignedRSVPEvent);
+  await publishToRelays(signedRSVPEvent);
+  const giftWraps: Event[] = [];
+  const ownGift = await nip59.wrapEvent(
+    {
+      pubkey: nip19.npubEncode(userPublicKey),
+      created_at: Math.floor(Date.now() / 1000),
+      kind: 55,
+      content: "",
+      tags: [
+        ["a", `32069:${userPublicKey}:${uniqueRSVPId}`],
+        ["viewKey", nip19.nsecEncode(viewSecretKey)],
+      ],
+    },
+    userPublicKey,
+    1055
+  );
+  giftWraps.push(ownGift);
+  for (const participant of participants) {
+    // Create a rumor
+    const giftWrap = await nip59.wrapEvent(
+      {
+      pubkey: nip19.npubEncode(userPublicKey),
+      created_at: Math.floor(Date.now() / 1000),
+      kind: 55,
+      content: "",
+      tags: [
+        ["a", `32069:${participant}:${uniqueRSVPId}`],
+        ["viewKey", nip19.nsecEncode(viewSecretKey)],
+      ],
+    },
+    participant,
+    1055
+    );
+    giftWraps.push(giftWrap);
+  }
+  await Promise.all(
+    giftWraps.map((gift) => {
+      return publishToRelays(gift);
+    }),
+  );
+  return {
+    rsvpEvent: signedRSVPEvent,
+    giftWraps,
+  };
+}
+
+export async function publishPublicRSVPEvent({
+  authorpubKey,
+  eventId,
+  status,
+}: {
+  authorpubKey: string;
+  eventId: string;
+  status: string;
+}) {
+  const uniqueRSVPId = uuid();
+  const userPublicKey = await getUserPublicKey();
+  
+  const unsignedRSVPEvent: UnsignedEvent = {
+    pubkey: userPublicKey, // Your public key here
+    created_at: Math.floor(Date.now() / 1000),
+    kind: 31925,
+    content: "",
+    tags: [
+      ["d" , uniqueRSVPId],
+      ["a", `31923:${authorpubKey}:${eventId}`],
       ["d" , uniqueRSVPId],
       ["L", "status"],
       ["l", `${status}`, "status"],
       ["L", "freebusy"],
       ["l", "free", "freebusy"]
-    ];
-    const eventContent = nip44.encrypt(
-      JSON.stringify(eventData),
-      nip44.getConversationKey(viewSecretKey, viewPublicKey),
-    );
+    ],
+  };
 
-    const unsignedRSVPEvent: UnsignedEvent = {
-      pubkey: userPublicKey, // Your public key here
-      created_at: Math.floor(Date.now() / 1000),
-      kind: 32069,
-      content: eventContent,
-      tags: [
-        ["d" , uniqueRSVPId], // Unique identifier for the RSVP event
-      ],
-    };
+  const signedRSVPEvent = await window.nostr.signEvent(unsignedRSVPEvent);
+  signedRSVPEvent.id = getEventHash(unsignedRSVPEvent);
+  await publishToRelays(signedRSVPEvent);
 
-    const signedRSVPEvent = await window.nostr.signEvent(unsignedRSVPEvent);
-    signedRSVPEvent.id = getEventHash(unsignedRSVPEvent);
-    await publishToRelays(signedRSVPEvent);
-
-    const giftWraps: Event[] = [];
-    const ownGift = await nip59.wrapRSVPEvent(
-      {
-        pubkey: nip19.npubEncode(userPublicKey),
-        created_at: Math.floor(Date.now() / 1000),
-        kind: 55,
-        content: "",
-        tags: [
-          ["a", `32069:${userPublicKey}:${uniqueRSVPId}`],
-          ["viewKey", nip19.nsecEncode(viewSecretKey)],
-        ],
-      },
-      userPublicKey,
-      1055
-    );
-    giftWraps.push(ownGift);
-    for (const participant of participants) {
-      // Create a rumor
-      const giftWrap = await nip59.wrapRSVPEvent(
-        {
-        pubkey: nip19.npubEncode(userPublicKey),
-        created_at: Math.floor(Date.now() / 1000),
-        kind: 55,
-        content: "",
-        tags: [
-          ["a", `32069:${participant}:${uniqueRSVPId}`],
-          ["viewKey", nip19.nsecEncode(viewSecretKey)],
-        ],
-      },
-      participant,
-      1055
-      );
-      giftWraps.push(giftWrap);
-    }
-    await Promise.all(
-      giftWraps.map((gift) => {
-        return publishToRelays(gift);
-      }),
-    );
-    return {
-      rsvpEvent: signedRSVPEvent,
-      giftWraps,
-    };
-  } else {  // Public calendar event
-    // Create the RSVP event without encryption
-    // This is a public event, so we don't need to encrypt the content
-    const unsignedRSVPEvent: UnsignedEvent = {
-      pubkey: userPublicKey, // Your public key here
-      created_at: Math.floor(Date.now() / 1000),
-      kind: 32069,
-      content: "",
-      tags: [
-        ["d" , uniqueRSVPId],
-        ["a", `${eventKind}:${authorpubKey}:${eventId}`],
-        ["d" , uniqueRSVPId],
-        ["L", "status"],
-        ["l", `${status}`, "status"],
-        ["L", "freebusy"],
-        ["l", "free", "freebusy"]
-      ],
-    };
-
-    const signedRSVPEvent = await window.nostr.signEvent(unsignedRSVPEvent);
-    signedRSVPEvent.id = getEventHash(unsignedRSVPEvent);
-    await publishToRelays(signedRSVPEvent);
-
-    const giftWraps: Event[] = [];
-    const ownGift = await nip59.wrapRSVPEvent(
-      {
-        pubkey: nip19.npubEncode(userPublicKey),
-        created_at: Math.floor(Date.now() / 1000),
-        kind: 55,
-        content: "",
-        tags: [
-          ["a", `32069:${userPublicKey}:${uniqueRSVPId}`],
-        ],
-      },
-      userPublicKey,
-      1055
-    );
-    giftWraps.push(ownGift);
-    for (const participant of participants) {
-      // Create a rumor
-      const giftWrap = await nip59.wrapRSVPEvent(
-        {
-        pubkey: nip19.npubEncode(userPublicKey),
-        created_at: Math.floor(Date.now() / 1000),
-        kind: 55,
-        content: "",
-        tags: [
-          ["a", `32069:${participant}:${uniqueRSVPId}`],
-        ],
-      },
-      participant,
-      1055
-      );
-      giftWraps.push(giftWrap);
-    }
-    await Promise.all(
-      giftWraps.map((gift) => {
-        return publishToRelays(gift);
-      }),
-    );
-    return {
-      rsvpEvent: signedRSVPEvent,
-      giftWraps,
-    };
-  }
+  return {
+    rsvpEvent: signedRSVPEvent,
+  };
 }
+
+export const fetchPublicRSVPEvents = (
+  onEvent: (event: Event) => void,
+) => {
+  const relayList = getRelays();
+  const filter: Filter = {
+    kinds: [31925],
+  };
+
+  return pool.subscribeMany(relayList, [filter], {
+    onevent: (event: Event) => {
+      onEvent(event);
+    },
+  });
+};
 export async function publishPrivateCalendarEvent({
   title,
   description,
@@ -267,6 +248,7 @@ export async function publishPrivateCalendarEvent({
       ],
     },
     userPublicKey,
+    1055
   );
   giftWraps.push(ownGift);
   for (const participant of participants) {
@@ -283,8 +265,8 @@ export async function publishPrivateCalendarEvent({
         ],
       },
       participant,
+      1052
     );
-    giftWrap.kind = 1052;
     giftWraps.push(giftWrap);
   }
   await Promise.all(
@@ -361,43 +343,24 @@ export async function getDetailsFromRSVPGiftWrap(giftWrap: Event) {
     const closer = pool.subscribeMany(relayList, [filter], {
       onevent: async (rsvpEvent: Event) => {
         try {
-          // Check if viewKey is present to determine if it's a private calendar event
-          if (viewKey) {
-            // Private calendar event - decrypt the content
-            const viewPrivateKey = nip19.decode(viewKey as NSec).data;
-            const decryptedContent = nip44.decrypt(
-              rsvpEvent.content,
-              nip44.getConversationKey(viewPrivateKey, getPublicKey(viewPrivateKey)),
-            );
-
-            const eventData = JSON.parse(decryptedContent);
-            
-            closer.close();
-            resolve({
-              rsvpEvent: {
-                ...rsvpEvent,
-                decryptedData: eventData,
-              },
-              eventId,
-              viewKey,
-              aTag: aTag[1],
-              isPrivate: true,
-            });
-          } else {
-            // Public calendar event - content is in tags, no decryption needed
-            closer.close();
-            resolve({
-              rsvpEvent: {
-                ...rsvpEvent,
-                // For public events, the RSVP data is in the tags
-                publicData: rsvpEvent.tags,
-              },
-              eventId,
-              viewKey: null,
-              aTag: aTag[1],
-              isPrivate: false,
-            });
-          }
+          const viewPrivateKey = nip19.decode(viewKey as NSec).data;
+          const decryptedContent = nip44.decrypt(
+            rsvpEvent.content,
+            nip44.getConversationKey(viewPrivateKey, getPublicKey(viewPrivateKey)),
+          );
+          const eventData = JSON.parse(decryptedContent);
+          
+          closer.close();
+          resolve({
+            rsvpEvent: {
+              ...rsvpEvent,
+              decryptedData: eventData,
+            },
+            eventId,
+            viewKey,
+            aTag: aTag[1],
+            isPrivate: true,
+          });
         } catch (error: any) {
           closer.close();
           reject(new Error(`Failed to process RSVP event: ${error.message}`));
@@ -424,7 +387,7 @@ export async function getDetailsFromRSVPGiftWrap(giftWrap: Event) {
   });
 }
 
-export const fetchAndDecryptRSVPEvents = (
+export const fetchAndDecryptPrivateRSVPEvents = (
   { participants }: { participants: string[] },
   onEvent: (decryptedRSVP: any) => void,
 ) => {

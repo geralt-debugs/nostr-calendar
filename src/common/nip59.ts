@@ -63,7 +63,7 @@ export async function createSeal(rumor: Rumor, recipientPublicKey: string) {
   });
 }
 
-export function createWrap(seal: NostrEvent, recipientPublicKey: string, kind : number = 1052) {
+export function createWrap(seal: NostrEvent, recipientPublicKey: string, kind : number) {
   const randomKey = generateSecretKey();
 
   return finalizeEvent(
@@ -80,27 +80,18 @@ export function createWrap(seal: NostrEvent, recipientPublicKey: string, kind : 
 export async function wrapEvent(
   event: Partial<UnsignedEvent>,
   recipientPublicKey: string,
+  kind : number
 ) {
   const rumor = await createRumor(event);
 
   const seal = await createSeal(rumor, recipientPublicKey);
-  return createWrap(seal, recipientPublicKey);
-}
-
-export async function wrapRSVPEvent(
-  event: Partial<UnsignedEvent>,
-  recipientPublicKey: string,
-  kind: number
-) {
-  const rumor = await createRumor(event);
-
-  const seal = await createSeal(rumor, recipientPublicKey);
-  return createWrap(seal, recipientPublicKey , kind);
+  return createWrap(seal, recipientPublicKey, kind);
 }
 
 export async function wrapManyEvents(
   event: Partial<UnsignedEvent>,
   recipientsPublicKeys: string[],
+  kind : number
 ) {
   if (!recipientsPublicKeys || recipientsPublicKeys.length === 0) {
     throw new Error("At least one recipient is required.");
@@ -108,10 +99,10 @@ export async function wrapManyEvents(
 
   const senderPublicKey = await getUserPublicKey();
 
-  const wrappeds = [wrapEvent(event, senderPublicKey)];
+  const wrappeds = [wrapEvent(event, senderPublicKey, kind)];
 
   recipientsPublicKeys.forEach((recipientPublicKey) => {
-    wrappeds.push(wrapEvent(event, recipientPublicKey));
+    wrappeds.push(wrapEvent(event, recipientPublicKey, kind));
   });
 
   return wrappeds;
