@@ -126,12 +126,7 @@ function CalendarLayoutDayWeek({
   const styles = getStyles(theme);
 
   return (
-    <div
-      style={{
-        ...styles.root,
-        width: isMobile ? "100vw" : "calc(100vw - 257px)",
-      }}
-    >
+    <div style={styles.root}>
       <CalendarHeader
         selectedWeekIndex={selectedWeekIndex}
         selectedWeek={selectedWeek}

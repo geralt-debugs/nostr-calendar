@@ -17,7 +17,6 @@ import { useIntl } from "react-intl";
 import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
 import remarkGfm from "remark-gfm";
 import { Participant } from "./Participant";
-import { RSVPDetails } from "./RSVPDetails";
 
 const getStyles: IGetStyles = (theme: Theme) => ({
   divTitleButton: {
@@ -120,18 +119,20 @@ function CalendarEventViewDialog() {
               {formatMessage({ id: "navigation.participants" })}
             </Typography>
             <Typography variant="body2">
-              {calendarEvent.participants.map((participant) => (
-                <Participant key={participant} pubKey={participant} />
-              ))}
+              {calendarEvent.participants.map((participant) => {
+                const rsvpResponse = calendarEvent.rsvpResponses?.find(
+                  (response) => response.participantId === participant
+                )?.response || "pending";
+                return (
+                  <Participant 
+                    key={participant} 
+                    pubKey={participant} 
+                    rsvpResponse={rsvpResponse}
+                  />
+                );
+              })}
             </Typography>
           </div>
-        )}
-        
-        {calendarEvent.participants.length > 0 && (
-          <RSVPDetails 
-            participants={calendarEvent.participants}
-            rsvpResponses={calendarEvent.rsvpResponses || []}
-          />
         )}
         <div>
           <Typography variant="subtitle1">
