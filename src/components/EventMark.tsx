@@ -1,6 +1,6 @@
-import React, { useEffect } from "react";
+import React, { useEffect , useState } from "react";
 import { styled, Theme, useTheme } from "@mui/material/styles";
-import { format, differenceInMinutes } from "date-fns";
+import { format, differenceInMinutes, set } from "date-fns";
 import { useDrag } from "react-dnd";
 import { getEmptyImage } from "react-dnd-html5-backend";
 import { IGetStyles } from "../common/types";
@@ -14,7 +14,8 @@ const MarkerStyle = styled("div")<{
   len: number;
   sq: number;
   isPrivateEvent: boolean;
-}>(({ theme, position, duration, len, sq, isPrivateEvent }) => ({
+  isSelected : boolean;
+}>(({ theme, position, duration, len, sq, isPrivateEvent, isSelected }) => ({
   marginTop: position,
   height: duration,
   width: `calc((100% / ${len}) - 2px)`,
@@ -27,9 +28,8 @@ const MarkerStyle = styled("div")<{
   padding: "4px 8px",
   cursor: "pointer",
   boxShadow: "4px 4px 4px 0px rgba(0,0,0,0.25)",
-  zIndex: 50,
+  zIndex: isSelected ? 53 : 50,
   "&:hover": {
-    zIndex: 53,
     backgroundColor: isPrivateEvent ? teal[50] : theme.palette.primary.light,
   },
   minHeight: 24,
@@ -108,6 +108,7 @@ function EventMark({
   const theme = useTheme();
   const styles = getBaseStyles(theme);
   const { updateEvent } = useEventDetails((state) => state);
+  const [isSelected, setIsSelected] = useState(false);
 
   const beginDate = new Date(calendarEvent.begin);
   const endDate = new Date(calendarEvent.end);
@@ -128,9 +129,14 @@ function EventMark({
   const duration = differenceInMinutes(endDate, beginDate) - 3;
 
   const viewEvent = () => {
+    setIsSelected(true);
     updateEvent(calendarEvent);
-  };
 
+    setTimeout(() => {
+      setIsSelected(false);
+    }, 2000);
+  };
+  
   const [{ isDragging }, drag, preview] = useDrag({
     type: "box",
     collect: (monitor) => ({
@@ -176,6 +182,7 @@ function EventMark({
         eventEl.stopPropagation();
         viewEvent();
       }}
+      isSelected={isSelected}
     >
       <div style={{ ...styles.markerText }}>
         {calendarEvent.title || calendarEvent.description}

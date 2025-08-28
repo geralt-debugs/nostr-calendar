@@ -8,13 +8,9 @@ import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import TodayIcon from "@mui/icons-material/Today";
-import ViewWeekIcon from "@mui/icons-material/ViewWeek";
-import CalendarViewDayIcon from "@mui/icons-material/CalendarViewDay";
-import ViewModuleIcon from "@mui/icons-material/ViewModule";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import Select from "react-select";
-// import Select from "react-select"
 import { format } from "date-fns";
 import getWeekDays from "../common/getWeekDays";
 import getSelectedWeekIndex from "../common/getSelectedWeekIndex";
@@ -24,6 +20,22 @@ import { ISettings, useSettings } from "../stores/settings";
 import { isMobile } from "../common/utils";
 
 const drawerWidth = 260;
+
+// Layout options with better labels and icons
+const layoutOptions = [
+  {
+    value: "day",
+    label: "Day",
+  },
+  {
+    value: "week", 
+    label: "Week",
+  },
+  {
+    value: "month",
+    label: "Month", 
+  }
+];
 
 const languageOptions = [
   {
@@ -36,7 +48,27 @@ const languageOptions = [
   },
 ];
 
-function CalendarToolbar(props) {
+interface CalendarToolbarProps {
+  open: boolean;
+  handleDrawerOpen: () => void;
+  handleDrawerClose: () => void;
+  toggleDrawer: () => void;
+  changeLanguage: (language: { value: string; label: string } | null) => void;
+  goToToday: () => void;
+  next: () => void;
+  previous: () => void;
+}
+
+function CalendarToolbar({
+  open,
+  handleDrawerOpen,
+  handleDrawerClose,
+  toggleDrawer,
+  changeLanguage,
+  goToToday,
+  next,
+  previous,
+}: CalendarToolbarProps) {
   const theme = useTheme();
   const {
     settings: { layout },
@@ -86,18 +118,9 @@ function CalendarToolbar(props) {
     },
     select: {
       width: theme.spacing(15),
+      marginRight: theme.spacing(1),
     },
   };
-  const {
-    open,
-    handleDrawerOpen,
-    handleDrawerClose,
-    changeLanguage,
-    goToToday,
-    next,
-    previous,
-    // match,
-  } = props;
 
   const intl = useIntl();
 
@@ -106,6 +129,13 @@ function CalendarToolbar(props) {
 
   const setLayout = (newLayout: ISettings["layout"]) => {
     updateSetting("layout", newLayout);
+  };
+
+  // Handle layout change from dropdown
+  const handleLayoutChange = (selectedOption: { value: string; label: string } | null) => {
+    if (selectedOption) {
+      setLayout(selectedOption.value as ISettings["layout"]);
+    }
   };
 
   const weeks = getWeekDays(selectedDate, 7);
@@ -150,11 +180,14 @@ function CalendarToolbar(props) {
       }}
     >
       <Toolbar>
-        {/* {isMobile && (
+        <Tooltip
+          title={open ? "Close sidebar" : "Open sidebar"}
+          style={{ ...styles.tooltip }}
+        >
           <IconButton
             color="inherit"
-            aria-label="Open drawer"
-            onClick={open ? handleDrawerClose : handleDrawerOpen}
+            aria-label="Toggle sidebar"
+            onClick={toggleDrawer}
             edge="start"
             style={{
               ...styles.menuButton,
@@ -162,7 +195,7 @@ function CalendarToolbar(props) {
           >
             <MenuIcon />
           </IconButton>
-        )} */}
+        </Tooltip>
 
         <Tooltip
           title={`${format(new Date(), "ccc, d MMMM", { locale: locale })}`}
@@ -203,50 +236,17 @@ function CalendarToolbar(props) {
 
         {!isMobile && (
           <>
-            <Tooltip
-              title={intl.formatMessage({ id: "navigation.day" })}
-              style={{ ...styles.tooltip }}
-            >
-              <IconButton
-                color="inherit"
-                aria-label="Day View"
-                onClick={() => setLayout("day")}
-                edge="start"
-                style={{ ...styles.menuButton }}
-              >
-                <CalendarViewDayIcon />
-              </IconButton>
-            </Tooltip>
-
-            <Tooltip
-              title={intl.formatMessage({ id: "navigation.week" })}
-              style={{ ...styles.tooltip }}
-            >
-              <IconButton
-                color="inherit"
-                aria-label="Week View"
-                onClick={() => setLayout("week")}
-                edge="start"
-                style={{ ...styles.menuButton }}
-              >
-                <ViewWeekIcon />
-              </IconButton>
-            </Tooltip>
-
-            <Tooltip
-              title={intl.formatMessage({ id: "navigation.month" })}
-              style={{ ...styles.tooltip }}
-            >
-              <IconButton
-                color="inherit"
-                aria-label="Month View"
-                onClick={() => setLayout("month")}
-                edge="start"
-                style={{ ...styles.menuButton }}
-              >
-                <ViewModuleIcon />
-              </IconButton>
-            </Tooltip>
+            {/* Layout Dropdown */}
+            <div style={{ ...styles.select }}>
+              <Select
+                options={layoutOptions}
+                value={layoutOptions.find(option => option.value === layout)}
+                onChange={handleLayoutChange}
+                isSearchable={false}
+                placeholder="View"
+                aria-label="Select calendar layout"
+              />
+            </div>
           </>
         )}
 
