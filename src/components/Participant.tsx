@@ -1,11 +1,38 @@
-import { Skeleton } from "@mui/material";
+import { Skeleton, useTheme } from "@mui/material";
 import { useGetParticipant } from "../stores/participants";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import CheckCircleIcon from "@mui/icons-material/CheckCircle";
+import CancelIcon from "@mui/icons-material/Cancel";
+import HelpIcon from "@mui/icons-material/Help";
+import ScheduleIcon from "@mui/icons-material/Schedule";
 import { nip19 } from "nostr-tools";
+import { RSVPResponse } from "../stores/events";
 
-export const Participant = ({ pubKey }: { pubKey: string }) => {
+interface ParticipantProps {
+  pubKey: string;
+  rsvpResponse?: RSVPResponse;
+}
+
+const getRSVPIcon = (response: RSVPResponse, theme: any) => {
+  switch (response) {
+    case "accepted":
+      return <CheckCircleIcon style={{ color: theme.palette.success.main, fontSize: "16px" }} />;
+    case "declined":
+      return <CancelIcon style={{ color: theme.palette.error.main, fontSize: "16px" }} />;
+    case "maybe":
+      return <HelpIcon style={{ color: theme.palette.warning.main, fontSize: "16px" }} />;
+    case "pending":
+      return <ScheduleIcon style={{ color: theme.palette.text.secondary, fontSize: "16px" }} />;
+    default:
+      return null;
+  }
+};
+
+export const Participant = ({ pubKey, rsvpResponse }: ParticipantProps) => {
+  const theme = useTheme();
   const { participant, loading } = useGetParticipant({ pubKey });
   const nip19PubKey = nip19.npubEncode(participant.publicKey);
+  
   return (
     <div
       style={{
@@ -33,10 +60,14 @@ export const Participant = ({ pubKey }: { pubKey: string }) => {
         style={{
           overflow: "hidden",
           textOverflow: "ellipsis",
-          maxWidth: "100%%",
+          maxWidth: "100%",
+          display: "flex",
+          alignItems: "center",
+          gap: "8px",
         }}
       >
-        {participant.name || nip19PubKey}
+        <span>{participant.name || nip19PubKey}</span>
+        {rsvpResponse && getRSVPIcon(rsvpResponse, theme)}
       </div>
     </div>
   );

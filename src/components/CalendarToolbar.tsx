@@ -36,7 +36,27 @@ const languageOptions = [
   },
 ];
 
-function CalendarToolbar(props) {
+interface CalendarToolbarProps {
+  open: boolean;
+  handleDrawerOpen: () => void;
+  handleDrawerClose: () => void;
+  toggleDrawer: () => void;
+  changeLanguage: (language: { value: string; label: string } | null) => void;
+  goToToday: () => void;
+  next: () => void;
+  previous: () => void;
+}
+
+function CalendarToolbar({
+  open,
+  handleDrawerOpen,
+  handleDrawerClose,
+  toggleDrawer,
+  changeLanguage,
+  goToToday,
+  next,
+  previous,
+}: CalendarToolbarProps) {
   const theme = useTheme();
   const {
     settings: { layout },
@@ -88,16 +108,6 @@ function CalendarToolbar(props) {
       width: theme.spacing(15),
     },
   };
-  const {
-    open,
-    handleDrawerOpen,
-    handleDrawerClose,
-    changeLanguage,
-    goToToday,
-    next,
-    previous,
-    // match,
-  } = props;
 
   const intl = useIntl();
 
@@ -150,11 +160,14 @@ function CalendarToolbar(props) {
       }}
     >
       <Toolbar>
-        {/* {isMobile && (
+        <Tooltip
+          title={open ? "Close sidebar" : "Open sidebar"}
+          style={{ ...styles.tooltip }}
+        >
           <IconButton
             color="inherit"
-            aria-label="Open drawer"
-            onClick={open ? handleDrawerClose : handleDrawerOpen}
+            aria-label="Toggle sidebar"
+            onClick={toggleDrawer}
             edge="start"
             style={{
               ...styles.menuButton,
@@ -162,7 +175,7 @@ function CalendarToolbar(props) {
           >
             <MenuIcon />
           </IconButton>
-        )} */}
+        </Tooltip>
 
         <Tooltip
           title={`${format(new Date(), "ccc, d MMMM", { locale: locale })}`}

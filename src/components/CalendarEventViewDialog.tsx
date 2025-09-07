@@ -119,9 +119,18 @@ function CalendarEventViewDialog() {
               {formatMessage({ id: "navigation.participants" })}
             </Typography>
             <Typography variant="body2">
-              {calendarEvent.participants.map((participant) => (
-                <Participant pubKey={participant} />
-              ))}
+              {calendarEvent.participants.map((participant) => {
+                const rsvpResponse = calendarEvent.rsvpResponses?.find(
+                  (response) => response.participantId === participant
+                )?.response || "pending";
+                return (
+                  <Participant 
+                    key={participant} 
+                    pubKey={participant} 
+                    rsvpResponse={rsvpResponse}
+                  />
+                );
+              })}
             </Typography>
           </div>
         )}
@@ -152,6 +161,9 @@ function CalendarEventViewDialog() {
             </Typography>
           </div>
         )}
+        <button style={{ backgroundColor: "red", color: "white" , padding: '8px', borderRadius: '4px', border: 'none', cursor: 'pointer'}}>
+          <div>RSVP EVENT</div>
+        </button>
       </DialogContent>
       <DialogActions />
     </Dialog>

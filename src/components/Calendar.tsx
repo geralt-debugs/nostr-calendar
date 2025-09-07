@@ -44,7 +44,9 @@ function Calendar() {
     events.fetchEvents();
   }
   events.fetchPrivateEvents();
-  const changeLanguage = (newLang: { value: string }) => {
+  const changeLanguage = (newLang: { value: string; label: string } | null) => {
+    if (!newLang) return;
+    
     const i18nLocale = newLang.value;
     const newDateFnLocale = i18nLocale === "de-DE" ? de : null;
 
@@ -104,7 +106,7 @@ function Calendar() {
     ...flattenMessages(dictionary[stateCalendar.i18nLocale]),
   };
 
-  const [open, setOpen] = useState(true);
+  const [open, setOpen] = useState(!isMobile); // Start closed on mobile, open on desktop
 
   const handleDrawerOpen = () => {
     setOpen(true);
@@ -112,6 +114,10 @@ function Calendar() {
 
   const handleDrawerClose = () => {
     setOpen(false);
+  };
+
+  const toggleDrawer = () => {
+    setOpen(!open);
   };
 
   const [runAnimation, setRunAnimation] = useState(true);
@@ -195,19 +201,18 @@ function Calendar() {
             open={open}
             handleDrawerOpen={handleDrawerOpen}
             handleDrawerClose={handleDrawerClose}
+            toggleDrawer={toggleDrawer}
             changeLanguage={changeLanguage}
           />
-          {!isMobile && (
-            <CalendarDrawer
-              selectedDate={selectedDate}
-              next={next}
-              previous={previous}
-              open={open}
-              handleDrawerClose={handleDrawerClose}
-              layout={"month"}
-              locale={locale}
-            />
-          )}
+          <CalendarDrawer
+            selectedDate={selectedDate}
+            next={next}
+            previous={previous}
+            open={open}
+            handleDrawerClose={handleDrawerClose}
+            layout={"month"}
+            locale={locale}
+          />
 
           <CalendarMain
             // selectedDate={selectedDate}

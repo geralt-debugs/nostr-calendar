@@ -2,6 +2,12 @@ export type NestedObject = Record<string, NestedObject | string>;
 
 const dictionary: NestedObject = {
   "en-US": {
+    rsvp: {
+      accepted: "Accepted",
+      declined: "Declined", 
+      maybe: "Maybe",
+      pending: "Pending",
+    },
     navigation: {
       today: "today",
       previousDay: "Previous day",
@@ -23,6 +29,7 @@ const dictionary: NestedObject = {
       location: "Location",
       participants: "Participants",
       addParticipants: "Enter participant nPub",
+      rsvpDetails: "RSVP Details",
       privateEvent: "Private Event",
       privateEventCaption:
         "Private events are only visible to you and the invited participants",
@@ -32,6 +39,12 @@ const dictionary: NestedObject = {
     },
   },
   "de-DE": {
+    rsvp: {
+      accepted: "Angenommen",
+      declined: "Abgelehnt",
+      maybe: "Vielleicht", 
+      pending: "Ausstehend",
+    },
     navigation: {
       today: "Heute",
       previousDay: "Vortag",
@@ -54,6 +67,7 @@ const dictionary: NestedObject = {
       location: "Ort",
       participants: "Teilnehmer",
       addParticipants: "Teilnehmer nPub eingeben",
+      rsvpDetails: "RSVP Details",
       privateEvent: "Privat Ereignis",
       privateEventCaption:
         "Privat Ereignis sind nur für Sie und die eingeladenen Teilnehmer sichtbar",

@@ -134,7 +134,12 @@ const getStyles: IGetStyles = (theme: Theme) => ({
   },
 });
 
-function CalendarHeader(props: any) {
+interface CalendarHeaderProps {
+  selectedWeekIndex: number;
+  selectedWeek: Date[];
+}
+
+function CalendarHeader(props: CalendarHeaderProps) {
   const theme = useTheme();
   const styles = getStyles(theme);
 

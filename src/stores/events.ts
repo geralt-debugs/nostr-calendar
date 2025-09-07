@@ -11,6 +11,14 @@ import { isValid } from "date-fns";
 import { appendOne, denormalize, normalize, removeOne } from "normal-store";
 import { SubCloser } from "nostr-tools/abstract-pool";
 
+export type RSVPResponse = "accepted" | "declined" | "maybe" | "pending";
+
+export interface IRSVPResponse {
+  participantId: string;
+  response: RSVPResponse;
+  timestamp: number;
+}
+
 export interface ICalendarEvent {
   begin: number;
   description: string;
@@ -20,6 +28,7 @@ export interface ICalendarEvent {
   createdAt: number;
   categories: string[];
   participants: string[];
+  rsvpResponses: IRSVPResponse[];
   reference: string[];
   image?: string;
   location: string[];
@@ -50,6 +59,7 @@ const processPrivateEvent = (event: Event) => {
     geoHash: [],
     participants: [],
     isPrivateEvent: true,
+    rsvpResponses: [],
   };
 
   event.tags.forEach(([key, value]) => {
@@ -87,6 +97,14 @@ const processPrivateEvent = (event: Event) => {
         break;
       case "g":
         parsedEvent.geoHash.push(value);
+        break;
+      case "rsvp":
+        try {
+          const rsvpData = JSON.parse(value) as { participantId: string; response: RSVPResponse; timestamp: number };
+          parsedEvent.rsvpResponses.push(rsvpData);
+        } catch (error) {
+          console.warn("Failed to parse RSVP data:", value);
+        }
         break;
     }
   });
@@ -169,6 +187,7 @@ export const useTimeBasedEvents = create<{
           geoHash: [],
           participants: [],
           isPrivateEvent: false,
+          rsvpResponses: [],
         };
 
         event.tags.forEach(([key, value]) => {
@@ -202,6 +221,14 @@ export const useTimeBasedEvents = create<{
               break;
             case "g":
               parsedEvent.geoHash.push(value);
+              break;
+            case "rsvp":
+              try {
+                const rsvpData = JSON.parse(value) as { participantId: string; response: RSVPResponse; timestamp: number };
+                parsedEvent.rsvpResponses.push(rsvpData);
+              } catch (error) {
+                console.warn("Failed to parse RSVP data:", value);
+              }
               break;
           }
         });

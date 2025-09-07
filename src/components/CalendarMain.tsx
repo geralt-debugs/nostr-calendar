@@ -8,6 +8,7 @@ import CalendarLayoutDayWeek from "./CalendarLayoutDayWeek";
 import { IGetStyles } from "../common/types";
 import { DrawerHeader } from "./DrawerHeader";
 import { useSettings } from "../stores/settings";
+import { isMobile } from "../common/utils";
 
 const drawerWidth = 260;
 
@@ -33,7 +34,12 @@ const getStyles: IGetStyles = (theme: Theme) => ({
   },
 });
 
-function CalendarMain(props: any) {
+interface CalendarMainProps {
+  open: boolean;
+  runAnimation: boolean;
+}
+
+function CalendarMain(props: CalendarMainProps) {
   const theme = useTheme();
   const styles = getStyles(theme);
   const { stateCalendar } = useContext(CalendarContext);
@@ -48,7 +54,7 @@ function CalendarMain(props: any) {
     <div
       style={{
         ...styles.content,
-        ...(open ? styles.contentShift : {}),
+        ...(open && !isMobile ? styles.contentShift : {}),
       }}
     >
       <DrawerHeader style={{ justifyContent: "center" }} />

@@ -61,6 +61,7 @@ export default async function createEditEvent({
     reference: [],
     geoHash: [],
     participants: [self],
+    rsvpResponses: [],
     website: "",
     user: "",
     isPrivateEvent: true,
