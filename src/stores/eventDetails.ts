@@ -8,19 +8,22 @@ export const TEMP_CALENDAR_ID = "Temp calendar id";
 export const useEventDetails = create<{
   event: ICalendarEvent | null;
   action: "edit" | "create" | "view";
+  selectedEventId: string | null;
   updateEventDetails: <T extends keyof ICalendarEvent>(
     key: T,
     value: ICalendarEvent[T],
   ) => void;
   updateEvent: (event: ICalendarEvent, action?: Action) => void;
   closeEventDetails: () => void;
+  setSelectedEvent: (eventId: string | null) => void;
 }>((set) => ({
   event: null,
   action: "view",
+  selectedEventId: null,
   updateEvent: (event, action = "view") => {
-    set({ action, event });
+    set({ action, event, selectedEventId: event.id });
   },
-  closeEventDetails: () => set({ event: null, action: "view" }),
+  closeEventDetails: () => set({ event: null, action: "view", selectedEventId: null }),
   updateEventDetails: (key, value) =>
     set(({ event }) => {
       if (!event) {
@@ -28,4 +31,5 @@ export const useEventDetails = create<{
       }
       return { event: { ...event, [key]: value } };
     }),
+  setSelectedEvent: (eventId) => set({ selectedEventId: eventId }),
 }));
