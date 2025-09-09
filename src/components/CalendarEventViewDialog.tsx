@@ -181,8 +181,8 @@ function CalendarEventViewDialog() {
       
       <button 
         style={{ 
-          backgroundColor: "red", 
-          color: "white", 
+          backgroundColor: "rgb(251, 177, 123)",
+          color: "grey.900", 
           padding: '8px', 
           borderRadius: '4px', 
           border: 'none', 

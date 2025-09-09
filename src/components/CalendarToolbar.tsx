@@ -109,6 +109,12 @@ function CalendarToolbar({
       width: theme.spacing(18),
       marginRight: theme.spacing(1),
     },
+    logo :{
+      cursor: "pointer",
+      marginRight: theme.spacing(2),
+      height: isMobile ? 30 : 40,
+      objectFit: "contain",
+    }
   };
 
   const intl = useIntl();
@@ -188,6 +194,12 @@ function CalendarToolbar({
             <MenuIcon />
           </IconButton>
         </Tooltip>
+        
+        <img 
+          src="/formstr.png" 
+          alt="Calendar Logo" 
+          style={styles.logo}
+        />
 
         <Tooltip
           title={`${format(new Date(), "ccc, d MMMM", { locale: locale })}`}
