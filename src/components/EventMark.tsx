@@ -14,7 +14,8 @@ const MarkerStyle = styled("div")<{
   len: number;
   sq: number;
   isPrivateEvent: boolean;
-}>(({ theme, position, duration, len, sq, isPrivateEvent }) => ({
+  isSelected: boolean;
+}>(({ theme, position, duration, len, sq, isPrivateEvent, isSelected }) => ({
   marginTop: position,
   height: duration,
   width: `calc((100% / ${len}) - 2px)`,
@@ -26,10 +27,11 @@ const MarkerStyle = styled("div")<{
   backgroundColor: isPrivateEvent ? teal[100] : theme.palette.primary.main,
   padding: "4px 8px",
   cursor: "pointer",
-  boxShadow: "4px 4px 4px 0px rgba(0,0,0,0.25)",
-  zIndex: 50,
+  boxShadow: isSelected 
+    ? "6px 6px 8px 0px rgba(0,0,0,0.4)"
+    : "4px 4px 4px 0px rgba(0,0,0,0.25)",
+  zIndex: isSelected ? 53 : 50,
   "&:hover": {
-    zIndex: 53,
     backgroundColor: isPrivateEvent ? teal[50] : theme.palette.primary.light,
   },
   minHeight: 24,
@@ -107,7 +109,8 @@ function EventMark({
 }) {
   const theme = useTheme();
   const styles = getBaseStyles(theme);
-  const { updateEvent } = useEventDetails((state) => state);
+  const { updateEvent, selectedEventId } = useEventDetails((state) => state);
+  const isSelected = selectedEventId === calendarEvent.id;
 
   const beginDate = new Date(calendarEvent.begin);
   const endDate = new Date(calendarEvent.end);
@@ -167,6 +170,7 @@ function EventMark({
       len={len}
       sq={sq}
       isPrivateEvent={calendarEvent.isPrivateEvent}
+      isSelected={isSelected}
       onDragStart={(eventEl) => onDragStart(eventEl, calendarEvent)}
       onDragEnd={(eventEl) => onDragStart(eventEl, calendarEvent)}
       style={{
