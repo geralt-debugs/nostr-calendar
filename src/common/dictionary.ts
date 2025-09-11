@@ -37,6 +37,15 @@ const dictionary: NestedObject = {
     filters: {
       showPublicEvents: "Show Public Events",
     },
+    message: {
+      title: 'Calendar by Formstr',
+      modeSelection_description: 'Choose how you\'d like to use the calendar',
+      modeSelection_loginButton: 'Login with Nostr',
+      modeSelection_guestButton: 'Continue as Guest',
+      modeSelection_loginInfo: 'Login to save and sync events across devices',
+      login_description: 'Login to manage your events',
+      login_error: 'Login failed'
+    }
   },
   "de-DE": {
     rsvp: {
@@ -68,13 +77,22 @@ const dictionary: NestedObject = {
       participants: "Teilnehmer",
       addParticipants: "Teilnehmer nPub eingeben",
       rsvpDetails: "RSVP Details",
-      privateEvent: "Privat Ereignis",
+      privateEvent: "Privates Ereignis",
       privateEventCaption:
-        "Privat Ereignis sind nur für Sie und die eingeladenen Teilnehmer sichtbar",
+        "Private Ereignisse sind nur für Sie und die eingeladenen Teilnehmer sichtbar",
     },
     filters: {
-      showPublicEvents: "shau öffentlichen Ereignisse",
+      showPublicEvents: "Öffentliche Ereignisse anzeigen",
     },
+    message: {
+      title: 'Kalender von Formstr',
+      modeSelection_description: 'Wählen Sie, wie Sie den Kalender verwenden möchten',
+      modeSelection_loginButton: 'Mit Nostr anmelden',
+      modeSelection_guestButton: 'Als Gast fortfahren',
+      modeSelection_loginInfo: 'Melden Sie sich an, um Ereignisse zu speichern und geräteübergreifend zu synchronisieren',
+      login_description: 'Anmelden, um Ihre Ereignisse zu verwalten',
+      login_error: 'Anmeldung fehlgeschlagen'
+    }
   },
 };
 export default dictionary;
