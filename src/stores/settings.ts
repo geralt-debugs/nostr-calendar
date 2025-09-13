@@ -35,9 +35,6 @@ export const useSettings = create<{
   settings: previousSettings,
   updateSetting: (setting, value) =>
     set(({ settings }) => {
-      if (setting === "layout" && isMobile) {
-        return { settings };
-      }
       const newSettings = { ...settings, [setting]: value };
       setItem(localStorageKey, newSettings);
       return { settings: newSettings };
