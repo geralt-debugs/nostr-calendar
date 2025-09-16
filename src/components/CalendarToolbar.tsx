@@ -148,7 +148,7 @@ function CalendarToolbar({
 
   const { stateCalendar } = useContext(CalendarContext);
   const { selectedDate, locale, i18nLocale } = stateCalendar;
-
+  
   const weeks = getWeekDays(selectedDate, 7);
   const selectedWeekIndex = getSelectedWeekIndex(selectedDate, weeks, 0);
   const selectedWeek = weeks[selectedWeekIndex];

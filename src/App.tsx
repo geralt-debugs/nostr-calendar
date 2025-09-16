@@ -16,7 +16,6 @@ let _locale =
   "en-US";
 _locale = ~Object.keys(dictionary).indexOf(_locale) ? _locale : "en-US";
 
-
 function App() {
   const { user, isInitialized, initializeUser, updateUser } = useUser();
   const [appMode, setAppMode] = useState<string | null>(null); // null, 'login', or 'guest'

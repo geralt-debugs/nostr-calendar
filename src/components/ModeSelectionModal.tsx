@@ -3,6 +3,7 @@ import { Box, Typography, Paper, Button } from "@mui/material";
 import Calendar from "./Calendar";
 import { useIntl } from "react-intl";
 
+
 interface ModeSelectionModalProps {
   isOpen: boolean;
   onModeSelect: (mode: string) => void;
@@ -12,7 +13,8 @@ const ModeSelectionModal: React.FC<ModeSelectionModalProps> = ({
   isOpen, 
   onModeSelect 
 }) => {
-    const intl = useIntl();
+
+  const intl = useIntl();
     
   // Prevent scrolling when modal is open
   useEffect(() => {
