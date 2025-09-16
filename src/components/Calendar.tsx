@@ -1,6 +1,5 @@
 import { useState } from "react";
-import { IntlProvider } from "react-intl";
-import { flattenMessages, isMobile } from "../common/utils";
+import { isMobile } from "../common/utils";
 import dictionary from "../common/dictionary";
 import {
   addMonths,
@@ -100,12 +99,6 @@ function Calendar() {
     // handleCloseViewDialog,
   });
 
-  const i18nLocale = _locale;
-  const locale_dictionary = {
-    ...flattenMessages(dictionary["en-US"]),
-    ...flattenMessages(dictionary[stateCalendar.i18nLocale]),
-  };
-
   const [open, setOpen] = useState(!isMobile); // Start closed on mobile, open on desktop
 
   const handleDrawerOpen = () => {
@@ -186,45 +179,43 @@ function Calendar() {
 
   return (
     <CalendarContext.Provider value={{ stateCalendar, setStateCalendar }}>
-      <IntlProvider locale={i18nLocale} messages={locale_dictionary}>
-        <div
-          style={{
-            width: "100%",
-            height: "100%",
-            display: "flex",
-          }}
-        >
-          <CalendarToolbar
-            goToToday={goToToday}
-            next={next}
-            previous={previous}
-            open={open}
-            handleDrawerOpen={handleDrawerOpen}
-            handleDrawerClose={handleDrawerClose}
-            toggleDrawer={toggleDrawer}
-            changeLanguage={changeLanguage}
-          />
-          <CalendarDrawer
-            selectedDate={selectedDate}
-            next={next}
-            previous={previous}
-            open={open}
-            handleDrawerClose={handleDrawerClose}
-            layout={"month"}
-            locale={locale}
-          />
+      <div
+        style={{
+          width: "100%",
+          height: "100%",
+          display: "flex",
+        }}
+      >
+        <CalendarToolbar
+          goToToday={goToToday}
+          next={next}
+          previous={previous}
+          open={open}
+          handleDrawerOpen={handleDrawerOpen}
+          handleDrawerClose={handleDrawerClose}
+          toggleDrawer={toggleDrawer}
+          changeLanguage={changeLanguage}
+        />
+        <CalendarDrawer
+          selectedDate={selectedDate}
+          next={next}
+          previous={previous}
+          open={open}
+          handleDrawerClose={handleDrawerClose}
+          layout={"month"}
+          locale={locale}
+        />
 
-          <CalendarMain
-            // selectedDate={selectedDate}
-            open={open}
-            // layout={layout}
-            runAnimation={runAnimation}
-          />
+        <CalendarMain
+          // selectedDate={selectedDate}
+          open={open}
+          // layout={layout}
+          runAnimation={runAnimation}
+        />
 
-          <CalendarEventDialog />
-          <CalendarEventViewDialog />
-        </div>
-      </IntlProvider>
+        <CalendarEventDialog />
+        <CalendarEventViewDialog />
+      </div>
     </CalendarContext.Provider>
   );
 }

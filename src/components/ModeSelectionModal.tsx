@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
 import { Box, Typography, Paper, Button } from "@mui/material";
 import Calendar from "./Calendar";
+import { useIntl } from "react-intl";
+
 
 interface ModeSelectionModalProps {
   isOpen: boolean;
@@ -11,6 +13,9 @@ const ModeSelectionModal: React.FC<ModeSelectionModalProps> = ({
   isOpen, 
   onModeSelect 
 }) => {
+
+  const intl = useIntl();
+    
   // Prevent scrolling when modal is open
   useEffect(() => {
     if (isOpen) {
@@ -78,10 +83,10 @@ const ModeSelectionModal: React.FC<ModeSelectionModalProps> = ({
           }}
         >
           <Typography variant="h4" component="h1" gutterBottom>
-            Calendar by Formstr
+            {intl.formatMessage({ id: "message.title" })}
           </Typography>
           <Typography variant="body1" color="text.secondary" sx={{ mb: 3 }}>
-            Choose how you'd like to use the calendar
+            {intl.formatMessage({ id : "message.modeSelection_description" })}
           </Typography>
           <Box display="flex" flexDirection="column" gap={2}>
             <Button
@@ -91,7 +96,7 @@ const ModeSelectionModal: React.FC<ModeSelectionModalProps> = ({
               onClick={() => onModeSelect('login')}
               sx={{ py: 1.5 }}
             >
-              Login with Nostr
+              {intl.formatMessage({ id: "message.modeSelection_loginButton" })}
             </Button>
             <Button
               variant="outlined"
@@ -100,11 +105,11 @@ const ModeSelectionModal: React.FC<ModeSelectionModalProps> = ({
               onClick={() => onModeSelect('guest')}
               sx={{ py: 1.5 }}
             >
-              Continue as Guest
+              {intl.formatMessage({ id: "message.modeSelection_guestButton" })}
             </Button>
           </Box>
           <Typography variant="caption" color="text.secondary" sx={{ mt: 2, display: 'block' }}>
-            Login to save and sync events across devices
+            {intl.formatMessage({ id: "message.modeSelection_loginInfo" })}
           </Typography>
         </Paper>
       </Box>

@@ -6,6 +6,15 @@ import { useEffect, useState } from 'react';
 import { useUser } from './stores/user';
 import { init as initNostrLogin } from "nostr-login";
 import { getUserPublicKey } from "./common/nostr";
+import { IntlProvider } from 'react-intl';
+import { flattenMessages } from './common/utils';
+import dictionary from "./common/dictionary";
+
+let _locale =
+  (navigator.languages && navigator.languages[0]) ||
+  navigator.language ||
+  "en-US";
+_locale = ~Object.keys(dictionary).indexOf(_locale) ? _locale : "en-US";
 
 function App() {
   const { user, isInitialized, initializeUser, updateUser } = useUser();
@@ -49,35 +58,43 @@ function App() {
     setShowModeSelection(false);
   };
 
+  const i18nLocale = _locale;
+  const locale_dictionary = {
+    ...flattenMessages(dictionary["en-US"]),
+    ...flattenMessages(dictionary[i18nLocale]),
+  };
+
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      
-      {/* Mode Selection Modal */}
-      <ModeSelectionModal
-        isOpen={showModeSelection}
-        onModeSelect={handleModeSelection}
-      />
-      
-      {/* Main App Content */}
-      {(appMode || user) && !showModeSelection && (
-        <div className="App">
-          <Calendar />
-        </div>
-      )}
-      
-      {/* Loading State */}
-      {!showModeSelection && !appMode && !user && (
-        <Box 
-          display="flex" 
-          justifyContent="center" 
-          alignItems="center" 
-          minHeight="100vh"
-        >
-          <Typography>Loading...</Typography>
-        </Box>
-      )}
-    </ThemeProvider>
+    <IntlProvider locale={i18nLocale} messages={locale_dictionary}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        
+        {/* Mode Selection Modal */}
+        <ModeSelectionModal
+          isOpen={showModeSelection}
+          onModeSelect={handleModeSelection}
+        />
+        
+        {/* Main App Content */}
+        {(appMode || user) && !showModeSelection && (
+          <div className="App">
+            <Calendar />
+          </div>
+        )}
+        
+        {/* Loading State */}
+        {!showModeSelection && !appMode && !user && (
+          <Box 
+            display="flex" 
+            justifyContent="center" 
+            alignItems="center" 
+            minHeight="100vh"
+          >
+            <Typography>Loading...</Typography>
+          </Box>
+        )}
+      </ThemeProvider>
+    </IntlProvider>
   );
 }
 

@@ -10,32 +10,16 @@ import MenuIcon from "@mui/icons-material/Menu";
 import TodayIcon from "@mui/icons-material/Today";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import Select from "react-select";
-// import Select from "react-select"
 import { format } from "date-fns";
 import getWeekDays from "../common/getWeekDays";
 import getSelectedWeekIndex from "../common/getSelectedWeekIndex";
 import { useTheme } from "@mui/material";
 import { UserMenu } from "./UserMenu";
-import { ISettings, useSettings } from "../stores/settings";
+import { useSettings } from "../stores/settings";
 import { isMobile } from "../common/utils";
-import { getSelectStyles } from "../components/selectStyles";
-const drawerWidth = 260;
+import LayoutSelector from "./LayoutSelector";
 
-const layoutOptions = [
-  {
-    value: "day",
-    label: "Day",
-  },
-  {
-    value: "week", 
-    label: "Week",
-  },
-  {
-    value: "month",
-    label: "Month", 
-  }
-];
+const drawerWidth = 260;
 
 interface CalendarToolbarProps {
   open: boolean;
@@ -61,8 +45,8 @@ function CalendarToolbar({
   const theme = useTheme();
   const {
     settings: { layout },
-    updateSetting,
   } = useSettings((state) => state);
+  
   const styles: Record<string, HTMLAttributes<HTMLDivElement>["style"]> = {
     root: {
       flexGrow: 1,
@@ -72,17 +56,22 @@ function CalendarToolbar({
       borderBottom: "1px solid #E0E0E0",
     },
     menuButton: {
-      marginRight: theme.spacing(2),
+      marginLeft: isMobile ? theme.spacing(0.5) : theme.spacing(0),
+      marginRight: isMobile ? theme.spacing(0.5) : theme.spacing(2),
     },
     title: {
-      flexGrow: 1,
-      paddingLeft: theme.spacing(1),
       fontWeight: 400,
-      fontSize: theme.spacing(3),
+      fontSize: isMobile ? theme.spacing(2.2) : theme.spacing(3),
       textTransform: "capitalize",
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      whiteSpace: "nowrap",
+      minWidth: 0,
+      textAlign: "center",
+      margin: `0 ${theme.spacing(1)}px`,
     },
     button: {
-      paddingRight: theme.spacing(1),
+      paddingRight: isMobile ? theme.spacing(0.5) : theme.spacing(1),
     },
     appBar: {
       zIndex: theme.zIndex.drawer + 1,
@@ -106,14 +95,52 @@ function CalendarToolbar({
       marginTop: 2,
     },
     select: {
-      width: theme.spacing(18),
-      marginRight: theme.spacing(1),
+      width: isMobile ? theme.spacing(12) : theme.spacing(18),
+      marginRight: isMobile ? theme.spacing(0.5) : theme.spacing(1),
+      minWidth: isMobile ? theme.spacing(12) : theme.spacing(18),
     },
-    logo :{
+    logo: {
       cursor: "pointer",
-      marginRight: theme.spacing(2),
+      marginRight: isMobile ? theme.spacing(2) : theme.spacing(2),
       height: isMobile ? 30 : 40,
       objectFit: "contain",
+      flexShrink: 0, 
+    },
+    toolbar: {
+      minHeight: isMobile ? 56 : 64,
+      paddingLeft: isMobile ? theme.spacing(1) : theme.spacing(2),
+      paddingRight: isMobile ? theme.spacing(1) : theme.spacing(2),
+      display: "flex",
+      alignItems: "center",
+    },
+    iconButton: {
+      padding: isMobile ? theme.spacing(0.75) : theme.spacing(1),
+    },
+    leftSection: {
+      display: "flex",
+      alignItems: "center",
+      flex: isMobile ? "0 0 auto" : "1 1 0",
+      minWidth: 0,
+    },
+    centerSection: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      flex: isMobile ? "1 1 auto" : "1 1 0",
+      maxWidth: isMobile ? "50%" : "none",
+      minWidth: 0,
+    },
+    rightSection: {
+      display: "flex",
+      alignItems: "center",
+      flex: isMobile ? "0 0 auto" : "1 1 0",
+      justifyContent: "flex-end",
+      gap: theme.spacing(1),
+      minWidth: 0,
+    },
+    navigationButtons: {
+      display: "flex",
+      alignItems: "center",
     }
   };
 
@@ -121,21 +148,7 @@ function CalendarToolbar({
 
   const { stateCalendar } = useContext(CalendarContext);
   const { selectedDate, locale, i18nLocale } = stateCalendar;
-
-  const setLayout = (newLayout: ISettings["layout"]) => {
-    updateSetting("layout", newLayout);
-  };
   
-  // Handle layout change from dropdown
-  const handleLayoutChange = (selectedOption: { value: string; label: string } | null) => {
-    if (selectedOption) {
-      setLayout(selectedOption.value as ISettings["layout"]);
-    }
-  };
-
-  // Custom styles for curvy react-select dropdown
-  const selectStyles = getSelectStyles(theme);
-
   const weeks = getWeekDays(selectedDate, 7);
   const selectedWeekIndex = getSelectedWeekIndex(selectedDate, weeks, 0);
   const selectedWeek = weeks[selectedWeekIndex];
@@ -166,7 +179,7 @@ function CalendarToolbar({
       ? `${firstDayOfWeekMonth} - ${lastDayOfWeekMonth} ${firstDayOfWeekYear}`
       : false;
   const showMonthAndYear = !showMonthsAndYear
-    ? format(selectedDate, "MMMM", { locale: locale })
+    ? format(selectedDate, isMobile ? "MMM yyyy" : "MMMM", { locale: locale })
     : false;
 
   return (
@@ -177,92 +190,93 @@ function CalendarToolbar({
         width: "100vw",
       }}
     >
-      <Toolbar>
-        <Tooltip
-          title={open ? "Close sidebar" : "Open sidebar"}
-          style={{ ...styles.tooltip }}
-        >
-          <IconButton
-            color="inherit"
-            aria-label="Toggle sidebar"
-            onClick={toggleDrawer}
-            edge="start"
-            style={{
-              ...styles.menuButton,
-            }}
+      <Toolbar style={styles.toolbar}>
+        {/* Left Section - Menu and Logo */}
+        <div style={styles.leftSection}>
+          <Tooltip
+            title={open ? "Close sidebar" : "Open sidebar"}
+            style={{ ...styles.tooltip }}
           >
-            <MenuIcon />
-          </IconButton>
-        </Tooltip>
-        
-        <img 
-          src="/formstr.png" 
-          alt="Calendar Logo" 
-          style={styles.logo}
-        />
+            <IconButton
+              color="inherit"
+              aria-label="Toggle sidebar"
+              onClick={toggleDrawer}
+              edge="start"
+              style={{
+                ...styles.menuButton,
+                ...styles.iconButton,
+              }}
+            >
+              <MenuIcon />
+            </IconButton>
+          </Tooltip>
+          
+          <img 
+            src="/formstr.png" 
+            alt="Calendar Logo" 
+            style={styles.logo}
+          />
 
-        <Tooltip
-          title={`${format(new Date(), "ccc, d MMMM", { locale: locale })}`}
-          style={{ ...styles.tooltip }}
-        >
-          <IconButton
-            color="inherit"
-            aria-label="Today"
-            onClick={goToToday}
-            edge="start"
-            style={{ ...styles.menuButton }}
+          <Tooltip
+            title={`${format(new Date(), "ccc, d MMMM", { locale: locale })}`}
+            style={{ ...styles.tooltip }}
           >
-            <TodayIcon />
-          </IconButton>
-        </Tooltip>
+            <IconButton
+              color="inherit"
+              aria-label="Today"
+              onClick={goToToday}
+              edge="start"
+              style={{ 
+                ...styles.menuButton,
+                ...styles.iconButton,
+              }}
+            >
+              <TodayIcon />
+            </IconButton>
+          </Tooltip>
+        </div>
 
-        <Tooltip
-          title={intl.formatMessage({ id: i18nPreviousLabel(layout) })}
-          style={{ ...styles.tooltip }}
-        >
-          <IconButton onClick={previous}>
-            <ChevronLeftIcon />
-          </IconButton>
-        </Tooltip>
+        {/* Center Section - Navigation */}
+        <div style={styles.centerSection}>
+          <div style={styles.navigationButtons}>
+            <Tooltip
+              title={intl.formatMessage({ id: i18nPreviousLabel(layout) })}
+              style={{ ...styles.tooltip }}
+            >
+              <IconButton 
+                onClick={previous}
+                style={styles.iconButton}
+              >
+                <ChevronLeftIcon />
+              </IconButton>
+            </Tooltip>
 
-        <Tooltip
-          title={intl.formatMessage({ id: i18nNextLabel(layout) })}
-          style={{ ...styles.tooltip }}
-        >
-          <IconButton onClick={next}>
-            <ChevronRightIcon />
-          </IconButton>
-        </Tooltip>
+            <Typography style={{ ...styles.title }}>
+              {showMonthsAndYears || showMonthsAndYear || showMonthAndYear}
+            </Typography>
 
-        <Typography style={{ ...styles.title }}>
-          {showMonthsAndYears || showMonthsAndYear || showMonthAndYear}
-        </Typography>
+            <Tooltip
+              title={intl.formatMessage({ id: i18nNextLabel(layout) })}
+              style={{ ...styles.tooltip }}
+            >
+              <IconButton 
+                onClick={next}
+                style={styles.iconButton}
+              >
+                <ChevronRightIcon />
+              </IconButton>
+            </Tooltip>
+          </div>
+        </div>
 
-        {!isMobile && (
-          <>
-            {/* Layout Dropdown */}
-            <div style={{ ...styles.select }}>
-              <Select
-                options={layoutOptions}
-                value={layoutOptions.find(option => option.value === layout)}
-                onChange={handleLayoutChange}
-                isSearchable={false}
-                placeholder="View"
-                aria-label="Select calendar layout"
-                styles={selectStyles}
-              />
-            </div>
-          </>
-        )}
+        {/* Right Section - Dropdown and User Menu */}
+        <div style={styles.rightSection}>
+          {!isMobile && (
+            <LayoutSelector style={styles.select} />
+          )}
 
-        {/* <Select
-          options={languageOptions}
-          defaultValue={languageOptions.find((option) => {
-            return option.value === i18nLocale;
-          })}
-          onChange={changeLanguage}
-        /> */}
-        <UserMenu />
+          <UserMenu />
+        </div>
       </Toolbar>
     </div>
   );

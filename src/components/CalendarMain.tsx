@@ -15,15 +15,16 @@ const drawerWidth = 260;
 const getStyles: IGetStyles = (theme: Theme) => ({
   content: {
     flexGrow: 1,
-    // padding: theme.spacing(0),
     transition: theme.transitions.create("margin", {
       easing: theme.transitions.easing.sharp,
       duration: theme.transitions.duration.leavingScreen,
     }),
-    marginLeft: -drawerWidth,
+    marginLeft: isMobile ? 0 : -drawerWidth,
     height: "100%",
     width: "100%",
-    minWidth: 1000,
+    minWidth: isMobile ? "100%" : 1000,
+    maxWidth: "100%",
+    overflowX: isMobile ? "auto" : "visible",
   },
   contentShift: {
     transition: theme.transitions.create("margin", {

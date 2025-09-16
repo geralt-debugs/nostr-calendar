@@ -4,12 +4,10 @@ import Typography from "@mui/material/Typography";
 import Grid from "@mui/material/Grid";
 import { styled, Theme, useTheme } from "@mui/material";
 import { format } from "date-fns";
-import createEditEvent from "./createEditEvent";
 import { IGetStyles } from "../common/types";
 import clsx from "clsx";
 import { useTimeBasedEvents } from "../stores/events";
 import { useEventDetails } from "../stores/eventDetails";
-// import EventMark from './EventMark'
 
 const DayStyle = styled("div")<{
   paperColour: string;
@@ -29,7 +27,7 @@ const DayStyle = styled("div")<{
     border-radius: 50%;
     padding: ${({ spacing }) => spacing};
     cursor: pointer;
-    transition: background-color 0.1s ease; /* Add transition for smoother hover */
+    transition: background-color 0.1s ease;
 
     &:hover {
       background-color: ${({ hoverColour }) => hoverColour};
@@ -45,7 +43,7 @@ const MonthMarkerStyle = styled("div")<{
   display: flex;
   align-items: center;
   overflow: hidden;
-  min-height: 23;
+  min-height: 23px;
   border: ${({ borderColour }) => `1px solid ${borderColour}`};
   background-color: ${({ primaryColour }) => `${primaryColour}`};
   padding: 1px 3px;
@@ -53,42 +51,68 @@ const MonthMarkerStyle = styled("div")<{
   border-radius: 3px;
   border-top-right-radius: 3px;
   cursor: pointer;
-  z-index: 50;
+  font-size: 0.75rem;
+  line-height: 1.2;
+  
   &:hover {
-    z-index: 53;
     background-color: ${({ hoverColour }) => `${hoverColour}`};
   }
 `;
 
 const getStyles: IGetStyles = (theme: Theme) => ({
+  calendarContainer: {
+    width: '100%',
+    overflow: 'hidden',
+  },
+  
   paperHeader: {
     borderBottom: "1px solid #dadce0",
     borderRight: "1px solid #dadce0",
-    padding: theme.spacing(1),
+    padding: theme.spacing(0.5),
     textAlign: "center",
     color: theme.palette.text.secondary,
     backgroundColor: theme.palette.background.paper,
     borderRadius: 0,
-    minWidth: 64.38,
+    width: '100%',
+    minHeight: '40px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    
+    [theme.breakpoints.up('sm')]: {
+      padding: theme.spacing(1),
+      minHeight: '48px',
+    },
   },
+  
   title: {
     textTransform: "capitalize",
+    fontSize: '0.75rem',
+    
+    [theme.breakpoints.up('sm')]: {
+      fontSize: '0.875rem',
+    },
   },
 
   paper: {
     borderBottom: "1px solid #dadce0",
     borderRight: "1px solid #dadce0",
-    padding: theme.spacing(1),
+    padding: theme.spacing(0.5),
     textAlign: "center",
     color: theme.palette.text.secondary,
     backgroundColor: theme.palette.background.paper,
     borderRadius: 0,
-    minWidth: 64.38,
+    width: '100%',
     height: "100%",
     display: "flex",
-    alignItems: "center",
+    alignItems: "flex-start",
     flexDirection: "column",
+    
+    [theme.breakpoints.up('sm')]: {
+      padding: theme.spacing(1),
+    },
   },
+  
   paperWeekend: {
     backgroundColor: theme.palette.grey[100],
   },
@@ -96,6 +120,7 @@ const getStyles: IGetStyles = (theme: Theme) => ({
   centerContent: {
     display: "flex",
     justifyContent: "center",
+    width: '100%',
   },
 
   eventsContainer: {
@@ -111,6 +136,29 @@ const getStyles: IGetStyles = (theme: Theme) => ({
     whiteSpace: "nowrap",
     textOverflow: "ellipsis",
     gap: "2px",
+    marginTop: theme.spacing(0.5),
+  },
+  
+  gridItem: {
+    flex: 1,
+    minWidth: 0,
+  },
+  
+  dayNumber: {
+    width: '100%',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: theme.spacing(0.5),
+  },
+  
+  monthLabel: {
+    fontSize: '0.6rem',
+    marginTop: '2px',
+    
+    [theme.breakpoints.up('sm')]: {
+      fontSize: '0.75rem',
+    },
   },
 });
 
@@ -126,15 +174,18 @@ function CalendarLayoutMonth({ weeks }: { weeks: Date[][] }) {
 
   const maxHeight = (weeks: Date[][]) => {
     const size = weeks.length;
+    const baseHeight = window.innerHeight < 600 ? '80px' : '120px';
 
     if (size === 5) {
       return {
-        height: "calc((100% / 5) - 21.2px)",
+        height: `calc((100vh - 200px) / 5)`,
+        minHeight: baseHeight,
       };
     }
 
     return {
-      height: "calc((100% / 6) - 17.5px)",
+      height: `calc((100vh - 200px) / 6)`,
+      minHeight: baseHeight,
     };
   };
 
@@ -173,38 +224,18 @@ function CalendarLayoutMonth({ weeks }: { weeks: Date[][] }) {
             onClick={() => {
               updateEvent(event);
             }}
+            title={event.title}
           >
             {event.title}
           </MonthMarkerStyle>
         ));
     });
     return markers;
-
-    // const markers = dayEvents.map((event: any, index: number) => {
-    //     const hour = new Date(event.begin).getHours()
-    //     const thisHoursHas = eventsByHour.find((evHour: any) => evHour.hour === hour)
-
-    //     console.log(
-    //         `key=event-${event.id}`,
-    //         `calendarEvent=${event.begin}`,
-    //         `sq=${index}`,
-    //         `len=${thisHoursHas ? thisHoursHas.len : 0}`,
-    //     )
-
-    //     return (
-    //         <EventMark
-    //             key={`event-${event.id}`}
-    //             calendarEvent={event}
-    //             sq={index}
-    //             len={thisHoursHas ? thisHoursHas.len : 0}
-    //         />
-    //     )
-    // })
-    // return markers
   };
 
   return (
-    <>
+    <div style={styles.calendarContainer}>
+      {/* Header Row */}
       <Grid
         container
         spacing={0}
@@ -212,6 +243,7 @@ function CalendarLayoutMonth({ weeks }: { weeks: Date[][] }) {
         justifyContent="center"
         alignItems="center"
         wrap="nowrap"
+        style={{ width: '100%' }}
       >
         {weeks[0].map((weekDay: Date, index: number) => {
           const day = format(weekDay, "ccc").toUpperCase();
@@ -219,10 +251,9 @@ function CalendarLayoutMonth({ weeks }: { weeks: Date[][] }) {
 
           return (
             <Grid
-              style={{
-                flexGrow: "1",
-              }}
+              item
               key={`calendar-column-header-label-${index}`}
+              style={styles.gridItem}
             >
               <div
                 style={{
@@ -230,7 +261,7 @@ function CalendarLayoutMonth({ weeks }: { weeks: Date[][] }) {
                   ...(isWeekend ? styles.paperWeekend : {}),
                 }}
               >
-                <Typography style={{ ...styles.title }}>
+                <Typography style={styles.title}>
                   {format(weekDay, "ccc", { locale: locale })}
                 </Typography>
               </div>
@@ -239,6 +270,7 @@ function CalendarLayoutMonth({ weeks }: { weeks: Date[][] }) {
         })}
       </Grid>
 
+      {/* Calendar Weeks */}
       {weeks.map((week, weekIndex) => (
         <Grid
           container
@@ -248,7 +280,7 @@ function CalendarLayoutMonth({ weeks }: { weeks: Date[][] }) {
           alignItems="stretch"
           wrap="nowrap"
           key={`calendar-main-line-${weekIndex}`}
-          style={maxHeight(weeks)}
+          style={{ ...maxHeight(weeks), width: '100%' }}
         >
           {week.map((day, dayIndex: number) => {
             const isToday =
@@ -260,10 +292,9 @@ function CalendarLayoutMonth({ weeks }: { weeks: Date[][] }) {
 
             return (
               <Grid
-                style={{
-                  flexGrow: "1",
-                }}
+                item
                 key={`calendar-main-line-${weekIndex}-column-${dayIndex}`}
+                style={styles.gridItem}
               >
                 <div
                   style={{
@@ -271,53 +302,39 @@ function CalendarLayoutMonth({ weeks }: { weeks: Date[][] }) {
                     ...(isWeekend ? styles.paperWeekend : {}),
                   }}
                 >
-                  <Typography component={"div"} style={{ ...styles.title }}>
-                    <DayStyle
-                      primaryColour={theme.palette.primary.main}
-                      hoverColour={theme.palette.primary.dark}
-                      spacing={theme.spacing(1)}
-                      paperColour={theme.palette.background.paper}
-                      className={clsx({ today: isToday })}
-                    >
-                      {day.getDate()}
-                    </DayStyle>
-                    <div>
-                      {day.getDate() === 1
-                        ? format(new Date(day), " MMM", {
+                  <div style={styles.dayNumber}>
+                    <Typography component={"div"} style={styles.title}>
+                      <DayStyle
+                        primaryColour={theme.palette.primary.main}
+                        hoverColour={theme.palette.primary.dark}
+                        spacing={theme.spacing(1)}
+                        paperColour={theme.palette.background.paper}
+                        className={clsx({ today: isToday })}
+                      >
+                        {day.getDate()}
+                      </DayStyle>
+                      {day.getDate() === 1 && (
+                        <div style={styles.monthLabel}>
+                          {format(new Date(day), " MMM", {
                             locale: locale,
-                          })
-                        : null}
-                    </div>
-                  </Typography>
+                          })}
+                        </div>
+                      )}
+                    </Typography>
+                  </div>
 
                   {eventsOfDay && eventsOfDay.length > 0 && (
-                    <div style={{ ...styles.eventsContainer }} data-date={day}>
+                    <div style={styles.eventsContainer} data-date={day}>
                       {eventsOfDay}
                     </div>
                   )}
-
-                  {/* {false && (
-                                        <div className={classes.centerContent}>
-                                            <Typography className={clsx(classes.title)}>
-                                                <span className={clsx({ [classes.today]: isToday })}>
-                                                    {day.getDate()}
-                                                </span>
-
-                                                {day.getDate() === 1
-                                                    ? format(new Date(day), " MMM", {
-                                                          locale: locale,
-                                                      })
-                                                    : null}
-                                            </Typography>
-                                        </div>
-                                    )} */}
                 </div>
               </Grid>
             );
           })}
         </Grid>
       ))}
-    </>
+    </div>
   );
 }
 
