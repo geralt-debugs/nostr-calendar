@@ -8,9 +8,6 @@ import Typography from "@mui/material/Typography";
 import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
 import TodayIcon from "@mui/icons-material/Today";
-import ViewWeekIcon from "@mui/icons-material/ViewWeek";
-import CalendarViewDayIcon from "@mui/icons-material/CalendarViewDay";
-import ViewModuleIcon from "@mui/icons-material/ViewModule";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 import Select from "react-select";
@@ -22,18 +19,22 @@ import { useTheme } from "@mui/material";
 import { UserMenu } from "./UserMenu";
 import { ISettings, useSettings } from "../stores/settings";
 import { isMobile } from "../common/utils";
-
+import { getSelectStyles } from "../components/selectStyles";
 const drawerWidth = 260;
 
-const languageOptions = [
+const layoutOptions = [
   {
-    value: "en-US",
-    label: "English",
+    value: "day",
+    label: "Day",
   },
   {
-    value: "de-DE",
-    label: "Deutsch",
+    value: "week", 
+    label: "Week",
   },
+  {
+    value: "month",
+    label: "Month", 
+  }
 ];
 
 interface CalendarToolbarProps {
@@ -105,8 +106,15 @@ function CalendarToolbar({
       marginTop: 2,
     },
     select: {
-      width: theme.spacing(15),
+      width: theme.spacing(18),
+      marginRight: theme.spacing(1),
     },
+    logo :{
+      cursor: "pointer",
+      marginRight: theme.spacing(2),
+      height: isMobile ? 30 : 40,
+      objectFit: "contain",
+    }
   };
 
   const intl = useIntl();
@@ -117,6 +125,16 @@ function CalendarToolbar({
   const setLayout = (newLayout: ISettings["layout"]) => {
     updateSetting("layout", newLayout);
   };
+  
+  // Handle layout change from dropdown
+  const handleLayoutChange = (selectedOption: { value: string; label: string } | null) => {
+    if (selectedOption) {
+      setLayout(selectedOption.value as ISettings["layout"]);
+    }
+  };
+
+  // Custom styles for curvy react-select dropdown
+  const selectStyles = getSelectStyles(theme);
 
   const weeks = getWeekDays(selectedDate, 7);
   const selectedWeekIndex = getSelectedWeekIndex(selectedDate, weeks, 0);
@@ -176,6 +194,12 @@ function CalendarToolbar({
             <MenuIcon />
           </IconButton>
         </Tooltip>
+        
+        <img 
+          src="/formstr.png" 
+          alt="Calendar Logo" 
+          style={styles.logo}
+        />
 
         <Tooltip
           title={`${format(new Date(), "ccc, d MMMM", { locale: locale })}`}
@@ -216,60 +240,28 @@ function CalendarToolbar({
 
         {!isMobile && (
           <>
-            <Tooltip
-              title={intl.formatMessage({ id: "navigation.day" })}
-              style={{ ...styles.tooltip }}
-            >
-              <IconButton
-                color="inherit"
-                aria-label="Day View"
-                onClick={() => setLayout("day")}
-                edge="start"
-                style={{ ...styles.menuButton }}
-              >
-                <CalendarViewDayIcon />
-              </IconButton>
-            </Tooltip>
-
-            <Tooltip
-              title={intl.formatMessage({ id: "navigation.week" })}
-              style={{ ...styles.tooltip }}
-            >
-              <IconButton
-                color="inherit"
-                aria-label="Week View"
-                onClick={() => setLayout("week")}
-                edge="start"
-                style={{ ...styles.menuButton }}
-              >
-                <ViewWeekIcon />
-              </IconButton>
-            </Tooltip>
-
-            <Tooltip
-              title={intl.formatMessage({ id: "navigation.month" })}
-              style={{ ...styles.tooltip }}
-            >
-              <IconButton
-                color="inherit"
-                aria-label="Month View"
-                onClick={() => setLayout("month")}
-                edge="start"
-                style={{ ...styles.menuButton }}
-              >
-                <ViewModuleIcon />
-              </IconButton>
-            </Tooltip>
+            {/* Layout Dropdown */}
+            <div style={{ ...styles.select }}>
+              <Select
+                options={layoutOptions}
+                value={layoutOptions.find(option => option.value === layout)}
+                onChange={handleLayoutChange}
+                isSearchable={false}
+                placeholder="View"
+                aria-label="Select calendar layout"
+                styles={selectStyles}
+              />
+            </div>
           </>
         )}
 
-        <Select
+        {/* <Select
           options={languageOptions}
           defaultValue={languageOptions.find((option) => {
             return option.value === i18nLocale;
           })}
           onChange={changeLanguage}
-        />
+        /> */}
         <UserMenu />
       </Toolbar>
     </div>
