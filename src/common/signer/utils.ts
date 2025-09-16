@@ -1,9 +1,9 @@
 import { generateSecretKey } from "nostr-tools";
 import { bytesToHex, hexToBytes } from "@noble/hashes/utils";
 
-const LOCAL_APP_SECRET_KEY = "formstr:client-secret";
-const LOCAL_BUNKER_URI = "formstr:bunkerUri";
-const LOCAL_STORAGE_KEYS = "formstr:keys";
+const LOCAL_APP_SECRET_KEY = "calendar:client-secret";
+const LOCAL_BUNKER_URI = "calendar:bunkerUri";
+const LOCAL_STORAGE_KEYS = "calendar:keys";
 
 type BunkerUri = { bunkerUri: string };
 

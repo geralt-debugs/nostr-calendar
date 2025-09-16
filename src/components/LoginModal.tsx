@@ -55,7 +55,7 @@ const Nip46Section: React.FC<Nip46SectionProps> = ({ onSuccess }) => {
       relays: ["wss://relay.nsec.app"],
       secret,
       perms,
-      name: "Formstr",
+      name: "Calendar",
       url: window.location.origin,
     };
 

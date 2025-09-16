@@ -17,6 +17,8 @@ import { TEMP_CALENDAR_ID } from "../stores/eventDetails";
 import { AbstractRelay } from "nostr-tools/abstract-relay";
 import * as nip59 from "./nip59";
 import { NSec } from "nostr-tools/nip19";
+import { signerManager } from "./signer";
+import { useUser } from "../stores/user";
 
 const defaultRelays = [
   "wss://relay.damus.io/",
@@ -31,7 +33,7 @@ const defaultRelays = [
 
 const _onAcceptedRelays = console.log.bind(
   console,
-  "Successfully published to relay: ",
+  "Successfully published to relay: "
 );
 
 export const pool = new SimplePool();
@@ -41,12 +43,12 @@ export const getRelays = () => {
 };
 
 export async function getUserPublicKey() {
-  return await window.nostr.getPublicKey();
+  return useUser.getState().user?.publicKey ?? null;
 }
 
 export const ensureRelay = async (
   url: string,
-  params?: { connectionTimeout?: number },
+  params?: { connectionTimeout?: number }
 ): Promise<AbstractRelay> => {
   const relay = new Relay(url);
   if (params?.connectionTimeout)
@@ -62,9 +64,9 @@ export async function publishPrivateRSVPEvent({
   participants, // List of participant public keys
 }: {
   eventId: string;
-  authorpubKey: string; 
+  authorpubKey: string;
   status: string;
-  participants: string[]; 
+  participants: string[];
 }) {
   const uniqueRSVPId = uuid();
   const userPublicKey = await getUserPublicKey();
@@ -74,15 +76,15 @@ export async function publishPrivateRSVPEvent({
   // Encrypt the RSVP data
   const eventData = [
     ["a", `32678:${authorpubKey}:${eventId}`],
-    ["d" , uniqueRSVPId],
+    ["d", uniqueRSVPId],
     ["L", "status"],
     ["l", `${status}`, "status"],
     ["L", "freebusy"],
-    ["l", "free", "freebusy"]
+    ["l", "free", "freebusy"],
   ];
   const eventContent = nip44.encrypt(
     JSON.stringify(eventData),
-    nip44.getConversationKey(viewSecretKey, viewPublicKey),
+    nip44.getConversationKey(viewSecretKey, viewPublicKey)
   );
   const unsignedRSVPEvent: UnsignedEvent = {
     pubkey: userPublicKey, // Your public key here
@@ -90,7 +92,7 @@ export async function publishPrivateRSVPEvent({
     kind: 32069,
     content: eventContent,
     tags: [
-      ["d" , uniqueRSVPId], // Unique identifier for the RSVP event
+      ["d", uniqueRSVPId], // Unique identifier for the RSVP event
     ],
   };
   const signedRSVPEvent = await window.nostr.signEvent(unsignedRSVPEvent);
@@ -116,24 +118,24 @@ export async function publishPrivateRSVPEvent({
     // Create a rumor
     const giftWrap = await nip59.wrapEvent(
       {
-      pubkey: nip19.npubEncode(userPublicKey),
-      created_at: Math.floor(Date.now() / 1000),
-      kind: 55,
-      content: "",
-      tags: [
-        ["a", `32069:${participant}:${uniqueRSVPId}`],
-        ["viewKey", nip19.nsecEncode(viewSecretKey)],
-      ],
-    },
-    participant,
-    1055
+        pubkey: nip19.npubEncode(userPublicKey),
+        created_at: Math.floor(Date.now() / 1000),
+        kind: 55,
+        content: "",
+        tags: [
+          ["a", `32069:${participant}:${uniqueRSVPId}`],
+          ["viewKey", nip19.nsecEncode(viewSecretKey)],
+        ],
+      },
+      participant,
+      1055
     );
     giftWraps.push(giftWrap);
   }
   await Promise.all(
     giftWraps.map((gift) => {
       return publishToRelays(gift);
-    }),
+    })
   );
   return {
     rsvpEvent: signedRSVPEvent,
@@ -152,20 +154,20 @@ export async function publishPublicRSVPEvent({
 }) {
   const uniqueRSVPId = uuid();
   const userPublicKey = await getUserPublicKey();
-  
+
   const unsignedRSVPEvent: UnsignedEvent = {
     pubkey: userPublicKey, // Your public key here
     created_at: Math.floor(Date.now() / 1000),
     kind: 31925,
     content: "",
     tags: [
-      ["d" , uniqueRSVPId],
+      ["d", uniqueRSVPId],
       ["a", `31923:${authorpubKey}:${eventId}`],
-      ["d" , uniqueRSVPId],
+      ["d", uniqueRSVPId],
       ["L", "status"],
       ["l", `${status}`, "status"],
       ["L", "freebusy"],
-      ["l", "free", "freebusy"]
+      ["l", "free", "freebusy"],
     ],
   };
 
@@ -178,9 +180,7 @@ export async function publishPublicRSVPEvent({
   };
 }
 
-export const fetchPublicRSVPEvents = (
-  onEvent: (event: Event) => void,
-) => {
+export const fetchPublicRSVPEvents = (onEvent: (event: Event) => void) => {
   const relayList = getRelays();
   const filter: Filter = {
     kinds: [31925],
@@ -216,7 +216,7 @@ export async function publishPrivateCalendarEvent({
   const userPublicKey = await getUserPublicKey();
   const eventContent = nip44.encrypt(
     JSON.stringify(eventData),
-    nip44.getConversationKey(viewSecretKey, viewPublicKey),
+    nip44.getConversationKey(viewSecretKey, viewPublicKey)
   );
 
   const unsignedCalendarEvent: UnsignedEvent = {
@@ -272,7 +272,7 @@ export async function publishPrivateCalendarEvent({
   await Promise.all(
     giftWraps.map((gift) => {
       return publishToRelays(gift);
-    }),
+    })
   );
   return {
     calendarEvent: signedEvent,
@@ -300,7 +300,7 @@ export async function getDetailsFromGiftWrap(giftWrap: Event) {
 
 export const fetchCalendarGiftWraps = (
   { participants }: { participants: string[] },
-  onEvent: (event: { eventId: string; viewKey: string }) => void,
+  onEvent: (event: { eventId: string; viewKey: string }) => void
 ) => {
   const relayList = getRelays();
   const filter = {
@@ -346,10 +346,13 @@ export async function getDetailsFromRSVPGiftWrap(giftWrap: Event) {
           const viewPrivateKey = nip19.decode(viewKey as NSec).data;
           const decryptedContent = nip44.decrypt(
             rsvpEvent.content,
-            nip44.getConversationKey(viewPrivateKey, getPublicKey(viewPrivateKey)),
+            nip44.getConversationKey(
+              viewPrivateKey,
+              getPublicKey(viewPrivateKey)
+            )
           );
           const eventData = JSON.parse(decryptedContent);
-          
+
           closer.close();
           resolve({
             rsvpEvent: {
@@ -375,21 +378,21 @@ export async function getDetailsFromRSVPGiftWrap(giftWrap: Event) {
           viewKey,
           aTag: aTag[1],
           isPrivate: viewKey ? true : false,
-          status: 'tentative', // Default status when no RSVP is present
+          status: "tentative", // Default status when no RSVP is present
         });
-      }
+      },
     });
-    
+
     setTimeout(() => {
       closer.close();
-      reject(new Error('Timeout: RSVP event fetch timed out'));
+      reject(new Error("Timeout: RSVP event fetch timed out"));
     }, 10000);
   });
 }
 
 export const fetchAndDecryptPrivateRSVPEvents = (
   { participants }: { participants: string[] },
-  onEvent: (decryptedRSVP: any) => void,
+  onEvent: (decryptedRSVP: any) => void
 ) => {
   const relayList = getRelays();
   const filter = {
@@ -403,7 +406,7 @@ export const fetchAndDecryptPrivateRSVPEvents = (
         const decryptedRSVP = await getDetailsFromRSVPGiftWrap(giftWrap);
         onEvent(decryptedRSVP);
       } catch (error) {
-        console.error('Failed to process RSVP gift wrap:', error);
+        console.error("Failed to process RSVP gift wrap:", error);
       }
     },
   });
@@ -413,7 +416,7 @@ export async function viewPrivateEvent(calendarEvent: Event, viewKey: string) {
   const viewPrivateKey = nip19.decode(viewKey as NSec).data;
   const decryptedContent = nip44.decrypt(
     calendarEvent.content,
-    nip44.getConversationKey(viewPrivateKey, getPublicKey(viewPrivateKey)),
+    nip44.getConversationKey(viewPrivateKey, getPublicKey(viewPrivateKey))
   );
 
   return {
@@ -424,7 +427,7 @@ export async function viewPrivateEvent(calendarEvent: Event, viewKey: string) {
 
 export async function fetchPrivateCalendarEvents(
   { eventIds }: { eventIds: string[] },
-  onEvent: (event: Event) => void,
+  onEvent: (event: Event) => void
 ) {
   const relayList = getRelays();
   const filter = {
@@ -442,7 +445,7 @@ export async function fetchPrivateCalendarEvents(
 
 export const publishToRelays = (
   event: Event,
-  onAcceptedRelays: (url: string) => void = _onAcceptedRelays,
+  onAcceptedRelays: (url: string) => void = _onAcceptedRelays
 ) => {
   return Promise.any(
     getRelays()
@@ -458,7 +461,7 @@ export const publishToRelays = (
               return reason;
             }),
             new Promise<string>((_, reject) =>
-              setTimeout(() => reject("timeout"), 5000),
+              setTimeout(() => reject("timeout"), 5000)
             ),
           ]);
         } finally {
@@ -470,7 +473,7 @@ export const publishToRelays = (
             }
           }
         }
-      }),
+      })
   );
 };
 
@@ -489,7 +492,7 @@ export const fetchCalendarEvents = (onEvent: (event: Event) => void) => {
 
 export const publishPublicCalendarEvent = async (
   event: ICalendarEvent,
-  onAcceptedRelays?: (url: string) => void,
+  onAcceptedRelays?: (url: string) => void
 ) => {
   const pubKey = await getUserPublicKey();
   const id = event.id !== TEMP_CALENDAR_ID ? event.id : uuid();
@@ -522,7 +525,7 @@ export const publishPublicCalendarEvent = async (
 
 export const fetchUserInfo = (
   userPublicKeys: string[],
-  onEvent: (event: Event) => void,
+  onEvent: (event: Event) => void
 ) => {
   const relayList = getRelays();
   const filter: Filter = {

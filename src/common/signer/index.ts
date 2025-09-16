@@ -1,6 +1,6 @@
 import { nip07Signer } from "./NIP07Signer";
 import { createNip46Signer } from "./NIP46Signer";
-import { NostrSigner } from "./types";
+
 import {
   getBunkerUriInLocalStorage,
   getKeysFromLocalStorage,
@@ -11,6 +11,7 @@ import {
   removeAppSecretFromLocalStorage,
 } from "./utils";
 import { createLocalSigner } from "./LocalSigner";
+import { NostrSigner } from "./types";
 
 class Signer {
   private signer: NostrSigner | null = null;
@@ -97,7 +98,7 @@ class Signer {
       if (this.signer) return this.signer;
     }
 
-    throw new Error("No signer available and no login modal registered.");
+    throw new Error("NO_SIGNER_AVAILABLE_AND_NO_LOGIN_REQUEST_REGISTERED");
   }
 
   onChange(cb: () => void) {
