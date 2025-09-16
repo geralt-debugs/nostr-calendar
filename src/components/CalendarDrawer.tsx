@@ -9,8 +9,11 @@ import { Locale } from "date-fns";
 import CalendarSmall from "../engine_components/CalendarSmall";
 import { Filters } from "./Filters";
 import { isMobile } from "../common/utils";
+import Typography from "@mui/material/Typography";
+import LayoutSelector from "./LayoutSelector";
 
 const drawerWidth = 260;
+
 const getStyles = (
   theme: Theme,
 ): Record<string, HTMLAttributes<HTMLDivElement>["style"]> => ({
@@ -24,6 +27,13 @@ const getStyles = (
   drawerPaper: {
     width: drawerWidth,
   },
+  drawerHeader: {
+    display: "flex",
+    alignItems: "center",
+    padding: theme.spacing(0, 1),
+    ...theme.mixins.toolbar,
+    justifyContent: "flex-end",
+  },
   calendarSmall: {
     marginTop: theme.spacing(4),
     marginRight: theme.spacing(1),
@@ -32,6 +42,18 @@ const getStyles = (
     minHeight: 265,
     minWidth: 240,
     background: theme.palette.background.paper,
+  },
+  layoutSection: {
+    padding: theme.spacing(2),
+  },
+  layoutTitle: {
+    marginBottom: theme.spacing(1),
+    fontSize: "0.875rem",
+    fontWeight: 500,
+    color: theme.palette.text.secondary,
+  },
+  layoutSelect: {
+    width: "100%",
   },
 });
 
@@ -49,9 +71,11 @@ function CalendarDrawer(props: CalendarDrawerProps) {
   const { open, handleDrawerClose } = props;
   const theme = useTheme();
   const styles = getStyles(theme);
+
   return (
     <Drawer
-      style={{ ...styles.drawer, ...styles.drawerPaper }}
+      style={{ ...styles.drawer }}
+      PaperProps={{ style: styles.drawerPaper }}
       variant={isMobile ? "temporary" : "persistent"}
       anchor="left"
       open={open}
@@ -67,7 +91,23 @@ function CalendarDrawer(props: CalendarDrawerProps) {
         </IconButton>
       </div>
       <Divider />
-      <div style={{ ...styles.calendarSmall }}>{<CalendarSmall />}</div>
+
+      {/* Layout Selector - Show for mobile or always if you prefer */}
+      {isMobile && (
+        <>
+          <div style={styles.layoutSection}>
+            <Typography style={styles.layoutTitle}>
+              Calendar View
+            </Typography>
+            <LayoutSelector style={styles.layoutSelect} />
+          </div>
+          <Divider />
+        </>
+      )}
+
+      <div style={{ ...styles.calendarSmall }}>
+        <CalendarSmall />
+      </div>
       <Divider />
       <Filters />
     </Drawer>

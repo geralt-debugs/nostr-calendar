@@ -12,6 +12,9 @@ const ModeSelectionModal: React.FC<ModeSelectionModalProps> = ({
   isOpen, 
   onModeSelect 
 }) => {
+
+  const intl = useIntl();
+    
   // Prevent scrolling when modal is open
   useEffect(() => {
     if (isOpen) {
