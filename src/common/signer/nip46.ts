@@ -269,7 +269,7 @@ export class BunkerSigner implements Signer {
     clientSecretKey: Uint8Array,
     connectionURI: string,
     params: BunkerSignerParams = {},
-    maxWait: number = 300_000
+    maxWait: number = 30 * 1000
   ): Promise<BunkerSigner> {
     const signer = new BunkerSigner(clientSecretKey, params);
     const parsedURI = parseNostrConnectURI(connectionURI);

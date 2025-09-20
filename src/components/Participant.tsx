@@ -47,8 +47,7 @@ const getRSVPIcon = (response: RSVPResponse, theme: any) => {
 export const Participant = ({ pubKey, rsvpResponse }: ParticipantProps) => {
   const theme = useTheme();
   const { participant, loading } = useGetParticipant({ pubKey });
-  console.log("participant", participant, pubKey);
-  const nip19PubKey = nip19.npubEncode(participant.publicKey);
+  const npub = nip19.npubEncode(pubKey);
 
   return (
     <div
@@ -83,7 +82,7 @@ export const Participant = ({ pubKey, rsvpResponse }: ParticipantProps) => {
           gap: "8px",
         }}
       >
-        <span>{participant.name || nip19PubKey}</span>
+        <span>{participant.name || npub}</span>
         {rsvpResponse && getRSVPIcon(rsvpResponse, theme)}
       </div>
     </div>

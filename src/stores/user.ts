@@ -1,12 +1,13 @@
 import { create } from "zustand";
 import { setItem } from "../common/localStorage";
 import { signerManager } from "../common/signer";
-import { useEventDetails } from "./eventDetails";
 import { useTimeBasedEvents } from "./events";
 
 export interface IUser {
   publicKey: string;
 }
+
+let isInitializing = false;
 
 const USER_STORAGE_KEY = "nostr_user";
 
@@ -37,8 +38,13 @@ export const useUser = create<{
   },
 
   initializeUser: async () => {
-    signerManager.onChange(onUserChange);
-    await signerManager.restoreFromStorage();
+    if (!isInitializing) {
+      isInitializing = true;
+      setTimeout(() => {
+        signerManager.onChange(onUserChange);
+        signerManager.restoreFromStorage();
+      }, 500);
+    }
   },
 }));
 
@@ -68,6 +74,5 @@ const onUserChange = async () => {
   if (hasUserChanged) {
     const eventManager = useTimeBasedEvents.getState();
     eventManager.resetPrivateEvents();
-    eventManager.fetchPrivateEvents();
   }
 };

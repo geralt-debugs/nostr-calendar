@@ -4,7 +4,6 @@ import { ThemeProvider, CssBaseline, Box, Typography } from "@mui/material";
 import { theme } from "./theme";
 import { useEffect, useState } from "react";
 import { useUser } from "./stores/user";
-// import { init as initNostrLogin } from "nostr-login";
 import { IntlProvider } from "react-intl";
 import { flattenMessages } from "./common/utils";
 import dictionary from "./common/dictionary";

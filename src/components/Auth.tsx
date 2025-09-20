@@ -1,4 +1,3 @@
-// import { launch as nostrLogin, logout as nostrLogout } from "nostr-login";
 import { MenuItem } from "@mui/material";
 import { useUser } from "../stores/user";
 import { useIntl } from "react-intl";
@@ -6,7 +5,7 @@ import { useEffect } from "react";
 
 export const Auth = () => {
   const { user, updateLoginModal, logout, initializeUser } = useUser(
-    (state) => state
+    (state) => state,
   );
   const hasUserLoggedIn = !!user;
   const intl = useIntl();
