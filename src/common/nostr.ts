@@ -204,8 +204,8 @@ export async function publishPrivateCalendarEvent({
   const eventData = [
     ["title", title],
     ["description", description],
-    ["start", start / 1000],
-    ["end", end / 1000],
+    ["start", String(Math.floor(start / 1000))],
+    ["end", String(Math.floor(end / 1000))],
     ["d", uniqueCalId],
   ];
 
@@ -220,7 +220,7 @@ export async function publishPrivateCalendarEvent({
   );
 
   const unsignedCalendarEvent: UnsignedEvent = {
-    pubkey: nip19.npubEncode(userPublicKey), // Your public key here
+    pubkey: userPublicKey,
     created_at: Math.floor(Date.now() / 1000),
     kind: 32678,
     content: eventContent,
@@ -248,7 +248,7 @@ export async function publishPrivateCalendarEvent({
       ],
     },
     userPublicKey,
-    1055
+    1052
   );
   giftWraps.push(ownGift);
   for (const participant of participants) {
@@ -260,7 +260,7 @@ export async function publishPrivateCalendarEvent({
         kind: 52,
         content: "",
         tags: [
-          ["a", `32678:${participant}:${uniqueCalId}`],
+          ["a", `32678:${userPublicKey}:${uniqueCalId}`],
           ["viewKey", nip19.nsecEncode(viewSecretKey)],
         ],
       },
