@@ -8,6 +8,7 @@ import {
 } from "nostr-tools";
 import { getConversationKey, encrypt } from "nostr-tools/nip44";
 import { Seal } from "nostr-tools/kinds";
+import { signerManager } from "./signer";
 
 type Rumor = UnsignedEvent & { id: string };
 
@@ -25,13 +26,20 @@ const nip44Encrypt = (
   publicKey: string,
 ) => encrypt(JSON.stringify(data), nip44ConversationKey(privateKey, publicKey));
 
-const nip44Decrypt = async (data: NostrEvent) =>
-  JSON.parse(
-    await window.nostr.nip44.decrypt(data.pubkey, data.content),
+const nip44Decrypt = async (data: NostrEvent) => {
+  const signer = await signerManager.getSigner();
+  if (!signer?.nip44Decrypt) {
+    throw new Error("CANNOT_DECRYPT_EVENT");
+  }
+  return JSON.parse(
+    await signer.nip44Decrypt(data.pubkey, data.content),
   ) as NostrEvent;
+};
 
 export async function getUserPublicKey() {
-  return await window.nostr.getPublicKey();
+  const signer = await signerManager.getSigner();
+  const pubKey = await signer.getPublicKey();
+  return pubKey;
 }
 
 export async function createRumor(event: Partial<UnsignedEvent>) {
@@ -51,19 +59,27 @@ export async function createRumor(event: Partial<UnsignedEvent>) {
 }
 
 export async function createSeal(rumor: Rumor, recipientPublicKey: string) {
-  return window.nostr.signEvent({
+  const signer = await signerManager.getSigner();
+  if (!signer?.nip44Encrypt) {
+    throw new Error("CANNOT_ENCRYPT");
+  }
+  const content = await signer.nip44Encrypt(
+    recipientPublicKey,
+    JSON.stringify(rumor),
+  );
+  return signer.signEvent({
     kind: Seal,
-    content: await window.nostr.nip44.encrypt(
-      recipientPublicKey,
-      JSON.stringify(rumor),
-    ),
+    content,
     created_at: randomNow(),
     tags: [],
-    pubkey: await getUserPublicKey(),
   });
 }
 
-export function createWrap(seal: NostrEvent, recipientPublicKey: string, kind : number) {
+export function createWrap(
+  seal: NostrEvent,
+  recipientPublicKey: string,
+  kind: number,
+) {
   const randomKey = generateSecretKey();
 
   return finalizeEvent(
@@ -80,7 +96,7 @@ export function createWrap(seal: NostrEvent, recipientPublicKey: string, kind : 
 export async function wrapEvent(
   event: Partial<UnsignedEvent>,
   recipientPublicKey: string,
-  kind : number
+  kind: number,
 ) {
   const rumor = await createRumor(event);
 
@@ -91,7 +107,7 @@ export async function wrapEvent(
 export async function wrapManyEvents(
   event: Partial<UnsignedEvent>,
   recipientsPublicKeys: string[],
-  kind : number
+  kind: number,
 ) {
   if (!recipientsPublicKeys || recipientsPublicKeys.length === 0) {
     throw new Error("At least one recipient is required.");

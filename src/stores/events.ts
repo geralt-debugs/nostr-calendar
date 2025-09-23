@@ -100,7 +100,11 @@ const processPrivateEvent = (event: Event) => {
         break;
       case "rsvp":
         try {
-          const rsvpData = JSON.parse(value) as { participantId: string; response: RSVPResponse; timestamp: number };
+          const rsvpData = JSON.parse(value) as {
+            participantId: string;
+            response: RSVPResponse;
+            timestamp: number;
+          };
           parsedEvent.rsvpResponses.push(rsvpData);
         } catch (error) {
           console.warn("Failed to parse RSVP data:", value);
@@ -149,20 +153,32 @@ export const useTimeBasedEvents = create<{
   eventById: Record<string, ICalendarEvent>;
   fetchEvents: () => void;
   fetchPrivateEvents: () => void;
+  resetPrivateEvents: () => void;
 }>((set) => ({
+  resetPrivateEvents: () => {
+    set(({ events }) => {
+      const publicEvents = events.filter((evt) => !evt.isPrivateEvent);
+      return {
+        events: publicEvents,
+      };
+    });
+  },
   events: [],
   eventIds: [],
   eventById: {},
   async fetchPrivateEvents() {
     if (privateSubloser) {
-      return;
+      privateSubloser.close();
     }
     const userPublicKey = await getUserPublicKey();
+    if (!userPublicKey) {
+      return;
+    }
     privateSubloser = fetchCalendarGiftWraps(
       { participants: [userPublicKey] },
       (event) => {
         processGiftWraps(event);
-      },
+      }
     );
   },
   fetchEvents: () => {
@@ -224,7 +240,11 @@ export const useTimeBasedEvents = create<{
               break;
             case "rsvp":
               try {
-                const rsvpData = JSON.parse(value) as { participantId: string; response: RSVPResponse; timestamp: number };
+                const rsvpData = JSON.parse(value) as {
+                  participantId: string;
+                  response: RSVPResponse;
+                  timestamp: number;
+                };
                 parsedEvent.rsvpResponses.push(rsvpData);
               } catch (error) {
                 console.warn("Failed to parse RSVP data:", value);

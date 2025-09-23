@@ -18,6 +18,7 @@ import CalendarEventViewDialog from "./CalendarEventViewDialog";
 import CalendarEventDialog from "./CalendarEventDialog";
 import { useTimeBasedEvents } from "../stores/events";
 import { useSettings } from "../stores/settings";
+import { useUser } from "../stores/user";
 
 let _locale =
   (navigator.languages && navigator.languages[0]) ||
@@ -38,14 +39,17 @@ function Calendar() {
   const {
     settings: { layout, filters },
   } = useSettings((state) => state);
+  const { user } = useUser();
   const events = useTimeBasedEvents((state) => state);
   if (filters?.showPublicEvents) {
     events.fetchEvents();
   }
-  events.fetchPrivateEvents();
+  if (user) {
+    events.fetchPrivateEvents();
+  }
   const changeLanguage = (newLang: { value: string; label: string } | null) => {
     if (!newLang) return;
-    
+
     const i18nLocale = newLang.value;
     const newDateFnLocale = i18nLocale === "de-DE" ? de : null;
 

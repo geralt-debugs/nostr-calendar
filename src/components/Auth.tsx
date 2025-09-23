@@ -1,12 +1,12 @@
-import { launch as nostrLogin, logout as nostrLogout } from "nostr-login";
-import { getUserPublicKey } from "../common/nostr";
 import { MenuItem } from "@mui/material";
 import { useUser } from "../stores/user";
 import { useIntl } from "react-intl";
 import { useEffect } from "react";
 
 export const Auth = () => {
-  const { user, updateUser, logout, initializeUser } = useUser((state) => state);
+  const { user, updateLoginModal, logout, initializeUser } = useUser(
+    (state) => state,
+  );
   const hasUserLoggedIn = !!user;
   const intl = useIntl();
 
@@ -16,9 +16,7 @@ export const Auth = () => {
 
   const handleLogin = async () => {
     try {
-      await nostrLogin();
-      const publicKey = await getUserPublicKey();
-      updateUser({ publicKey });
+      updateLoginModal(true);
     } catch (error) {
       console.error("Login failed:", error);
     }
@@ -26,7 +24,7 @@ export const Auth = () => {
 
   const handleLogout = async () => {
     try {
-      await nostrLogout();
+      // await nostrLogout();
       await logout();
     } catch (error) {
       console.error("Logout failed:", error);
@@ -45,5 +43,7 @@ export const Auth = () => {
     </MenuItem>
   );
 
-  return hasUserLoggedIn ? logoutElem : loginElem;
+  const toDisplay = hasUserLoggedIn ? logoutElem : loginElem;
+
+  return toDisplay;
 };
