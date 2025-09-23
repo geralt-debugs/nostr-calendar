@@ -16,13 +16,29 @@ interface ParticipantProps {
 const getRSVPIcon = (response: RSVPResponse, theme: any) => {
   switch (response) {
     case "accepted":
-      return <CheckCircleIcon style={{ color: theme.palette.success.main, fontSize: "16px" }} />;
+      return (
+        <CheckCircleIcon
+          style={{ color: theme.palette.success.main, fontSize: "16px" }}
+        />
+      );
     case "declined":
-      return <CancelIcon style={{ color: theme.palette.error.main, fontSize: "16px" }} />;
+      return (
+        <CancelIcon
+          style={{ color: theme.palette.error.main, fontSize: "16px" }}
+        />
+      );
     case "maybe":
-      return <HelpIcon style={{ color: theme.palette.warning.main, fontSize: "16px" }} />;
+      return (
+        <HelpIcon
+          style={{ color: theme.palette.warning.main, fontSize: "16px" }}
+        />
+      );
     case "pending":
-      return <ScheduleIcon style={{ color: theme.palette.text.secondary, fontSize: "16px" }} />;
+      return (
+        <ScheduleIcon
+          style={{ color: theme.palette.text.secondary, fontSize: "16px" }}
+        />
+      );
     default:
       return null;
   }
@@ -31,8 +47,8 @@ const getRSVPIcon = (response: RSVPResponse, theme: any) => {
 export const Participant = ({ pubKey, rsvpResponse }: ParticipantProps) => {
   const theme = useTheme();
   const { participant, loading } = useGetParticipant({ pubKey });
-  const nip19PubKey = nip19.npubEncode(participant.publicKey);
-  
+  const npub = nip19.npubEncode(pubKey);
+
   return (
     <div
       style={{
@@ -66,7 +82,7 @@ export const Participant = ({ pubKey, rsvpResponse }: ParticipantProps) => {
           gap: "8px",
         }}
       >
-        <span>{participant.name || nip19PubKey}</span>
+        <span>{participant.name || npub}</span>
         {rsvpResponse && getRSVPIcon(rsvpResponse, theme)}
       </div>
     </div>

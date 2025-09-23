@@ -51,23 +51,23 @@ import InfoIcon from "@mui/icons-material/Info";
 
 const getStyles: IGetStyles = (theme: Theme) => ({
   dialogPaper: {
-    borderRadius: '24px',
+    borderRadius: "24px",
     background: `linear-gradient(135deg, ${theme.palette.background.paper} 0%, ${theme.palette.background.default} 100%)`,
-    boxShadow: '0 32px 64px rgba(0, 0, 0, 0.12)',
-    overflow: 'hidden',
+    boxShadow: "0 32px 64px rgba(0, 0, 0, 0.12)",
+    overflow: "hidden",
   },
   dialogTitle: {
     background: `linear-gradient(135deg, ${theme.palette.primary.main}15 0%, ${theme.palette.primary.light}10 100%)`,
     borderBottom: `1px solid ${theme.palette.divider}`,
-    position: 'relative',
+    position: "relative",
     padding: theme.spacing(3, 3, 2, 3),
     [theme.breakpoints.down('sm')]: {
       padding: theme.spacing(2, 2, 1.5, 2),
     },
   },
   titleContainer: {
-    display: 'flex',
-    alignItems: 'center',
+    display: "flex",
+    alignItems: "center",
     gap: theme.spacing(2),
     [theme.breakpoints.down('sm')]: {
       gap: theme.spacing(1.5),
@@ -75,7 +75,7 @@ const getStyles: IGetStyles = (theme: Theme) => ({
   },
   titleIcon: {
     background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.light} 100%)`,
-    borderRadius: '12px',
+    borderRadius: "12px",
     padding: theme.spacing(1),
     color: 'white',
     display: 'flex',
@@ -90,7 +90,7 @@ const getStyles: IGetStyles = (theme: Theme) => ({
     position: "absolute",
     right: theme.spacing(2),
     top: theme.spacing(2),
-    display: 'flex',
+    display: "flex",
     gap: theme.spacing(0.5),
     [theme.breakpoints.down('sm')]: {
       right: theme.spacing(1),
@@ -99,11 +99,11 @@ const getStyles: IGetStyles = (theme: Theme) => ({
     },
   },
   actionButton: {
-    borderRadius: '12px',
+    borderRadius: "12px",
     padding: theme.spacing(1),
-    transition: 'all 0.3s ease',
-    '&:hover': {
-      transform: 'scale(1.1)',
+    transition: "all 0.3s ease",
+    "&:hover": {
+      transform: "scale(1.1)",
       background: theme.palette.action.hover,
     },
     [theme.breakpoints.down('sm')]: {
@@ -113,8 +113,8 @@ const getStyles: IGetStyles = (theme: Theme) => ({
   },
   closeButton: {
     color: theme.palette.error.main,
-    '&:hover': {
-      background: theme.palette.error.light + '20',
+    "&:hover": {
+      background: theme.palette.error.light + "20",
     },
   },
   form: {
@@ -128,14 +128,14 @@ const getStyles: IGetStyles = (theme: Theme) => ({
   },
   section: {
     background: theme.palette.background.paper,
-    borderRadius: '16px',
+    borderRadius: "16px",
     padding: theme.spacing(3),
     border: `1px solid ${theme.palette.divider}`,
-    boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)',
-    transition: 'all 0.3s ease',
-    '&:hover': {
-      transform: 'translateY(-2px)',
-      boxShadow: '0 8px 24px rgba(0, 0, 0, 0.1)',
+    boxShadow: "0 4px 12px rgba(0, 0, 0, 0.05)",
+    transition: "all 0.3s ease",
+    "&:hover": {
+      transform: "translateY(-2px)",
+      boxShadow: "0 8px 24px rgba(0, 0, 0, 0.1)",
     },
     [theme.breakpoints.down('sm')]: {
       padding: theme.spacing(2),
@@ -146,8 +146,8 @@ const getStyles: IGetStyles = (theme: Theme) => ({
     },
   },
   sectionHeader: {
-    display: 'flex',
-    alignItems: 'center',
+    display: "flex",
+    alignItems: "center",
     gap: theme.spacing(2),
     marginBottom: theme.spacing(2),
     [theme.breakpoints.down('sm')]: {
@@ -157,7 +157,7 @@ const getStyles: IGetStyles = (theme: Theme) => ({
   },
   sectionIcon: {
     background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.light} 100%)`,
-    borderRadius: '10px',
+    borderRadius: "10px",
     padding: theme.spacing(0.8),
     color: 'white',
     fontSize: '20px',
@@ -168,15 +168,15 @@ const getStyles: IGetStyles = (theme: Theme) => ({
     },
   },
   textField: {
-    '& .MuiOutlinedInput-root': {
-      borderRadius: '12px',
-      transition: 'all 0.3s ease',
-      '&:hover': {
-        transform: 'translateY(-1px)',
-        boxShadow: '0 4px 12px rgba(0, 0, 0, 0.1)',
+    "& .MuiOutlinedInput-root": {
+      borderRadius: "12px",
+      transition: "all 0.3s ease",
+      "&:hover": {
+        transform: "translateY(-1px)",
+        boxShadow: "0 4px 12px rgba(0, 0, 0, 0.1)",
       },
-      '&.Mui-focused': {
-        transform: 'translateY(-1px)',
+      "&.Mui-focused": {
+        transform: "translateY(-1px)",
         boxShadow: `0 4px 12px ${theme.palette.primary.main}30`,
       },
     },
@@ -192,20 +192,20 @@ const getStyles: IGetStyles = (theme: Theme) => ({
     },
   },
   timeSection: {
-    display: 'flex',
-    flexDirection: 'column',
+    display: "flex",
+    flexDirection: "column",
     gap: theme.spacing(2),
     [theme.breakpoints.down('sm')]: {
       gap: theme.spacing(1.5),
     },
   },
   timeRow: {
-    display: 'flex',
-    alignItems: 'center',
+    display: "flex",
+    alignItems: "center",
     gap: theme.spacing(2),
     padding: theme.spacing(2),
     background: theme.palette.background.default,
-    borderRadius: '12px',
+    borderRadius: "12px",
     border: `1px solid ${theme.palette.divider}`,
     flexWrap: 'wrap',
     [theme.breakpoints.down('sm')]: {
@@ -293,23 +293,23 @@ const getStyles: IGetStyles = (theme: Theme) => ({
     },
   },
   participantSection: {
-    display: 'flex',
-    flexDirection: 'column',
+    display: "flex",
+    flexDirection: "column",
     gap: theme.spacing(2),
     [theme.breakpoints.down('sm')]: {
       gap: theme.spacing(1.5),
     },
   },
   participantItem: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
     padding: theme.spacing(1.5, 2),
     background: theme.palette.background.default,
-    borderRadius: '12px',
+    borderRadius: "12px",
     border: `1px solid ${theme.palette.divider}`,
-    transition: 'all 0.3s ease',
-    '&:hover': {
+    transition: "all 0.3s ease",
+    "&:hover": {
       borderColor: theme.palette.primary.main,
       boxShadow: `0 2px 8px ${theme.palette.primary.main}20`,
     },
@@ -320,24 +320,24 @@ const getStyles: IGetStyles = (theme: Theme) => ({
   },
   removeButton: {
     color: theme.palette.error.main,
-    borderRadius: '8px',
+    borderRadius: "8px",
     padding: theme.spacing(0.5),
-    transition: 'all 0.3s ease',
-    '&:hover': {
-      background: theme.palette.error.light + '20',
-      transform: 'scale(1.1)',
+    transition: "all 0.3s ease",
+    "&:hover": {
+      background: theme.palette.error.light + "20",
+      transform: "scale(1.1)",
     },
     [theme.breakpoints.down('sm')]: {
       padding: theme.spacing(0.3),
     },
   },
   privacySection: {
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "space-between",
     padding: theme.spacing(2, 3),
     background: theme.palette.background.default,
-    borderRadius: '16px',
+    borderRadius: "16px",
     border: `1px solid ${theme.palette.divider}`,
     width: '100%',
     [theme.breakpoints.down('sm')]: {
@@ -349,8 +349,8 @@ const getStyles: IGetStyles = (theme: Theme) => ({
     },
   },
   privacyToggle: {
-    display: 'flex',
-    alignItems: 'center',
+    display: "flex",
+    alignItems: "center",
     gap: theme.spacing(2),
     [theme.breakpoints.down('sm')]: {
       gap: theme.spacing(1.5),
@@ -358,7 +358,7 @@ const getStyles: IGetStyles = (theme: Theme) => ({
     },
   },
   privacyChip: {
-    borderRadius: '12px',
+    borderRadius: "12px",
     padding: theme.spacing(0.5, 1),
     fontWeight: 600,
     [theme.breakpoints.down('sm')]: {
@@ -366,23 +366,23 @@ const getStyles: IGetStyles = (theme: Theme) => ({
     },
   },
   saveButton: {
-    borderRadius: '16px',
+    borderRadius: "16px",
     padding: theme.spacing(1.5, 4),
-    fontSize: '16px',
+    fontSize: "16px",
     fontWeight: 600,
-    textTransform: 'none',
+    textTransform: "none",
     background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.dark} 100%)`,
     boxShadow: `0 4px 16px ${theme.palette.primary.main}40`,
-    transition: 'all 0.3s ease',
-    '&:hover': {
-      transform: 'translateY(-2px)',
+    transition: "all 0.3s ease",
+    "&:hover": {
+      transform: "translateY(-2px)",
       boxShadow: `0 8px 24px ${theme.palette.primary.main}50`,
     },
-    '&:disabled': {
+    "&:disabled": {
       background: theme.palette.action.disabledBackground,
       color: theme.palette.action.disabled,
-      transform: 'none',
-      boxShadow: 'none',
+      transform: "none",
+      boxShadow: "none",
     },
     [theme.breakpoints.down('sm')]: {
       padding: theme.spacing(1.2, 3),
@@ -395,8 +395,8 @@ const getStyles: IGetStyles = (theme: Theme) => ({
     },
   },
   loadingButton: {
-    display: 'flex',
-    alignItems: 'center',
+    display: "flex",
+    alignItems: "center",
     gap: theme.spacing(1),
     [theme.breakpoints.down('sm')]: {
       gap: theme.spacing(0.8),
@@ -466,13 +466,18 @@ function CalendarEventDialog() {
 
   const handleOk = async () => {
     updateProcessing(true);
-    if (eventMetaDetails.type === "private") {
-      await publishPrivateCalendarEvent(eventDetails);
-    } else {
-      await publishPublicCalendarEvent(eventDetails);
+    try {
+      if (eventMetaDetails.type === "private") {
+        await publishPrivateCalendarEvent(eventDetails);
+      } else {
+        await publishPublicCalendarEvent(eventDetails);
+      }
+      updateProcessing(false);
+      closeDialog();
+    } catch (e: any) {
+      console.error(e.message);
+      updateProcessing(true);
     }
-    updateProcessing(false);
-    closeDialog();
   };
 
   const onChangeBeginDate = (newDate: Date) => {
@@ -606,8 +611,8 @@ function CalendarEventDialog() {
                 Event Details
               </Typography>
             </div>
-            
-            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+
+            <Box sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
               <TextField
                 fullWidth
                 placeholder="Event title..."
@@ -631,7 +636,9 @@ function CalendarEventDialog() {
                 }}
                 sx={styles.textField}
                 InputProps={{
-                  startAdornment: <ImageIcon sx={{ mr: 1, color: 'text.secondary' }} />,
+                  startAdornment: (
+                    <ImageIcon sx={{ mr: 1, color: "text.secondary" }} />
+                  ),
                 }}
               />
             </Box>
@@ -645,7 +652,7 @@ function CalendarEventDialog() {
                 When
               </Typography>
             </div>
-            
+
             <Box sx={styles.timeSection}>
               <Box sx={styles.timeRow}>
                 <Typography variant="body2" sx={styles.timeLabel}>
@@ -717,7 +724,7 @@ function CalendarEventDialog() {
                 Participants
               </Typography>
             </div>
-            
+
             <Box sx={styles.participantSection}>
               <ParticipantAdd
                 onAdd={(pubKey) => {
@@ -727,7 +734,7 @@ function CalendarEventDialog() {
                   updateEventDetails("participants", newParticipants);
                 }}
               />
-              
+
               {eventDetails.participants.map((participant) => (
                 <Box key={participant} sx={styles.participantItem}>
                   <Participant pubKey={participant} />
@@ -756,7 +763,7 @@ function CalendarEventDialog() {
                 Description
               </Typography>
             </div>
-            
+
             <TextField
               fullWidth
               placeholder="Add event description..."
@@ -801,7 +808,11 @@ function CalendarEventDialog() {
                   <Chip
                     label={eventMetaDetails.type}
                     size="small"
-                    color={eventMetaDetails.type === "private" ? "primary" : "secondary"}
+                    color={
+                      eventMetaDetails.type === "private"
+                        ? "primary"
+                        : "secondary"
+                    }
                     sx={styles.privacyChip}
                   />
                 </Box>
@@ -809,7 +820,9 @@ function CalendarEventDialog() {
             />
             <Tooltip
               placement="top"
-              title={intl.formatMessage({ id: "navigation.privateEventCaption" })}
+              title={intl.formatMessage({
+                id: "navigation.privateEventCaption",
+              })}
             >
               <IconButton size="small">
                 <InfoIcon />
@@ -817,10 +830,10 @@ function CalendarEventDialog() {
             </Tooltip>
           </div>
         </Box>
-        
-        <Button 
-          onClick={handleOk} 
-          color="primary" 
+
+        <Button
+          onClick={handleOk}
+          color="primary"
           disabled={buttonDisabled}
           sx={styles.saveButton}
         >
