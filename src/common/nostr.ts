@@ -206,8 +206,8 @@ export async function publishPrivateCalendarEvent({
   const eventData = [
     ["title", title],
     ["description", description],
-    ["start", String(Math.floor(start / 1000))],
-    ["end", String(Math.floor(end / 1000))],
+    ["start", start / 1000],
+    ["end", end / 1000],
     ["d", uniqueCalId],
   ];
 
@@ -249,7 +249,7 @@ export async function publishPrivateCalendarEvent({
         kind: 52,
         content: "",
         tags: [
-          ["a", `32678:${userPublicKey}:${uniqueCalId}`],
+          ["a", `32678:${participant}:${uniqueCalId}`],
           ["viewKey", nip19.nsecEncode(viewSecretKey)],
         ],
       },
