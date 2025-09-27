@@ -27,7 +27,7 @@ const getRSVPIcon = (response: RSVPResponse, theme: any) => {
           style={{ color: theme.palette.error.main, fontSize: "16px" }}
         />
       );
-    case "maybe":
+    case "tentative":
       return (
         <HelpIcon
           style={{ color: theme.palette.warning.main, fontSize: "16px" }}
@@ -44,11 +44,39 @@ const getRSVPIcon = (response: RSVPResponse, theme: any) => {
   }
 };
 
-export const Participant = ({ pubKey, rsvpResponse }: ParticipantProps) => {
+export const Participant = ({ pubKey, rsvpResponse = "pending"}: ParticipantProps) => {
   const theme = useTheme();
   const { participant, loading } = useGetParticipant({ pubKey });
   const npub = nip19.npubEncode(pubKey);
 
+  if (!participant || !participant.publicKey) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          maxWidth: "92%",
+          alignItems: "center",
+          gap: "12px",
+        }}
+      >
+        <Skeleton variant="circular" width={"24px"} height={"24px"} />
+        <div
+          style={{
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            maxWidth: "100%",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+          }}
+        >
+          <Skeleton width={100} height={20} />
+          {rsvpResponse && getRSVPIcon(rsvpResponse, theme)}
+        </div>
+      </div>
+    );
+  }
+  
   return (
     <div
       style={{
@@ -58,6 +86,7 @@ export const Participant = ({ pubKey, rsvpResponse }: ParticipantProps) => {
         gap: "12px",
       }}
     >
+      {rsvpResponse && getRSVPIcon(rsvpResponse, theme)}
       <object
         style={{
           width: "24px",
@@ -83,7 +112,6 @@ export const Participant = ({ pubKey, rsvpResponse }: ParticipantProps) => {
         }}
       >
         <span>{participant.name || npub}</span>
-        {rsvpResponse && getRSVPIcon(rsvpResponse, theme)}
       </div>
     </div>
   );

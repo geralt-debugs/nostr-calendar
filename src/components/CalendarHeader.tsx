@@ -122,7 +122,7 @@ const getStyles: IGetStyles = (theme: Theme) => ({
   },
   timeColumn: {
     position: "relative",
-    webkitBoxSizing: "border-box",
+    WebkitBoxSizing: "border-box",
   },
   timeColumnElement: {
     position: "relative",
