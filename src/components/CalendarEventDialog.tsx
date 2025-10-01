@@ -12,6 +12,7 @@ import {
   Avatar,
   Divider,
   CircularProgress,
+  useMediaQuery,
 } from "@mui/material";
 import { grey } from "@mui/material/colors";
 import Button from "@mui/material/Button";
@@ -60,20 +61,30 @@ const getStyles: IGetStyles = (theme: Theme) => ({
     borderBottom: `1px solid ${theme.palette.divider}`,
     position: "relative",
     padding: theme.spacing(3, 3, 2, 3),
+    [theme.breakpoints.down('sm')]: {
+      padding: theme.spacing(2, 2, 1.5, 2),
+    },
   },
   titleContainer: {
     display: "flex",
     alignItems: "center",
     gap: theme.spacing(2),
+    [theme.breakpoints.down('sm')]: {
+      gap: theme.spacing(1.5),
+    },
   },
   titleIcon: {
     background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.light} 100%)`,
     borderRadius: "12px",
     padding: theme.spacing(1),
-    color: "white",
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
+    color: 'white',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    [theme.breakpoints.down('sm')]: {
+      padding: theme.spacing(0.8),
+      borderRadius: '8px',
+    },
   },
   divTitleButton: {
     position: "absolute",
@@ -81,6 +92,11 @@ const getStyles: IGetStyles = (theme: Theme) => ({
     top: theme.spacing(2),
     display: "flex",
     gap: theme.spacing(0.5),
+    [theme.breakpoints.down('sm')]: {
+      right: theme.spacing(1),
+      top: theme.spacing(1.5),
+      gap: theme.spacing(0.3),
+    },
   },
   actionButton: {
     borderRadius: "12px",
@@ -89,6 +105,10 @@ const getStyles: IGetStyles = (theme: Theme) => ({
     "&:hover": {
       transform: "scale(1.1)",
       background: theme.palette.action.hover,
+    },
+    [theme.breakpoints.down('sm')]: {
+      padding: theme.spacing(0.7),
+      borderRadius: '8px',
     },
   },
   closeButton: {
@@ -102,6 +122,9 @@ const getStyles: IGetStyles = (theme: Theme) => ({
     flexDirection: "column",
     gap: theme.spacing(3),
     padding: theme.spacing(1, 0),
+    [theme.breakpoints.down('sm')]: {
+      gap: theme.spacing(2),
+    },
   },
   section: {
     background: theme.palette.background.paper,
@@ -114,19 +137,35 @@ const getStyles: IGetStyles = (theme: Theme) => ({
       transform: "translateY(-2px)",
       boxShadow: "0 8px 24px rgba(0, 0, 0, 0.1)",
     },
+    [theme.breakpoints.down('sm')]: {
+      padding: theme.spacing(2),
+      borderRadius: '12px',
+      '&:hover': {
+        transform: 'none',
+      },
+    },
   },
   sectionHeader: {
     display: "flex",
     alignItems: "center",
     gap: theme.spacing(2),
     marginBottom: theme.spacing(2),
+    [theme.breakpoints.down('sm')]: {
+      gap: theme.spacing(1.5),
+      marginBottom: theme.spacing(1.5),
+    },
   },
   sectionIcon: {
     background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.light} 100%)`,
     borderRadius: "10px",
     padding: theme.spacing(0.8),
-    color: "white",
-    fontSize: "20px",
+    color: 'white',
+    fontSize: '20px',
+    [theme.breakpoints.down('sm')]: {
+      padding: theme.spacing(0.6),
+      fontSize: '18px',
+      borderRadius: '8px',
+    },
   },
   textField: {
     "& .MuiOutlinedInput-root": {
@@ -141,11 +180,24 @@ const getStyles: IGetStyles = (theme: Theme) => ({
         boxShadow: `0 4px 12px ${theme.palette.primary.main}30`,
       },
     },
+    [theme.breakpoints.down('sm')]: {
+      '& .MuiOutlinedInput-root': {
+        '&:hover': {
+          transform: 'none',
+        },
+        '&.Mui-focused': {
+          transform: 'none',
+        },
+      },
+    },
   },
   timeSection: {
     display: "flex",
     flexDirection: "column",
     gap: theme.spacing(2),
+    [theme.breakpoints.down('sm')]: {
+      gap: theme.spacing(1.5),
+    },
   },
   timeRow: {
     display: "flex",
@@ -155,16 +207,98 @@ const getStyles: IGetStyles = (theme: Theme) => ({
     background: theme.palette.background.default,
     borderRadius: "12px",
     border: `1px solid ${theme.palette.divider}`,
+    flexWrap: 'wrap',
+    [theme.breakpoints.down('sm')]: {
+      padding: theme.spacing(1.5),
+      gap: theme.spacing(1),
+      borderRadius: '8px',
+    },
+    [theme.breakpoints.down('xs')]: {
+      flexDirection: 'column',
+      alignItems: 'stretch',
+      gap: theme.spacing(1.5),
+    },
+  },
+  timeLabel: {
+    minWidth: '60px',
+    fontWeight: 600,
+    [theme.breakpoints.down('sm')]: {
+      minWidth: '50px',
+      fontSize: '0.875rem',
+    },
+    [theme.breakpoints.down('xs')]: {
+      minWidth: 'auto',
+      textAlign: 'center',
+    },
   },
   datepicker: {
-    "& .MuiOutlinedInput-root": {
-      borderRadius: "10px",
+    flex: '1 1 140px',
+    minWidth: '140px',
+    '& .MuiOutlinedInput-root': {
+      borderRadius: '10px',
+      height: '48px',
+    },
+    [theme.breakpoints.down('sm')]: {
+      flex: '1 1 120px',
+      minWidth: '120px',
+      '& .MuiOutlinedInput-root': {
+        height: '42px',
+        fontSize: '0.875rem',
+      },
+    },
+    [theme.breakpoints.down('xs')]: {
+      flex: '1 1 auto',
+      minWidth: 'auto',
+    },
+  },
+  timeSelect: {
+    flex: '0 0 100px',
+    minWidth: '100px',
+    '& .MuiOutlinedInput-root': {
+      borderRadius: '10px',
+      height: '48px',
+    },
+    '& .MuiSelect-select': {
+      padding: '12px 14px',
+      display: 'flex',
+      alignItems: 'center',
+    },
+    [theme.breakpoints.down('sm')]: {
+      flex: '0 0 90px',
+      minWidth: '90px',
+      '& .MuiOutlinedInput-root': {
+        height: '42px',
+        fontSize: '0.875rem',
+      },
+      '& .MuiSelect-select': {
+        padding: '10px 12px',
+      },
+    },
+    [theme.breakpoints.down('xs')]: {
+      flex: '1 1 auto',
+      minWidth: 'auto',
+    },
+  },
+  dayChip: {
+    flex: '0 0 auto',
+    '& .MuiChip-root': {
+      borderRadius: '8px',
+      fontWeight: 500,
+    },
+    [theme.breakpoints.down('sm')]: {
+      '& .MuiChip-root': {
+        fontSize: '0.75rem',
+        height: '28px',
+      },
     },
   },
   participantSection: {
     display: "flex",
     flexDirection: "column",
     gap: theme.spacing(2),
+    [theme.breakpoints.down('sm')]: {
+      gap: theme.spacing(1.5),
+    },
   },
   participantItem: {
     display: "flex",
@@ -179,6 +313,10 @@ const getStyles: IGetStyles = (theme: Theme) => ({
       borderColor: theme.palette.primary.main,
       boxShadow: `0 2px 8px ${theme.palette.primary.main}20`,
     },
+    [theme.breakpoints.down('sm')]: {
+      padding: theme.spacing(1, 1.5),
+      borderRadius: '8px',
+    },
   },
   removeButton: {
     color: theme.palette.error.main,
@@ -189,6 +327,9 @@ const getStyles: IGetStyles = (theme: Theme) => ({
       background: theme.palette.error.light + "20",
       transform: "scale(1.1)",
     },
+    [theme.breakpoints.down('sm')]: {
+      padding: theme.spacing(0.3),
+    },
   },
   privacySection: {
     display: "flex",
@@ -198,16 +339,31 @@ const getStyles: IGetStyles = (theme: Theme) => ({
     background: theme.palette.background.default,
     borderRadius: "16px",
     border: `1px solid ${theme.palette.divider}`,
+    width: '100%',
+    [theme.breakpoints.down('sm')]: {
+      padding: theme.spacing(1.5, 2),
+      borderRadius: '12px',
+      flexDirection: 'column',
+      gap: theme.spacing(2),
+      alignItems: 'stretch',
+    },
   },
   privacyToggle: {
     display: "flex",
     alignItems: "center",
     gap: theme.spacing(2),
+    [theme.breakpoints.down('sm')]: {
+      gap: theme.spacing(1.5),
+      justifyContent: 'center',
+    },
   },
   privacyChip: {
     borderRadius: "12px",
     padding: theme.spacing(0.5, 1),
     fontWeight: 600,
+    [theme.breakpoints.down('sm')]: {
+      fontSize: '0.75rem',
+    },
   },
   saveButton: {
     borderRadius: "16px",
@@ -228,11 +384,32 @@ const getStyles: IGetStyles = (theme: Theme) => ({
       transform: "none",
       boxShadow: "none",
     },
+    [theme.breakpoints.down('sm')]: {
+      padding: theme.spacing(1.2, 3),
+      fontSize: '14px',
+      borderRadius: '12px',
+      width: '100%',
+      '&:hover': {
+        transform: 'none',
+      },
+    },
   },
   loadingButton: {
     display: "flex",
     alignItems: "center",
     gap: theme.spacing(1),
+    [theme.breakpoints.down('sm')]: {
+      gap: theme.spacing(0.8),
+    },
+  },
+  dialogActions: {
+    padding: theme.spacing(2, 3, 3, 3),
+    flexDirection: 'column',
+    gap: theme.spacing(2),
+    [theme.breakpoints.down('sm')]: {
+      padding: theme.spacing(2),
+      gap: theme.spacing(1.5),
+    },
   },
 });
 
@@ -254,6 +431,7 @@ const timeOptions = Array.from(Array(24).keys()).reduce<{ value: string }[]>(
 function CalendarEventDialog() {
   const theme = useTheme();
   const styles = getStyles(theme);
+  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
   const { stateCalendar } = useContext(CalendarContext);
   const { locale } = stateCalendar;
@@ -363,7 +541,7 @@ function CalendarEventDialog() {
 
   return (
     <Dialog
-      fullScreen={fullScreen}
+      fullScreen={fullScreen || isMobile}
       fullWidth={true}
       maxWidth="md"
       open={open}
@@ -379,12 +557,23 @@ function CalendarEventDialog() {
           <div style={styles.titleIcon}>
             <EventIcon />
           </div>
-          <Typography variant="h5" component="h2" fontWeight={600}>
+          <Typography 
+            variant={isMobile ? "h6" : "h5"} 
+            component="h2" 
+            fontWeight={600}
+            sx={{ 
+              overflow: 'hidden', 
+              textOverflow: 'ellipsis', 
+              whiteSpace: 'nowrap',
+              flex: 1,
+              mr: 2
+            }}
+          >
             {eventDetails.title || "New Event"}
           </Typography>
         </div>
         <div style={styles.divTitleButton}>
-          {!fullScreen && (
+          {!fullScreen && !isMobile && (
             <IconButton
               sx={{ ...styles.actionButton }}
               onClick={handleFullScreen}
@@ -393,7 +582,7 @@ function CalendarEventDialog() {
               <FullscreenIcon />
             </IconButton>
           )}
-          {fullScreen && (
+          {fullScreen && !isMobile && (
             <IconButton
               sx={{ ...styles.actionButton }}
               onClick={handleFullScreen}
@@ -411,8 +600,8 @@ function CalendarEventDialog() {
           </IconButton>
         </div>
       </DialogTitle>
-
-      <DialogContent sx={{ padding: theme.spacing(3) }}>
+      
+      <DialogContent sx={{ padding: isMobile ? theme.spacing(2) : theme.spacing(3) }}>
         <form style={styles.form} noValidate>
           {/* Event Details Section */}
           <Box sx={styles.section}>
@@ -466,62 +655,63 @@ function CalendarEventDialog() {
 
             <Box sx={styles.timeSection}>
               <Box sx={styles.timeRow}>
-                <Typography
-                  variant="body2"
-                  fontWeight={600}
-                  sx={{ minWidth: "60px" }}
-                >
+                <Typography variant="body2" sx={styles.timeLabel}>
                   Starts
                 </Typography>
-                <Datepicker
-                  style={styles.datepicker}
-                  dateFormat={dateFormat}
-                  originalValue={new Date(eventDetails.begin)}
-                  onChange={onChangeBeginDate}
-                />
-                <TimeSelect
-                  options={timeOptions}
-                  value={{
-                    value: format(eventDetails.begin, "H:mm"),
-                  }}
-                  onChange={onChangeBeginTime}
-                />
-                <Chip
-                  label={format(eventDetails.begin, "ccc", { locale })}
-                  size="small"
-                  color="primary"
-                  variant="outlined"
-                />
+                <Box sx={styles.datepicker}>
+                  <Datepicker
+                    dateFormat={dateFormat}
+                    originalValue={new Date(eventDetails.begin)}
+                    onChange={onChangeBeginDate}
+                  />
+                </Box>
+                <Box sx={styles.timeSelect}>
+                  <TimeSelect
+                    options={timeOptions}
+                    value={{
+                      value: format(eventDetails.begin, "H:mm"),
+                    }}
+                    onChange={onChangeBeginTime}
+                  />
+                </Box>
+                <Box sx={styles.dayChip}>
+                  <Chip 
+                    label={format(eventDetails.begin, "ccc", { locale })}
+                    size="small"
+                    color="primary"
+                    variant="outlined"
+                  />
+                </Box>
               </Box>
 
               <Box sx={styles.timeRow}>
-                <Typography
-                  variant="body2"
-                  fontWeight={600}
-                  sx={{ minWidth: "60px" }}
-                >
+                <Typography variant="body2" sx={styles.timeLabel}>
                   Ends
                 </Typography>
-                <Datepicker
-                  style={styles.datepicker}
-                  dateFormat={dateFormat}
-                  originalValue={new Date(eventDetails.end)}
-                  onChange={onChangeEndDate}
-                />
-                <TimeSelect
-                  options={timeOptions}
-                  value={{
-                    value: format(eventDetails.end, "H:mm"),
-                  }}
-                  onChange={onChangeEndTime}
-                  style={styles.timeSelect}
-                />
-                <Chip
-                  label={format(eventDetails.end, "ccc", { locale })}
-                  size="small"
-                  color="secondary"
-                  variant="outlined"
-                />
+                <Box sx={styles.datepicker}>
+                  <Datepicker
+                    dateFormat={dateFormat}
+                    originalValue={new Date(eventDetails.end)}
+                    onChange={onChangeEndDate}
+                  />
+                </Box>
+                <Box sx={styles.timeSelect}>
+                  <TimeSelect
+                    options={timeOptions}
+                    value={{
+                      value: format(eventDetails.end, "H:mm"),
+                    }}
+                    onChange={onChangeEndTime}
+                  />
+                </Box>
+                <Box sx={styles.dayChip}>
+                  <Chip 
+                    label={format(eventDetails.end, "ccc", { locale })}
+                    size="small"
+                    color="secondary"
+                    variant="outlined"
+                  />
+                </Box>
               </Box>
             </Box>
           </Box>
@@ -578,7 +768,7 @@ function CalendarEventDialog() {
               fullWidth
               placeholder="Add event description..."
               multiline
-              rows={4}
+              rows={isMobile ? 3 : 4}
               onChange={(event) => {
                 updateEventDetails("description", event.target.value);
               }}
@@ -588,8 +778,8 @@ function CalendarEventDialog() {
           </Box>
         </form>
       </DialogContent>
-
-      <DialogActions sx={{ padding: theme.spacing(2, 3, 3, 3) }}>
+      
+      <DialogActions sx={styles.dialogActions}>
         <Box sx={styles.privacySection}>
           <div style={styles.privacyToggle}>
             {eventMetaDetails.type === "private" ? (
@@ -611,7 +801,7 @@ function CalendarEventDialog() {
                 />
               }
               label={
-                <Box sx={{ display: "flex", alignItems: "center", gap: 1 }}>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
                   <Typography variant="body2" fontWeight={600}>
                     {intl.formatMessage({ id: "navigation.privateEvent" })}
                   </Typography>
@@ -649,7 +839,7 @@ function CalendarEventDialog() {
         >
           {processing ? (
             <div style={styles.loadingButton}>
-              <CircularProgress size={20} color="inherit" />
+              <CircularProgress size={isMobile ? 16 : 20} color="inherit" />
               <span>Publishing...</span>
             </div>
           ) : (
