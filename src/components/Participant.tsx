@@ -140,29 +140,31 @@ export const Participant = ({ pubKey, rsvpResponse = "pending"}: ParticipantProp
           gap: "4px",
         }}
       >
-        <Tooltip 
-          title={
-            <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-              <span>{displayName}</span>
-            </div>
-          }
-          arrow
+        <div
+        style={{
+          overflow: "hidden",
+          textOverflow: "ellipsis",
+          maxWidth: "100%",
+          display: "flex",
+          alignItems: "center",
+          gap: "4px",
+        }}
         >
-          <span style={{ cursor: isLongText ? "pointer" : "default" }}>
+          <span>
             {truncateText(displayName)}
           </span>
-        </Tooltip>
-        {isLongText && (
-          <Tooltip title={copyTooltip} arrow>
-            <IconButton
-              size="small"
-              onClick={handleCopy}
-              style={{ padding: "2px" }}
-            >
-              <ContentCopyIcon style={{ fontSize: "14px" }} />
-            </IconButton>
-          </Tooltip>
-        )}
+          {isLongText && (
+            <Tooltip title={copyTooltip} arrow>
+              <IconButton
+                size="small"
+                onClick={handleCopy}
+                style={{ padding: "2px" }}
+              >
+                <ContentCopyIcon style={{ fontSize: "14px" }} />
+              </IconButton>
+            </Tooltip>
+          )}
+        </div>
       </div>
     </div>
   );
