@@ -183,22 +183,12 @@ export async function publishPublicRSVPEvent({
 }
 
 export const fetchPublicRSVPEvents = (
-  {
-    eventReference,
-    since,
-    until,
-  }: {
-    eventReference?: string;
-    since?: number;
-    until?: number;
-  } = {},
+  { eventReference }: { eventReference?: string },
   onEvent: (event: Event) => void
 ) => {
   const relayList = getRelays();
   const filter: Filter = {
     kinds: [31925],
-    ...(since && { since }),
-    ...(until && { until }),
     ...(eventReference && { "#a": [eventReference] }),
   };
 
@@ -208,6 +198,7 @@ export const fetchPublicRSVPEvents = (
     },
   });
 };
+
 export async function publishPrivateCalendarEvent({
   title,
   description,
@@ -400,23 +391,13 @@ export async function getDetailsFromRSVPGiftWrap(giftWrap: Event) {
 }
 
 export const fetchAndDecryptPrivateRSVPEvents = (
-  { 
-    participants, 
-    since, 
-    until 
-  }: { 
-    participants: string[];
-    since?: number;
-    until?: number;
-  },
+  { participants }: { participants: string[] },
   onEvent: (decryptedRSVP: unknown) => void,
 ) => {
   const relayList = getRelays();
   const filter: Filter = {
-    kinds: [1055], // Gift wrap kind for RSVP
+    kinds: [1055],
     "#p": participants,
-    ...(since && { since }),
-    ...(until && { until }),
   };
 
   return pool.subscribeMany(relayList, [filter], {
@@ -445,13 +426,15 @@ export async function viewPrivateEvent(calendarEvent: Event, viewKey: string) {
 }
 
 export async function fetchPrivateCalendarEvents(
-  { eventIds }: { eventIds: string[] },
+  { eventIds, since, until }: { eventIds: string[]; since?: number; until?: number },
   onEvent: (event: Event) => void,
 ) {
   const relayList = getRelays();
-  const filter = {
+  const filter: Filter = {
     kinds: [32678],
     "#d": eventIds,
+    ...(since && { since }),
+    ...(until && { until }),
   };
 
   const closer = pool.subscribeMany(relayList, [filter], {

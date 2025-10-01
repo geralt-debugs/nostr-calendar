@@ -48,7 +48,7 @@ interface TimeRangeConfig {
 // Configuration for time range - can be modified in one place
 export const getTimeRangeConfig = () : TimeRangeConfig => ({
   daysBefore: 7,
-  daysAfter: 7,
+  daysAfter: 21,
 });
 
 // Helper function to get configurable time range

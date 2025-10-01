@@ -112,7 +112,9 @@ const getStyles: IGetStyles = (theme: Theme) => ({
     flex: 1,
     padding: "8px 16px",
     borderRadius: "4px",
-    border: "1px solid #ccc",
+    borderWidth: "1px",
+    borderStyle: "solid",
+    borderColor: "#ccc",
     backgroundColor: "white",
     cursor: "pointer",
     display: "flex",
@@ -132,7 +134,6 @@ const getStyles: IGetStyles = (theme: Theme) => ({
 
 type RSVPStatus = "accepted" | "declined" | "tentative" | "pending";
 
-
 interface RSVPTimeRangeConfig {
   daysBefore: number;
   daysAfter: number;
@@ -140,6 +141,7 @@ interface RSVPTimeRangeConfig {
 
 // Default configuration - fetch 7 days before and after current date
 const DEFAULT_TIME_RANGE_CONFIG = getTimeRangeConfig();
+
 // Function to calculate time range based on configuration
 const calculateTimeRange = (config: RSVPTimeRangeConfig = DEFAULT_TIME_RANGE_CONFIG) => {
   const now = Date.now();
@@ -151,7 +153,6 @@ const calculateTimeRange = (config: RSVPTimeRangeConfig = DEFAULT_TIME_RANGE_CON
   
   return { since, until };
 };
-
 
 const useRSVPTimeRange = (initialConfig?: RSVPTimeRangeConfig) => {
   const [config, setConfig] = useState<RSVPTimeRangeConfig>(
@@ -191,6 +192,7 @@ const useRSVPManager = (calendarEvent: any, userPublicKey: string, timeRangeConf
   const [participantRSVPs, setParticipantRSVPs] = useState<Record<string, RSVPStatus>>({});
   const [isLoadingRSVPs, setIsLoadingRSVPs] = useState(false);
   const [isUpdatingRSVP, setIsUpdatingRSVP] = useState(false);
+  const [rsvpTimestamps, setRsvpTimestamps] = useState<Record<string, number>>({});
 
   const { timeRange, config } = useRSVPTimeRange(timeRangeConfig);
 
@@ -210,6 +212,7 @@ const useRSVPManager = (calendarEvent: any, userPublicKey: string, timeRangeConf
 
     const initialRsvpState: Record<string, RSVPStatus> = {};
     const initialParticipantRSVPs: Record<string, RSVPStatus> = {};
+    const initialTimestamps: Record<string, number> = {};
 
     calendarEvent.participants.forEach((participant: string) => {
       initialParticipantRSVPs[participant] = "pending";
@@ -217,19 +220,23 @@ const useRSVPManager = (calendarEvent: any, userPublicKey: string, timeRangeConf
 
     if (calendarEvent.rsvpResponses?.length > 0) {
       calendarEvent.rsvpResponses.forEach((response: any) => {
+        const timestamp = response.timestamp || 0;
+        
         if (response.participantId === userPublicKey) {
           initialRsvpState[eventKey] = response.response as RSVPStatus;
+          initialTimestamps[userPublicKey] = timestamp;
         }
         if (calendarEvent.participants.includes(response.participantId)) {
           initialParticipantRSVPs[response.participantId] = response.response as RSVPStatus;
+          initialTimestamps[response.participantId] = timestamp;
         }
       });
     }
 
     setRsvpStateByEvent(prev => ({ ...prev, ...initialRsvpState }));
     setParticipantRSVPs(initialParticipantRSVPs);
+    setRsvpTimestamps(initialTimestamps);
   }, [calendarEvent, eventKey, userPublicKey]);
-
 
   const processRSVPEvent = useCallback((rsvpEvent: any, decryptedTags?: any[]) => {
     if (!eventReference || !eventKey) return;
@@ -251,23 +258,38 @@ const useRSVPManager = (calendarEvent: any, userPublicKey: string, timeRangeConf
     if (statusTag) {
       const rsvpStatus = statusTag[1] as RSVPStatus;
       const participantPubKey = rsvpEvent.pubkey;
+      const eventTimestamp = rsvpEvent.created_at || 0;
 
-      if (participantPubKey === userPublicKey) {
-        setRsvpStateByEvent(prev => ({
-          ...prev,
-          [eventKey]: rsvpStatus
-        }));
-      }
+      // Only update if this is a newer event
+      setRsvpTimestamps(prev => {
+        const currentTimestamp = prev[participantPubKey] || 0;
+        
+        if (eventTimestamp <= currentTimestamp) {
+          return prev; // Skip older events
+        }
 
-      if (calendarEvent.participants.includes(participantPubKey)) {
-        setParticipantRSVPs(prev => ({
+        // Update the RSVP states for newer events
+        if (participantPubKey === userPublicKey) {
+          setRsvpStateByEvent(state => ({
+            ...state,
+            [eventKey]: rsvpStatus
+          }));
+        }
+
+        if (calendarEvent.participants.includes(participantPubKey)) {
+          setParticipantRSVPs(state => ({
+            ...state,
+            [participantPubKey]: rsvpStatus
+          }));
+        }
+
+        return {
           ...prev,
-          [participantPubKey]: rsvpStatus
-        }));
-      }
+          [participantPubKey]: eventTimestamp
+        };
+      });
     }
   }, [eventReference, eventKey, userPublicKey, calendarEvent?.participants]);
-
 
   useEffect(() => {
     if (!calendarEvent || !userPublicKey || !eventKey || !eventReference) return;
@@ -282,8 +304,6 @@ const useRSVPManager = (calendarEvent: any, userPublicKey: string, timeRangeConf
       subscription = fetchAndDecryptPrivateRSVPEvents(
         { 
           participants: calendarEvent.participants,
-          since: timeRange.since,
-          until: timeRange.until
         },
         (decryptedRSVPData: any) => {
           try {
@@ -299,8 +319,6 @@ const useRSVPManager = (calendarEvent: any, userPublicKey: string, timeRangeConf
       subscription = fetchPublicRSVPEvents(
         {
           eventReference,
-          since: timeRange.since,
-          until: timeRange.until
         },
         (rsvpEvent: any) => {
           processRSVPEvent(rsvpEvent);
@@ -316,7 +334,7 @@ const useRSVPManager = (calendarEvent: any, userPublicKey: string, timeRangeConf
       subscription?.close();
       clearTimeout(loadingTimeout);
     };
-  }, [calendarEvent, userPublicKey, eventKey, eventReference, timeRange.since, timeRange.until, config.daysBefore, config.daysAfter, initializeRSVPStates, processRSVPEvent]);
+  }, [calendarEvent, userPublicKey, eventKey, eventReference, timeRange.since, timeRange.until, initializeRSVPStates, processRSVPEvent]);
 
   const handleRSVPUpdate = useCallback(async (status: RSVPStatus) => {
     const currentStatus = eventKey ? (rsvpStateByEvent[eventKey] || "pending") : "pending";
@@ -341,9 +359,15 @@ const useRSVPManager = (calendarEvent: any, userPublicKey: string, timeRangeConf
         });
       }
       
+      // Optimistically update with current timestamp
       setRsvpStateByEvent(prev => ({
         ...prev,
         [eventKey]: status
+      }));
+      
+      setRsvpTimestamps(prev => ({
+        ...prev,
+        [userPublicKey]: Math.floor(Date.now() / 1000)
       }));
       
     } catch (error) {
@@ -356,7 +380,7 @@ const useRSVPManager = (calendarEvent: any, userPublicKey: string, timeRangeConf
     } finally {
       setIsUpdatingRSVP(false);
     }
-  }, [calendarEvent, eventKey, rsvpStateByEvent, isUpdatingRSVP]);
+  }, [calendarEvent, eventKey, rsvpStateByEvent, isUpdatingRSVP, userPublicKey]);
 
   return {
     currentRSVPStatus: eventKey ? (rsvpStateByEvent[eventKey] || "pending") : "pending",
