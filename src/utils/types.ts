@@ -1,0 +1,1 @@
+export type RSVPStatus = "accepted" | "declined" | "tentative" | "pending";

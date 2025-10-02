@@ -480,14 +480,14 @@ export const publishToRelays = (
 };
 
 export const fetchCalendarEvents = (
-  timeRange: { since?: number; until?: number } | undefined,
+  { since , until }: { since?: number; until?: number },
   onEvent: (event: Event) => void
 ) => {
   const relayList = getRelays();
   const filter: Filter = {
     kinds: [31923],
-    ...(timeRange?.since && { since: timeRange.since }),
-    ...(timeRange?.until && { until: timeRange.until }),
+    ...(since && { since }),
+    ...(until && { until }),
   };
 
   return pool.subscribeMany(relayList, [filter], {
