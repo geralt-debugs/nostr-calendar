@@ -11,8 +11,17 @@ import { Filters } from "./Filters";
 import { isMobile } from "../common/utils";
 import Typography from "@mui/material/Typography";
 import LayoutSelector from "./LayoutSelector";
+import { styled } from "@mui/material/styles";
 
 const drawerWidth = 260;
+
+const DrawerHeader = styled('div')(({ theme }) => ({
+  display: 'flex',
+  alignItems: 'center',
+  padding: theme.spacing(0, 1),
+  ...theme.mixins.toolbar,
+  justifyContent: 'flex-end',
+}));
 
 const getStyles = (
   theme: Theme,
@@ -27,13 +36,6 @@ const getStyles = (
   drawerPaper: {
     width: drawerWidth,
   },
-  drawerHeader: {
-    display: "flex",
-    alignItems: "center",
-    padding: theme.spacing(0, 1),
-    ...theme.mixins.toolbar,
-    justifyContent: "flex-end",
-  },
   calendarSmall: {
     marginTop: theme.spacing(4),
     marginRight: theme.spacing(1),
@@ -41,7 +43,7 @@ const getStyles = (
     marginLeft: theme.spacing(1),
     minHeight: 265,
     minWidth: 240,
-    background: theme.palette.background.paper,
+    backgroundColor: theme.palette.background.paper,
   },
   layoutSection: {
     padding: theme.spacing(2),
@@ -81,7 +83,7 @@ function CalendarDrawer(props: CalendarDrawerProps) {
       open={open}
       onClose={handleDrawerClose}
     >
-      <div style={{ ...styles.drawerHeader }}>
+      <DrawerHeader>
         <IconButton onClick={handleDrawerClose}>
           {theme.direction === "ltr" ? (
             <ChevronLeftIcon />
@@ -89,7 +91,7 @@ function CalendarDrawer(props: CalendarDrawerProps) {
             <ChevronRightIcon />
           )}
         </IconButton>
-      </div>
+      </DrawerHeader>
       <Divider />
 
       {/* Layout Selector - Show for mobile or always if you prefer */}

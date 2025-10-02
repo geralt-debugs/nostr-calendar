@@ -7,7 +7,6 @@ import CalendarHeader from "./CalendarHeader";
 import CalendarBoard from "./CalendarBoard";
 import CalendarBoardDragLayer from "./CalendarBoardDragLayer";
 import { IGetStyles } from "../common/types";
-import { isMobile } from "../common/utils";
 
 const Body = styled(Grid)`
   overflow: scroll;
@@ -44,7 +43,7 @@ const getStyles: IGetStyles = (theme: Theme) => ({
   },
   timeColumn: {
     position: "relative",
-    webkitBoxSizing: "border-box",
+    WebkitBoxSizing: "border-box",
     marginLeft: "auto",
   },
   timeColumnElement: {
@@ -95,7 +94,7 @@ const getStyles: IGetStyles = (theme: Theme) => ({
     backgroundColor: "#F5F5F5",
   },
   currentTimeDot: {
-    background: cyan[500],
+    backgroundColor: cyan[500],
     borderRadius: "50%",
     content: "''",
     position: "absolute",

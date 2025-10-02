@@ -182,10 +182,14 @@ export async function publishPublicRSVPEvent({
   };
 }
 
-export const fetchPublicRSVPEvents = (onEvent: (event: Event) => void) => {
+export const fetchPublicRSVPEvents = (
+  { eventReference }: { eventReference?: string },
+  onEvent: (event: Event) => void
+) => {
   const relayList = getRelays();
   const filter: Filter = {
     kinds: [31925],
+    ...(eventReference && { "#a": [eventReference] }),
   };
 
   return pool.subscribeMany(relayList, [filter], {
@@ -194,6 +198,7 @@ export const fetchPublicRSVPEvents = (onEvent: (event: Event) => void) => {
     },
   });
 };
+
 export async function publishPrivateCalendarEvent({
   title,
   description,
@@ -288,13 +293,15 @@ export async function getDetailsFromGiftWrap(giftWrap: Event) {
 }
 
 export const fetchCalendarGiftWraps = (
-  { participants }: { participants: string[] },
+  { participants, since, until }: { participants: string[]; since?: number; until?: number },
   onEvent: (event: { eventId: string; viewKey: string }) => void,
 ) => {
   const relayList = getRelays();
-  const filter = {
+  const filter: Filter = {
     kinds: [1052],
     "#p": participants,
+    ...(since && { since }),
+    ...(until && { until }),
   };
 
   return pool.subscribeMany(relayList, [filter], {
@@ -388,8 +395,8 @@ export const fetchAndDecryptPrivateRSVPEvents = (
   onEvent: (decryptedRSVP: unknown) => void,
 ) => {
   const relayList = getRelays();
-  const filter = {
-    kinds: [1055], // Gift wrap kind for RSVP
+  const filter: Filter = {
+    kinds: [1055],
     "#p": participants,
   };
 
@@ -419,13 +426,15 @@ export async function viewPrivateEvent(calendarEvent: Event, viewKey: string) {
 }
 
 export async function fetchPrivateCalendarEvents(
-  { eventIds }: { eventIds: string[] },
+  { eventIds, since, until }: { eventIds: string[]; since?: number; until?: number },
   onEvent: (event: Event) => void,
 ) {
   const relayList = getRelays();
-  const filter = {
+  const filter: Filter = {
     kinds: [32678],
     "#d": eventIds,
+    ...(since && { since }),
+    ...(until && { until }),
   };
 
   const closer = pool.subscribeMany(relayList, [filter], {
@@ -470,10 +479,15 @@ export const publishToRelays = (
   );
 };
 
-export const fetchCalendarEvents = (onEvent: (event: Event) => void) => {
+export const fetchCalendarEvents = (
+  { since , until }: { since?: number; until?: number },
+  onEvent: (event: Event) => void
+) => {
   const relayList = getRelays();
-  const filter = {
+  const filter: Filter = {
     kinds: [31923],
+    ...(since && { since }),
+    ...(until && { until }),
   };
 
   return pool.subscribeMany(relayList, [filter], {
