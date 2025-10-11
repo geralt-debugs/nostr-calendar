@@ -1,1 +1,6 @@
-export type RSVPStatus = "accepted" | "declined" | "tentative" | "pending";
+export enum RSVPStatus {
+  accepted = "accepted",
+  declined = "declined",
+  tentative = "tentative",
+  pending = "pending",
+}

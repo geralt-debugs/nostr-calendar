@@ -10,6 +10,8 @@ import remarkGfm from "remark-gfm";
 import { Participant } from "./Participant";
 import { getRSVPStatusColor, getRSVPButtonStyle } from "../utils/rsvpHelpers";
 import Grid from "@mui/material/Grid";
+import { RSVPResponse } from "../stores/events";
+import { RSVPStatus } from "../utils/types";
 
 const RenderContent = ({isMobile, styles, calendarEvent , locale, isLoadingRSVPs, participantRSVPs, currentRSVPStatus, isUpdatingRSVP, handleRSVPUpdate , formatMessage}: any) => {
   return (
@@ -44,7 +46,7 @@ const RenderContent = ({isMobile, styles, calendarEvent , locale, isLoadingRSVPs
           </Typography>
           <Typography variant="body2" component="div">
             {calendarEvent.participants.map((participant: string) => {
-              const rsvpResponse = participantRSVPs[participant] || "pending";
+              const rsvpResponse = participantRSVPs[participant] || RSVPResponse.pending;
               return (
                 <Participant 
                   key={participant} 
@@ -104,8 +106,8 @@ const RenderContent = ({isMobile, styles, calendarEvent , locale, isLoadingRSVPs
         
         <div style={{ display: "flex", gap: "8px", width: "100%" }}>
           <button
-            style={getRSVPButtonStyle("accepted", currentRSVPStatus === "accepted", isUpdatingRSVP , styles)}
-            onClick={() => handleRSVPUpdate("accepted")}
+            style={getRSVPButtonStyle(RSVPStatus.accepted, currentRSVPStatus === RSVPStatus.accepted, isUpdatingRSVP , styles)}
+            onClick={() => handleRSVPUpdate(RSVPStatus.accepted)}
             disabled={isUpdatingRSVP}
           >
             <CheckIcon style={{ fontSize: "18px" }} />
@@ -113,8 +115,8 @@ const RenderContent = ({isMobile, styles, calendarEvent , locale, isLoadingRSVPs
           </button>
           
           <button
-            style={getRSVPButtonStyle("declined", currentRSVPStatus === "declined", isUpdatingRSVP , styles)}
-            onClick={() => handleRSVPUpdate("declined")}
+            style={getRSVPButtonStyle(RSVPStatus.declined, currentRSVPStatus === RSVPStatus.declined, isUpdatingRSVP , styles)}
+            onClick={() => handleRSVPUpdate(RSVPStatus.declined)}
             disabled={isUpdatingRSVP}
           >
             <CloseOutlinedIcon style={{ fontSize: "18px" }} />
@@ -122,8 +124,8 @@ const RenderContent = ({isMobile, styles, calendarEvent , locale, isLoadingRSVPs
           </button>
           
           <button
-            style={getRSVPButtonStyle("tentative", currentRSVPStatus === "tentative", isUpdatingRSVP, styles)}
-            onClick={() => handleRSVPUpdate("tentative")}
+            style={getRSVPButtonStyle(RSVPStatus.tentative, currentRSVPStatus === RSVPStatus.tentative, isUpdatingRSVP, styles)}
+            onClick={() => handleRSVPUpdate(RSVPStatus.tentative)}
             disabled={isUpdatingRSVP}
           >
             <HelpOutlineIcon style={{ fontSize: "18px" }} />

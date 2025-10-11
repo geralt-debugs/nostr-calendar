@@ -18,6 +18,7 @@ import { AbstractRelay } from "nostr-tools/abstract-relay";
 import * as nip59 from "./nip59";
 import { NSec } from "nostr-tools/nip19";
 import { signerManager } from "./signer";
+import { RSVPStatus } from "../utils/types";
 
 const defaultRelays = [
   "wss://relay.damus.io/",
@@ -378,7 +379,7 @@ export async function getDetailsFromRSVPGiftWrap(giftWrap: Event) {
           viewKey,
           aTag: aTag[1],
           isPrivate: viewKey ? true : false,
-          status: "tentative", // Default status when no RSVP is present
+          status: RSVPStatus.tentative, // Default status when no RSVP is present
         });
       },
     });

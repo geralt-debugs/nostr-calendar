@@ -32,7 +32,7 @@ export const useRSVPManager = (calendarEvent: any, userPublicKey: string, timeRa
     const initialTimestamps: Record<string, number> = {};
 
     calendarEvent.participants.forEach((participant: string) => {
-      initialParticipantRSVPs[participant] = "pending";
+      initialParticipantRSVPs[participant] = RSVPStatus.pending;
     });
 
     if (calendarEvent.rsvpResponses?.length > 0) {
@@ -154,7 +154,7 @@ export const useRSVPManager = (calendarEvent: any, userPublicKey: string, timeRa
   }, [calendarEvent, userPublicKey, eventKey, eventReference, timeRange.since, timeRange.until, initializeRSVPStates, processRSVPEvent]);
 
   const handleRSVPUpdate = useCallback(async (status: RSVPStatus) => {
-    const currentStatus = eventKey ? (rsvpStateByEvent[eventKey] || "pending") : "pending";
+    const currentStatus = eventKey ? (rsvpStateByEvent[eventKey] || RSVPStatus.pending) : RSVPStatus.pending;
     
     if (isUpdatingRSVP || status === currentStatus || !eventKey) return;
     
@@ -189,7 +189,7 @@ export const useRSVPManager = (calendarEvent: any, userPublicKey: string, timeRa
       
     } catch (error) {
       console.error("Failed to update RSVP:", error);
-      const originalStatus = eventKey ? (rsvpStateByEvent[eventKey] || "pending") : "pending";
+      const originalStatus = eventKey ? (rsvpStateByEvent[eventKey] || RSVPStatus.pending) : RSVPStatus.pending;
       setRsvpStateByEvent(prev => ({
         ...prev,
         [eventKey]: originalStatus
@@ -200,7 +200,7 @@ export const useRSVPManager = (calendarEvent: any, userPublicKey: string, timeRa
   }, [calendarEvent, eventKey, rsvpStateByEvent, isUpdatingRSVP, userPublicKey]);
 
   return {
-    currentRSVPStatus: eventKey ? (rsvpStateByEvent[eventKey] || "pending") : "pending",
+    currentRSVPStatus: eventKey ? (rsvpStateByEvent[eventKey] || RSVPStatus.pending) : RSVPStatus.pending,
     participantRSVPs,
     isLoadingRSVPs,
     isUpdatingRSVP,

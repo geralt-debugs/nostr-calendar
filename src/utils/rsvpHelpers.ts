@@ -2,11 +2,11 @@ import { RSVPStatus } from "../utils/types";
 
 export const getRSVPStatusColor = (status: RSVPStatus) => {
   switch (status) {
-    case "accepted":
+    case RSVPStatus.accepted:
       return { backgroundColor: "#4CAF50", color: "white" };
-    case "declined":
+    case RSVPStatus.declined:
       return { backgroundColor: "#f44336", color: "white" };
-    case "tentative":
+    case RSVPStatus.tentative:
       return { backgroundColor: "#FF9800", color: "white" };
     default:
       return { backgroundColor: "#e0e0e0", color: "#666" };
@@ -26,21 +26,21 @@ export const getRSVPButtonStyle = (
 
   if (isSelected) {
     switch (status) {
-      case "accepted":
+      case RSVPStatus.accepted:
         return { 
           ...baseStyle, 
           backgroundColor: "#4CAF50",
           color: "white", 
           borderColor: "#4CAF50" 
         };
-      case "declined":
+      case RSVPStatus.declined:
         return { 
           ...baseStyle, 
           backgroundColor: "#f44336",
           color: "white", 
           borderColor: "#f44336" 
         };
-      case "tentative":
+      case RSVPStatus.tentative:
         return { 
           ...baseStyle, 
           backgroundColor: "#FF9800",

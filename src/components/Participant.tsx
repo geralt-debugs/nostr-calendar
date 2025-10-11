@@ -17,25 +17,25 @@ interface ParticipantProps {
 
 const getRSVPIcon = (response: RSVPResponse, theme: any) => {
   switch (response) {
-    case "accepted":
+    case RSVPResponse.accepted:
       return (
         <CheckCircleIcon
           style={{ color: theme.palette.success.main, fontSize: "16px" }}
         />
       );
-    case "declined":
+    case RSVPResponse.declined:
       return (
         <CancelIcon
           style={{ color: theme.palette.error.main, fontSize: "16px" }}
         />
       );
-    case "tentative":
+    case RSVPResponse.tentative:
       return (
         <HelpIcon
           style={{ color: theme.palette.warning.main, fontSize: "16px" }}
         />
       );
-    case "pending":
+    case RSVPResponse.pending:
       return (
         <ScheduleIcon
           style={{ color: theme.palette.text.secondary, fontSize: "16px" }}
@@ -58,7 +58,7 @@ const truncateText = (text: string, maxLength: number = 20) => {
   return `${text.slice(0, maxLength)}...`;
 };
 
-export const Participant = ({ pubKey, rsvpResponse = "pending"}: ParticipantProps) => {
+export const Participant = ({ pubKey, rsvpResponse = RSVPResponse.pending }: ParticipantProps) => {
   const theme = useTheme();
   const { participant, loading } = useGetParticipant({ pubKey });
   const npub = nip19.npubEncode(pubKey);

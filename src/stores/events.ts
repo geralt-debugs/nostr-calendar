@@ -11,7 +11,12 @@ import { isValid } from "date-fns";
 import { appendOne, denormalize, normalize, removeOne } from "normal-store";
 import { SubCloser } from "nostr-tools/abstract-pool";
 
-export type RSVPResponse = "accepted" | "declined" | "tentative" | "pending";
+export enum RSVPResponse {
+  accepted = "accepted",
+  declined = "declined",
+  tentative = "tentative",
+  pending = "pending",
+}
 
 export interface IRSVPResponse {
   participantId: string;
