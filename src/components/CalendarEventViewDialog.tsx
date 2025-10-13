@@ -13,7 +13,7 @@ import { getUserPublicKey} from "../common/nostr";
 import { getStyles } from "../styles/calendarEventStyles";
 import { useRSVPManager } from "./rsvpManager";
 import { DEFAULT_TIME_RANGE_CONFIG } from "./useRSVPTimeRange";
-import RenderContent from "./rendercontent";
+import RenderContent from "./RenderContent.tsx";
 
 function CalendarEventViewDialog() {
   const theme = useTheme();
