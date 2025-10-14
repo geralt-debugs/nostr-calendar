@@ -9,16 +9,16 @@ import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import { useEventDetails } from "../stores/eventDetails";
 import { useIntl } from "react-intl";
-import { getUserPublicKey} from "../common/nostr";
+import { getUserPublicKey } from "../common/nostr";
 import { getStyles } from "../styles/calendarEventStyles";
 import { useRSVPManager } from "./rsvpManager";
 import { DEFAULT_TIME_RANGE_CONFIG } from "./useRSVPTimeRange";
-import RenderContent from "./rendercontent";
+import RenderContent from "./RenderContent";
 
 function CalendarEventViewDialog() {
   const theme = useTheme();
   const styles = getStyles(theme);
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
   const {
     event: calendarEvent,
     action,
@@ -26,10 +26,10 @@ function CalendarEventViewDialog() {
   } = useEventDetails((state) => state);
   const { formatMessage } = useIntl();
   const { stateCalendar } = useContext(CalendarContext);
-  
+
   const [userPublicKey, setUserPublicKey] = useState<string>("");
   const customTimeRange = DEFAULT_TIME_RANGE_CONFIG;
-  
+
   const {
     currentRSVPStatus,
     participantRSVPs,
@@ -37,7 +37,7 @@ function CalendarEventViewDialog() {
     isUpdatingRSVP,
     handleRSVPUpdate,
   } = useRSVPManager(calendarEvent, userPublicKey, customTimeRange);
-  
+
   useEffect(() => {
     const initializeUser = async () => {
       try {
@@ -47,14 +47,14 @@ function CalendarEventViewDialog() {
         console.error("Failed to get user public key:", error);
       }
     };
-    
+
     initializeUser();
   }, []);
-  
+
   if (!calendarEvent || action === "create") {
     return null;
   }
-  
+
   const { locale } = stateCalendar;
 
   const handleCloseViewDialog = () => {
@@ -79,23 +79,40 @@ function CalendarEventViewDialog() {
           </IconButton>
         </div>
       </DialogTitle>
-      
-      <DialogContent style={isMobile ? styles.dialogContent : styles.dialogContentWeb}>
+
+      <DialogContent
+        style={isMobile ? styles.dialogContent : styles.dialogContentWeb}
+      >
         {isMobile && calendarEvent.image && (
           <div style={styles.imageContainer}>
             <img style={styles.image} src={calendarEvent.image} alt="Event" />
           </div>
         )}
-        
+
         {!isMobile && calendarEvent.image && (
           <div style={styles.imageContainerWeb}>
-            <img style={styles.imageWeb} src={calendarEvent.image} alt="Event" />
+            <img
+              style={styles.imageWeb}
+              src={calendarEvent.image}
+              alt="Event"
+            />
           </div>
         )}
-        
-        {RenderContent({isMobile, styles, calendarEvent , locale, isLoadingRSVPs, participantRSVPs, currentRSVPStatus, isUpdatingRSVP, handleRSVPUpdate , formatMessage})}
+
+        {RenderContent({
+          isMobile,
+          styles,
+          calendarEvent,
+          locale,
+          isLoadingRSVPs,
+          participantRSVPs,
+          currentRSVPStatus,
+          isUpdatingRSVP,
+          handleRSVPUpdate,
+          formatMessage,
+        })}
       </DialogContent>
-      
+
       <DialogActions />
     </Dialog>
   );
