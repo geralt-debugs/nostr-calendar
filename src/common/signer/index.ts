@@ -50,7 +50,7 @@ class Signer {
 
   async createGuestAccount(
     privkey: string,
-    userMetadata: { name?: string; picture?: string; about?: string }
+    userMetadata: { name?: string; picture?: string; about?: string },
   ) {
     this.signer = createLocalSigner(privkey);
 

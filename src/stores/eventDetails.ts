@@ -23,7 +23,8 @@ export const useEventDetails = create<{
   updateEvent: (event, action = "view") => {
     set({ action, event, selectedEventId: event.id });
   },
-  closeEventDetails: () => set({ event: null, action: "view", selectedEventId: null }),
+  closeEventDetails: () =>
+    set({ event: null, action: "view", selectedEventId: null }),
   updateEventDetails: (key, value) =>
     set(({ event }) => {
       if (!event) {

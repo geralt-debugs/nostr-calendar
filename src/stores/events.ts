@@ -10,6 +10,8 @@ import {
 import { isValid } from "date-fns";
 import { appendOne, denormalize, normalize, removeOne } from "normal-store";
 import { SubCloser } from "nostr-tools/abstract-pool";
+import { RepeatingFrequency } from "../utils/types";
+import { getRepeatFrequency } from "../utils/repeatingEventsHelper";
 
 export enum RSVPResponse {
   accepted = "accepted",
@@ -41,6 +43,9 @@ export interface ICalendarEvent {
   website: string;
   user: string;
   isPrivateEvent: boolean;
+  repeat: {
+    frequency: RepeatingFrequency | null;
+  };
 }
 
 let subscriptionCloser: SubCloser | undefined;
@@ -51,31 +56,37 @@ interface TimeRangeConfig {
   daysAfter: number;
 }
 // Configuration for time range - can be modified in one place
-export const getTimeRangeConfig = () : TimeRangeConfig => ({
+export const getTimeRangeConfig = (): TimeRangeConfig => ({
   daysBefore: 7,
   daysAfter: 21,
 });
 
 // Helper function to get configurable time range
-const getTimeRange = (customConfig?: { daysBefore?: number; daysAfter?: number }) => {
+const getTimeRange = (customConfig?: {
+  daysBefore?: number;
+  daysAfter?: number;
+}) => {
   const config = { ...getTimeRangeConfig(), ...customConfig };
   const now = new Date();
-  
+
   const daysBefore = new Date(now);
   daysBefore.setDate(now.getDate() - config.daysBefore);
-  
+
   const daysAfter = new Date(now);
   daysAfter.setDate(now.getDate() + config.daysAfter);
-  
+
   return {
     since: Math.floor(daysBefore.getTime() / 1000),
     until: Math.floor(daysAfter.getTime() / 1000),
     daysBefore: config.daysBefore,
-    daysAfter: config.daysAfter
+    daysAfter: config.daysAfter,
   };
 };
 
-const processPrivateEvent = (event: Event, timeRange: ReturnType<typeof getTimeRange>) => {
+const processPrivateEvent = (
+  event: Event,
+  timeRange: ReturnType<typeof getTimeRange>,
+) => {
   const { events } = useTimeBasedEvents.getState();
   let store = normalize(events);
   const parsedEvent: ICalendarEvent = {
@@ -93,27 +104,22 @@ const processPrivateEvent = (event: Event, timeRange: ReturnType<typeof getTimeR
     geoHash: [],
     participants: [],
     isPrivateEvent: true,
+    repeat: {
+      frequency: null,
+    },
     rsvpResponses: [],
   };
 
-  event.tags.forEach(([key, value]) => {
+  event.tags.forEach(([key, value], index) => {
     switch (key) {
       case "description":
         parsedEvent.description = value;
         break;
       case "start":
-        const startNum = Number(value);
-        if (isNaN(startNum) || startNum <= 0) {
-          return;
-        }
-        parsedEvent.begin = startNum * 1000;
+        parsedEvent.begin = Number(value) * 1000;
         break;
       case "end":
-        const endNum = Number(value);
-        if (isNaN(endNum) || endNum <= 0) {
-          return;
-        }
-        parsedEvent.end = endNum * 1000;
+        parsedEvent.end = Number(value) * 1000;
         break;
       case "d":
         parsedEvent.id = value;
@@ -140,21 +146,17 @@ const processPrivateEvent = (event: Event, timeRange: ReturnType<typeof getTimeR
       case "g":
         parsedEvent.geoHash.push(value);
         break;
-      case "rsvp":
-        try {
-          const rsvpData = JSON.parse(value) as {
-            participantId: string;
-            response: RSVPResponse;
-            timestamp: number;
-          };
-          parsedEvent.rsvpResponses.push(rsvpData);
-        } catch (error) {
-          console.warn("Failed to parse RSVP data:", value);
+      case "L":
+        switch (value) {
+          case "repeat":
+            parsedEvent.repeat = {
+              frequency: getRepeatFrequency(event.tags[index + 1]?.[1]),
+            };
+            break;
         }
         break;
     }
   });
-
   // Check if we have valid begin/end times after processing all tags
   if (parsedEvent.begin === 0 || parsedEvent.end === 0) {
     return;
@@ -163,7 +165,7 @@ const processPrivateEvent = (event: Event, timeRange: ReturnType<typeof getTimeR
   // Filter: check if event is within our time range
   const eventStart = parsedEvent.begin / 1000;
   const eventEnd = parsedEvent.end / 1000;
-  
+
   // Skip events that are completely outside our time range
   if (eventEnd < timeRange.since || eventStart > timeRange.until) {
     return;
@@ -193,7 +195,10 @@ const processPrivateEvent = (event: Event, timeRange: ReturnType<typeof getTimeR
 
 const processedEventIds: string[] = [];
 
-const processGiftWraps = (rumor: { viewKey: string; eventId: string }, timeRange: ReturnType<typeof getTimeRange>) => {
+const processGiftWraps = (
+  rumor: { viewKey: string; eventId: string },
+  timeRange: ReturnType<typeof getTimeRange>,
+) => {
   if (processedEventIds.includes(rumor.eventId)) {
     return;
   }
@@ -207,12 +212,21 @@ const processGiftWraps = (rumor: { viewKey: string; eventId: string }, timeRange
 export const useTimeBasedEvents = create<{
   events: ICalendarEvent[];
   eventById: Record<string, ICalendarEvent>;
-  fetchEvents: (customTimeRange?: { daysBefore?: number; daysAfter?: number }) => void;
-  fetchPrivateEvents: (customTimeRange?: { daysBefore?: number; daysAfter?: number }) => void;
+  fetchEvents: (customTimeRange?: {
+    daysBefore?: number;
+    daysAfter?: number;
+  }) => void;
+  fetchPrivateEvents: (customTimeRange?: {
+    daysBefore?: number;
+    daysAfter?: number;
+  }) => void;
   resetPrivateEvents: () => void;
   getTimeRangeConfig: () => { daysBefore: number; daysAfter: number };
-  updateTimeRangeConfig: (config: { daysBefore?: number; daysAfter?: number }) => void;
-}>((set, get) => ({
+  updateTimeRangeConfig: (config: {
+    daysBefore?: number;
+    daysAfter?: number;
+  }) => void;
+}>((set) => ({
   resetPrivateEvents: () => {
     set(({ events }) => {
       const publicEvents = events.filter((evt) => !evt.isPrivateEvent);
@@ -236,31 +250,31 @@ export const useTimeBasedEvents = create<{
     if (!userPublicKey) {
       return;
     }
-    
+
     const timeRange = getTimeRange(customTimeRange);
-    
+
     privateSubloser = fetchCalendarGiftWraps(
-      { 
+      {
         participants: [userPublicKey],
         since: timeRange.since,
-        until: timeRange.until
+        until: timeRange.until,
       },
       (event) => {
         processGiftWraps(event, timeRange);
-      }
+      },
     );
   },
   fetchEvents: (customTimeRange) => {
     if (subscriptionCloser) {
       return;
     }
-    
+
     const timeRange = getTimeRange(customTimeRange);
-    
+
     subscriptionCloser = fetchCalendarEvents(
       {
         since: timeRange.since,
-        until: timeRange.until
+        until: timeRange.until,
       },
       (event: Event) => {
         set(({ events, eventById }) => {
@@ -281,23 +295,18 @@ export const useTimeBasedEvents = create<{
             participants: [],
             isPrivateEvent: false,
             rsvpResponses: [],
+            repeat: {
+              frequency: null,
+            },
           };
 
-          event.tags.forEach(([key, value]) => {
+          event.tags.forEach(([key, value], index) => {
             switch (key) {
               case "start":
-                const startNum = Number(value);
-                if (isNaN(startNum) || startNum <= 0) {
-                  return;
-                }
-                parsedEvent.begin = startNum * 1000;
+                parsedEvent.begin = Number(value) * 1000;
                 break;
               case "end":
-                const endNum = Number(value);
-                if (isNaN(endNum) || endNum <= 0) {
-                  return;
-                }
-                parsedEvent.end = endNum * 1000;
+                parsedEvent.end = Number(value) * 1000;
                 break;
               case "d":
                 parsedEvent.id = value;
@@ -323,16 +332,13 @@ export const useTimeBasedEvents = create<{
               case "g":
                 parsedEvent.geoHash.push(value);
                 break;
-              case "rsvp":
-                try {
-                  const rsvpData = JSON.parse(value) as {
-                    participantId: string;
-                    response: RSVPResponse;
-                    timestamp: number;
-                  };
-                  parsedEvent.rsvpResponses.push(rsvpData);
-                } catch (error) {
-                  console.warn("Failed to parse RSVP data:", value);
+              case "L":
+                switch (value) {
+                  case "repeat":
+                    parsedEvent.repeat = {
+                      frequency: getRepeatFrequency(event.tags[index + 1]?.[1]),
+                    };
+                    break;
                 }
                 break;
             }
@@ -346,7 +352,7 @@ export const useTimeBasedEvents = create<{
           // Client-side filter for events within time range (backup check)
           const eventStart = parsedEvent.begin / 1000;
           const eventEnd = parsedEvent.end / 1000;
-          
+
           if (eventEnd < timeRange.since || eventStart > timeRange.until) {
             return { events, eventById }; // Skip this event
           }
@@ -371,7 +377,7 @@ export const useTimeBasedEvents = create<{
             events: denormalize(store),
           };
         });
-      }
+      },
     );
   },
   clearEvents: () => set({ events: [], eventById: {} }),

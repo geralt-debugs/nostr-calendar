@@ -2,25 +2,20 @@ import React, { useContext, useState } from "react";
 import { CalendarContext } from "../common/CalendarContext";
 import {
   FormControlLabel,
-  FormGroup,
   Switch,
   Theme,
   Tooltip,
   useTheme,
   Box,
   Chip,
-  Avatar,
-  Divider,
   CircularProgress,
   useMediaQuery,
 } from "@mui/material";
-import { grey } from "@mui/material/colors";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
-import FormControl from "@mui/material/FormControl";
 import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import IconButton from "@mui/material/IconButton";
@@ -61,7 +56,7 @@ const getStyles: IGetStyles = (theme: Theme) => ({
     borderBottom: `1px solid ${theme.palette.divider}`,
     position: "relative",
     padding: theme.spacing(3, 3, 2, 3),
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down("sm")]: {
       padding: theme.spacing(2, 2, 1.5, 2),
     },
   },
@@ -69,7 +64,7 @@ const getStyles: IGetStyles = (theme: Theme) => ({
     display: "flex",
     alignItems: "center",
     gap: theme.spacing(2),
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down("sm")]: {
       gap: theme.spacing(1.5),
     },
   },
@@ -77,13 +72,13 @@ const getStyles: IGetStyles = (theme: Theme) => ({
     background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.light} 100%)`,
     borderRadius: "12px",
     padding: theme.spacing(1),
-    color: 'white',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    [theme.breakpoints.down('sm')]: {
+    color: "white",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    [theme.breakpoints.down("sm")]: {
       padding: theme.spacing(0.8),
-      borderRadius: '8px',
+      borderRadius: "8px",
     },
   },
   divTitleButton: {
@@ -92,7 +87,7 @@ const getStyles: IGetStyles = (theme: Theme) => ({
     top: theme.spacing(2),
     display: "flex",
     gap: theme.spacing(0.5),
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down("sm")]: {
       right: theme.spacing(1),
       top: theme.spacing(1.5),
       gap: theme.spacing(0.3),
@@ -106,9 +101,9 @@ const getStyles: IGetStyles = (theme: Theme) => ({
       transform: "scale(1.1)",
       background: theme.palette.action.hover,
     },
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down("sm")]: {
       padding: theme.spacing(0.7),
-      borderRadius: '8px',
+      borderRadius: "8px",
     },
   },
   closeButton: {
@@ -122,7 +117,7 @@ const getStyles: IGetStyles = (theme: Theme) => ({
     flexDirection: "column",
     gap: theme.spacing(3),
     padding: theme.spacing(1, 0),
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down("sm")]: {
       gap: theme.spacing(2),
     },
   },
@@ -137,11 +132,11 @@ const getStyles: IGetStyles = (theme: Theme) => ({
       transform: "translateY(-2px)",
       boxShadow: "0 8px 24px rgba(0, 0, 0, 0.1)",
     },
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down("sm")]: {
       padding: theme.spacing(2),
-      borderRadius: '12px',
-      '&:hover': {
-        transform: 'none',
+      borderRadius: "12px",
+      "&:hover": {
+        transform: "none",
       },
     },
   },
@@ -150,7 +145,7 @@ const getStyles: IGetStyles = (theme: Theme) => ({
     alignItems: "center",
     gap: theme.spacing(2),
     marginBottom: theme.spacing(2),
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down("sm")]: {
       gap: theme.spacing(1.5),
       marginBottom: theme.spacing(1.5),
     },
@@ -159,12 +154,12 @@ const getStyles: IGetStyles = (theme: Theme) => ({
     background: `linear-gradient(135deg, ${theme.palette.primary.main} 0%, ${theme.palette.primary.light} 100%)`,
     borderRadius: "10px",
     padding: theme.spacing(0.8),
-    color: 'white',
-    fontSize: '20px',
-    [theme.breakpoints.down('sm')]: {
+    color: "white",
+    fontSize: "20px",
+    [theme.breakpoints.down("sm")]: {
       padding: theme.spacing(0.6),
-      fontSize: '18px',
-      borderRadius: '8px',
+      fontSize: "18px",
+      borderRadius: "8px",
     },
   },
   textField: {
@@ -180,13 +175,13 @@ const getStyles: IGetStyles = (theme: Theme) => ({
         boxShadow: `0 4px 12px ${theme.palette.primary.main}30`,
       },
     },
-    [theme.breakpoints.down('sm')]: {
-      '& .MuiOutlinedInput-root': {
-        '&:hover': {
-          transform: 'none',
+    [theme.breakpoints.down("sm")]: {
+      "& .MuiOutlinedInput-root": {
+        "&:hover": {
+          transform: "none",
         },
-        '&.Mui-focused': {
-          transform: 'none',
+        "&.Mui-focused": {
+          transform: "none",
         },
       },
     },
@@ -195,7 +190,7 @@ const getStyles: IGetStyles = (theme: Theme) => ({
     display: "flex",
     flexDirection: "column",
     gap: theme.spacing(2),
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down("sm")]: {
       gap: theme.spacing(1.5),
     },
   },
@@ -207,88 +202,88 @@ const getStyles: IGetStyles = (theme: Theme) => ({
     background: theme.palette.background.default,
     borderRadius: "12px",
     border: `1px solid ${theme.palette.divider}`,
-    flexWrap: 'wrap',
-    [theme.breakpoints.down('sm')]: {
+    flexWrap: "wrap",
+    [theme.breakpoints.down("sm")]: {
       padding: theme.spacing(1.5),
       gap: theme.spacing(1),
-      borderRadius: '8px',
+      borderRadius: "8px",
     },
-    [theme.breakpoints.down('xs')]: {
-      flexDirection: 'column',
-      alignItems: 'stretch',
+    [theme.breakpoints.down("xs")]: {
+      flexDirection: "column",
+      alignItems: "stretch",
       gap: theme.spacing(1.5),
     },
   },
   timeLabel: {
-    minWidth: '60px',
+    minWidth: "60px",
     fontWeight: 600,
-    [theme.breakpoints.down('sm')]: {
-      minWidth: '50px',
-      fontSize: '0.875rem',
+    [theme.breakpoints.down("sm")]: {
+      minWidth: "50px",
+      fontSize: "0.875rem",
     },
-    [theme.breakpoints.down('xs')]: {
-      minWidth: 'auto',
-      textAlign: 'center',
+    [theme.breakpoints.down("xs")]: {
+      minWidth: "auto",
+      textAlign: "center",
     },
   },
   datepicker: {
-    flex: '1 1 140px',
-    minWidth: '140px',
-    '& .MuiOutlinedInput-root': {
-      borderRadius: '10px',
-      height: '48px',
+    flex: "1 1 140px",
+    minWidth: "140px",
+    "& .MuiOutlinedInput-root": {
+      borderRadius: "10px",
+      height: "48px",
     },
-    [theme.breakpoints.down('sm')]: {
-      flex: '1 1 120px',
-      minWidth: '120px',
-      '& .MuiOutlinedInput-root': {
-        height: '42px',
-        fontSize: '0.875rem',
+    [theme.breakpoints.down("sm")]: {
+      flex: "1 1 120px",
+      minWidth: "120px",
+      "& .MuiOutlinedInput-root": {
+        height: "42px",
+        fontSize: "0.875rem",
       },
     },
-    [theme.breakpoints.down('xs')]: {
-      flex: '1 1 auto',
-      minWidth: 'auto',
+    [theme.breakpoints.down("xs")]: {
+      flex: "1 1 auto",
+      minWidth: "auto",
     },
   },
   timeSelect: {
-    flex: '0 0 100px',
-    minWidth: '100px',
-    '& .MuiOutlinedInput-root': {
-      borderRadius: '10px',
-      height: '48px',
+    flex: "0 0 100px",
+    minWidth: "100px",
+    "& .MuiOutlinedInput-root": {
+      borderRadius: "10px",
+      height: "48px",
     },
-    '& .MuiSelect-select': {
-      padding: '12px 14px',
-      display: 'flex',
-      alignItems: 'center',
+    "& .MuiSelect-select": {
+      padding: "12px 14px",
+      display: "flex",
+      alignItems: "center",
     },
-    [theme.breakpoints.down('sm')]: {
-      flex: '0 0 90px',
-      minWidth: '90px',
-      '& .MuiOutlinedInput-root': {
-        height: '42px',
-        fontSize: '0.875rem',
+    [theme.breakpoints.down("sm")]: {
+      flex: "0 0 90px",
+      minWidth: "90px",
+      "& .MuiOutlinedInput-root": {
+        height: "42px",
+        fontSize: "0.875rem",
       },
-      '& .MuiSelect-select': {
-        padding: '10px 12px',
+      "& .MuiSelect-select": {
+        padding: "10px 12px",
       },
     },
-    [theme.breakpoints.down('xs')]: {
-      flex: '1 1 auto',
-      minWidth: 'auto',
+    [theme.breakpoints.down("xs")]: {
+      flex: "1 1 auto",
+      minWidth: "auto",
     },
   },
   dayChip: {
-    flex: '0 0 auto',
-    '& .MuiChip-root': {
-      borderRadius: '8px',
+    flex: "0 0 auto",
+    "& .MuiChip-root": {
+      borderRadius: "8px",
       fontWeight: 500,
     },
-    [theme.breakpoints.down('sm')]: {
-      '& .MuiChip-root': {
-        fontSize: '0.75rem',
-        height: '28px',
+    [theme.breakpoints.down("sm")]: {
+      "& .MuiChip-root": {
+        fontSize: "0.75rem",
+        height: "28px",
       },
     },
   },
@@ -296,7 +291,7 @@ const getStyles: IGetStyles = (theme: Theme) => ({
     display: "flex",
     flexDirection: "column",
     gap: theme.spacing(2),
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down("sm")]: {
       gap: theme.spacing(1.5),
     },
   },
@@ -313,9 +308,9 @@ const getStyles: IGetStyles = (theme: Theme) => ({
       borderColor: theme.palette.primary.main,
       boxShadow: `0 2px 8px ${theme.palette.primary.main}20`,
     },
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down("sm")]: {
       padding: theme.spacing(1, 1.5),
-      borderRadius: '8px',
+      borderRadius: "8px",
     },
   },
   removeButton: {
@@ -327,7 +322,7 @@ const getStyles: IGetStyles = (theme: Theme) => ({
       background: theme.palette.error.light + "20",
       transform: "scale(1.1)",
     },
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down("sm")]: {
       padding: theme.spacing(0.3),
     },
   },
@@ -339,30 +334,30 @@ const getStyles: IGetStyles = (theme: Theme) => ({
     background: theme.palette.background.default,
     borderRadius: "16px",
     border: `1px solid ${theme.palette.divider}`,
-    width: '100%',
-    [theme.breakpoints.down('sm')]: {
+    width: "100%",
+    [theme.breakpoints.down("sm")]: {
       padding: theme.spacing(1.5, 2),
-      borderRadius: '12px',
-      flexDirection: 'column',
+      borderRadius: "12px",
+      flexDirection: "column",
       gap: theme.spacing(2),
-      alignItems: 'stretch',
+      alignItems: "stretch",
     },
   },
   privacyToggle: {
     display: "flex",
     alignItems: "center",
     gap: theme.spacing(2),
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down("sm")]: {
       gap: theme.spacing(1.5),
-      justifyContent: 'center',
+      justifyContent: "center",
     },
   },
   privacyChip: {
     borderRadius: "12px",
     padding: theme.spacing(0.5, 1),
     fontWeight: 600,
-    [theme.breakpoints.down('sm')]: {
-      fontSize: '0.75rem',
+    [theme.breakpoints.down("sm")]: {
+      fontSize: "0.75rem",
     },
   },
   saveButton: {
@@ -384,13 +379,13 @@ const getStyles: IGetStyles = (theme: Theme) => ({
       transform: "none",
       boxShadow: "none",
     },
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down("sm")]: {
       padding: theme.spacing(1.2, 3),
-      fontSize: '14px',
-      borderRadius: '12px',
-      width: '100%',
-      '&:hover': {
-        transform: 'none',
+      fontSize: "14px",
+      borderRadius: "12px",
+      width: "100%",
+      "&:hover": {
+        transform: "none",
       },
     },
   },
@@ -398,15 +393,15 @@ const getStyles: IGetStyles = (theme: Theme) => ({
     display: "flex",
     alignItems: "center",
     gap: theme.spacing(1),
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down("sm")]: {
       gap: theme.spacing(0.8),
     },
   },
   dialogActions: {
     padding: theme.spacing(2, 3, 3, 3),
-    flexDirection: 'column',
+    flexDirection: "column",
     gap: theme.spacing(2),
-    [theme.breakpoints.down('sm')]: {
+    [theme.breakpoints.down("sm")]: {
       padding: theme.spacing(2),
       gap: theme.spacing(1.5),
     },
@@ -431,7 +426,7 @@ const timeOptions = Array.from(Array(24).keys()).reduce<{ value: string }[]>(
 function CalendarEventDialog() {
   const theme = useTheme();
   const styles = getStyles(theme);
-  const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const { stateCalendar } = useContext(CalendarContext);
   const { locale } = stateCalendar;
@@ -557,16 +552,16 @@ function CalendarEventDialog() {
           <div style={styles.titleIcon}>
             <EventIcon />
           </div>
-          <Typography 
-            variant={isMobile ? "h6" : "h5"} 
-            component="h2" 
+          <Typography
+            variant={isMobile ? "h6" : "h5"}
+            component="h2"
             fontWeight={600}
-            sx={{ 
-              overflow: 'hidden', 
-              textOverflow: 'ellipsis', 
-              whiteSpace: 'nowrap',
+            sx={{
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
               flex: 1,
-              mr: 2
+              mr: 2,
             }}
           >
             {eventDetails.title || "New Event"}
@@ -600,8 +595,10 @@ function CalendarEventDialog() {
           </IconButton>
         </div>
       </DialogTitle>
-      
-      <DialogContent sx={{ padding: isMobile ? theme.spacing(2) : theme.spacing(3) }}>
+
+      <DialogContent
+        sx={{ padding: isMobile ? theme.spacing(2) : theme.spacing(3) }}
+      >
         <form style={styles.form} noValidate>
           {/* Event Details Section */}
           <Box sx={styles.section}>
@@ -675,7 +672,7 @@ function CalendarEventDialog() {
                   />
                 </Box>
                 <Box sx={styles.dayChip}>
-                  <Chip 
+                  <Chip
                     label={format(eventDetails.begin, "ccc", { locale })}
                     size="small"
                     color="primary"
@@ -705,7 +702,7 @@ function CalendarEventDialog() {
                   />
                 </Box>
                 <Box sx={styles.dayChip}>
-                  <Chip 
+                  <Chip
                     label={format(eventDetails.end, "ccc", { locale })}
                     size="small"
                     color="secondary"
@@ -778,7 +775,7 @@ function CalendarEventDialog() {
           </Box>
         </form>
       </DialogContent>
-      
+
       <DialogActions sx={styles.dialogActions}>
         <Box sx={styles.privacySection}>
           <div style={styles.privacyToggle}>
@@ -801,7 +798,14 @@ function CalendarEventDialog() {
                 />
               }
               label={
-                <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, flexWrap: 'wrap' }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 1,
+                    flexWrap: "wrap",
+                  }}
+                >
                   <Typography variant="body2" fontWeight={600}>
                     {intl.formatMessage({ id: "navigation.privateEvent" })}
                   </Typography>

@@ -17,7 +17,7 @@ export const getRSVPButtonStyle = (
   status: RSVPStatus,
   isSelected: boolean,
   isUpdatingRSVP: boolean,
-  styles : any
+  styles: any,
 ) => {
   const baseStyle = {
     ...styles.rsvpButton,
@@ -27,25 +27,25 @@ export const getRSVPButtonStyle = (
   if (isSelected) {
     switch (status) {
       case RSVPStatus.accepted:
-        return { 
-          ...baseStyle, 
+        return {
+          ...baseStyle,
           backgroundColor: "#4CAF50",
-          color: "white", 
-          borderColor: "#4CAF50" 
+          color: "white",
+          borderColor: "#4CAF50",
         };
       case RSVPStatus.declined:
-        return { 
-          ...baseStyle, 
+        return {
+          ...baseStyle,
           backgroundColor: "#f44336",
-          color: "white", 
-          borderColor: "#f44336" 
+          color: "white",
+          borderColor: "#f44336",
         };
       case RSVPStatus.tentative:
-        return { 
-          ...baseStyle, 
+        return {
+          ...baseStyle,
           backgroundColor: "#FF9800",
-          color: "white", 
-          borderColor: "#FF9800" 
+          color: "white",
+          borderColor: "#FF9800",
         };
     }
   }

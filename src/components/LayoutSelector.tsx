@@ -10,13 +10,13 @@ const layoutOptions = [
     label: "Day",
   },
   {
-    value: "week", 
+    value: "week",
     label: "Week",
   },
   {
     value: "month",
-    label: "Month", 
-  }
+    label: "Month",
+  },
 ];
 
 interface LayoutSelectorProps {
@@ -32,7 +32,7 @@ const LayoutSelector: React.FC<LayoutSelectorProps> = ({
   className,
   isSearchable = false,
   placeholder = "View",
-  ariaLabel = "Select calendar layout"
+  ariaLabel = "Select calendar layout",
 }) => {
   const theme = useTheme();
   const {
@@ -43,9 +43,11 @@ const LayoutSelector: React.FC<LayoutSelectorProps> = ({
   const setLayout = (newLayout: ISettings["layout"]) => {
     updateSetting("layout", newLayout);
   };
-  
+
   // Handle layout change from dropdown
-  const handleLayoutChange = (selectedOption: { value: string; label: string } | null) => {
+  const handleLayoutChange = (
+    selectedOption: { value: string; label: string } | null,
+  ) => {
     if (selectedOption) {
       setLayout(selectedOption.value as ISettings["layout"]);
     }
@@ -58,7 +60,7 @@ const LayoutSelector: React.FC<LayoutSelectorProps> = ({
     <div style={style} className={className}>
       <Select
         options={layoutOptions}
-        value={layoutOptions.find(option => option.value === layout)}
+        value={layoutOptions.find((option) => option.value === layout)}
         onChange={handleLayoutChange}
         isSearchable={isSearchable}
         placeholder={placeholder}

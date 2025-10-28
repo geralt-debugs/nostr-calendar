@@ -65,5 +65,8 @@ export default async function createEditEvent({
     website: "",
     user: "",
     isPrivateEvent: true,
+    repeat: {
+      frequency: null,
+    },
   };
 }

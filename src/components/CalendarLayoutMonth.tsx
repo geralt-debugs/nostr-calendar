@@ -53,7 +53,7 @@ const MonthMarkerStyle = styled("div")<{
   cursor: pointer;
   font-size: 0.75rem;
   line-height: 1.2;
-  
+
   &:hover {
     background-color: ${({ hoverColour }) => `${hoverColour}`};
   }
@@ -61,10 +61,10 @@ const MonthMarkerStyle = styled("div")<{
 
 const getStyles: IGetStyles = (theme: Theme) => ({
   calendarContainer: {
-    width: '100%',
-    overflow: 'hidden',
+    width: "100%",
+    overflow: "hidden",
   },
-  
+
   paperHeader: {
     borderBottom: "1px solid #dadce0",
     borderRight: "1px solid #dadce0",
@@ -73,24 +73,24 @@ const getStyles: IGetStyles = (theme: Theme) => ({
     color: theme.palette.text.secondary,
     backgroundColor: theme.palette.background.paper,
     borderRadius: 0,
-    width: '100%',
-    minHeight: '40px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    
-    [theme.breakpoints.up('sm')]: {
+    width: "100%",
+    minHeight: "40px",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+
+    [theme.breakpoints.up("sm")]: {
       padding: theme.spacing(1),
-      minHeight: '48px',
+      minHeight: "48px",
     },
   },
-  
+
   title: {
     textTransform: "capitalize",
-    fontSize: '0.75rem',
-    
-    [theme.breakpoints.up('sm')]: {
-      fontSize: '0.875rem',
+    fontSize: "0.75rem",
+
+    [theme.breakpoints.up("sm")]: {
+      fontSize: "0.875rem",
     },
   },
 
@@ -102,17 +102,17 @@ const getStyles: IGetStyles = (theme: Theme) => ({
     color: theme.palette.text.secondary,
     backgroundColor: theme.palette.background.paper,
     borderRadius: 0,
-    width: '100%',
+    width: "100%",
     height: "100%",
     display: "flex",
     alignItems: "flex-start",
     flexDirection: "column",
-    
-    [theme.breakpoints.up('sm')]: {
+
+    [theme.breakpoints.up("sm")]: {
       padding: theme.spacing(1),
     },
   },
-  
+
   paperWeekend: {
     backgroundColor: theme.palette.grey[100],
   },
@@ -120,7 +120,7 @@ const getStyles: IGetStyles = (theme: Theme) => ({
   centerContent: {
     display: "flex",
     justifyContent: "center",
-    width: '100%',
+    width: "100%",
   },
 
   eventsContainer: {
@@ -138,26 +138,26 @@ const getStyles: IGetStyles = (theme: Theme) => ({
     gap: "2px",
     marginTop: theme.spacing(0.5),
   },
-  
+
   gridItem: {
     flex: 1,
     minWidth: 0,
   },
-  
+
   dayNumber: {
-    width: '100%',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
+    width: "100%",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
     marginBottom: theme.spacing(0.5),
   },
-  
+
   monthLabel: {
-    fontSize: '0.6rem',
-    marginTop: '2px',
-    
-    [theme.breakpoints.up('sm')]: {
-      fontSize: '0.75rem',
+    fontSize: "0.6rem",
+    marginTop: "2px",
+
+    [theme.breakpoints.up("sm")]: {
+      fontSize: "0.75rem",
     },
   },
 });
@@ -174,7 +174,7 @@ function CalendarLayoutMonth({ weeks }: { weeks: Date[][] }) {
 
   const maxHeight = (weeks: Date[][]) => {
     const size = weeks.length;
-    const baseHeight = window.innerHeight < 600 ? '80px' : '120px';
+    const baseHeight = window.innerHeight < 600 ? "80px" : "120px";
 
     if (size === 5) {
       return {
@@ -243,7 +243,7 @@ function CalendarLayoutMonth({ weeks }: { weeks: Date[][] }) {
         justifyContent="center"
         alignItems="center"
         wrap="nowrap"
-        style={{ width: '100%' }}
+        style={{ width: "100%" }}
       >
         {weeks[0].map((weekDay: Date, index: number) => {
           const day = format(weekDay, "ccc").toUpperCase();
@@ -280,7 +280,7 @@ function CalendarLayoutMonth({ weeks }: { weeks: Date[][] }) {
           alignItems="stretch"
           wrap="nowrap"
           key={`calendar-main-line-${weekIndex}`}
-          style={{ ...maxHeight(weeks), width: '100%' }}
+          style={{ ...maxHeight(weeks), width: "100%" }}
         >
           {week.map((day, dayIndex: number) => {
             const isToday =

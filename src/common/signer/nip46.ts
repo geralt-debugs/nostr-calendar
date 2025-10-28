@@ -12,7 +12,7 @@ import { SimplePool } from "nostr-tools";
 import { Handlerinformation, NostrConnect } from "nostr-tools/kinds";
 import { Signer } from "nostr-tools/signer";
 
-var _fetch: any;
+let _fetch: any;
 
 try {
   _fetch = fetch;
@@ -32,7 +32,7 @@ export type BunkerPointer = {
 };
 
 export function toBunkerURL(bunkerPointer: BunkerPointer): string {
-  let bunkerURL = new URL(`bunker://${bunkerPointer.pubkey}`);
+  const bunkerURL = new URL(`bunker://${bunkerPointer.pubkey}`);
   bunkerPointer.relays.forEach((relay) => {
     bunkerURL.searchParams.append("relay", relay);
   });
@@ -45,9 +45,9 @@ export function toBunkerURL(bunkerPointer: BunkerPointer): string {
 /** This takes either a bunker:// URL or a name@domain.com NIP-05 identifier
     and returns a BunkerPointer -- or null in case of error */
 export async function parseBunkerInput(
-  input: string
+  input: string,
 ): Promise<BunkerPointer | null> {
-  let match = input.match(BUNKER_REGEX);
+  const match = input.match(BUNKER_REGEX);
   if (match) {
     try {
       const pubkey = match[1];
@@ -66,7 +66,7 @@ export async function parseBunkerInput(
 }
 
 export async function queryBunkerProfile(
-  nip05: string
+  nip05: string,
 ): Promise<BunkerPointer | null> {
   const match = nip05.match(NIP05_REGEX);
   if (!match) return null;
@@ -77,8 +77,8 @@ export async function queryBunkerProfile(
     const url = `https://${domain}/.well-known/nostr.json?name=${name}`;
     const res = await (await _fetch(url, { redirect: "error" })).json();
 
-    let pubkey = res.names[name];
-    let relays = res.nip46[pubkey] || [];
+    const pubkey = res.names[name];
+    const relays = res.nip46[pubkey] || [];
 
     return { pubkey, relays, secret: null };
   } catch (_err) {
@@ -148,7 +148,7 @@ export function createNostrConnectURI(params: NostrConnectParams): string {
 export function parseNostrConnectURI(uri: string): ParsedNostrConnectURI {
   if (!uri.startsWith("nostrconnect://")) {
     throw new Error(
-      'Invalid nostrconnect URI: Must start with "nostrconnect://".'
+      'Invalid nostrconnect URI: Must start with "nostrconnect://".',
     );
   }
 
@@ -246,7 +246,7 @@ export class BunkerSigner implements Signer {
   public static fromBunker(
     clientSecretKey: Uint8Array,
     bp: BunkerPointer,
-    params: BunkerSignerParams = {}
+    params: BunkerSignerParams = {},
   ): BunkerSigner {
     if (bp.relays.length === 0) {
       throw new Error("No relays specified for this bunker");
@@ -269,7 +269,7 @@ export class BunkerSigner implements Signer {
     clientSecretKey: Uint8Array,
     connectionURI: string,
     params: BunkerSignerParams = {},
-    maxWait: number = 30 * 1000
+    maxWait: number = 30 * 1000,
   ): Promise<BunkerSigner> {
     const signer = new BunkerSigner(clientSecretKey, params);
     const parsedURI = parseNostrConnectURI(connectionURI);
@@ -279,7 +279,7 @@ export class BunkerSigner implements Signer {
       const timer = setTimeout(() => {
         sub.close();
         reject(
-          new Error(`Connection timed out after ${maxWait / 1000} seconds`)
+          new Error(`Connection timed out after ${maxWait / 1000} seconds`),
         );
       }, maxWait);
 
@@ -291,7 +291,7 @@ export class BunkerSigner implements Signer {
             try {
               const tempConvKey = getConversationKey(
                 clientSecretKey,
-                event.pubkey
+                event.pubkey,
               );
               const decryptedContent = decrypt(event.content, tempConvKey);
 
@@ -308,7 +308,7 @@ export class BunkerSigner implements Signer {
                 };
                 signer.conversationKey = getConversationKey(
                   clientSecretKey,
-                  event.pubkey
+                  event.pubkey,
                 );
                 signer.setupSubscription(params);
                 resolve(signer);
@@ -321,12 +321,12 @@ export class BunkerSigner implements Signer {
             clearTimeout(timer);
             reject(
               new Error(
-                "Subscription closed before connection was established."
-              )
+                "Subscription closed before connection was established.",
+              ),
             );
           },
           maxWait,
-        }
+        },
       );
     });
   }
@@ -355,13 +355,13 @@ export class BunkerSigner implements Signer {
               params.onauth(error);
             } else {
               console.warn(
-                `nostr-tools/nip46: remote signer ${this.bp.pubkey} tried to send an "auth_url"='${error}' but there was no onauth() callback configured.`
+                `nostr-tools/nip46: remote signer ${this.bp.pubkey} tried to send an "auth_url"='${error}' but there was no onauth() callback configured.`,
               );
             }
             return;
           }
 
-          let handler = listeners[id];
+          const handler = listeners[id];
           if (handler) {
             if (error) handler.reject(error);
             else if (result) handler.resolve(result);
@@ -371,7 +371,7 @@ export class BunkerSigner implements Signer {
         onclose: () => {
           this.subCloser = undefined;
         },
-      }
+      },
     );
     this.isOpen = true;
   }
@@ -394,7 +394,7 @@ export class BunkerSigner implements Signer {
 
         const encryptedContent = encrypt(
           JSON.stringify({ id, method, params }),
-          this.conversationKey
+          this.conversationKey,
         );
 
         // the request event
@@ -405,7 +405,7 @@ export class BunkerSigner implements Signer {
             content: encryptedContent,
             created_at: Math.floor(Date.now() / 1000),
           },
-          this.secretKey
+          this.secretKey,
         );
 
         // setup callback listener
@@ -425,7 +425,7 @@ export class BunkerSigner implements Signer {
    * The promise will be rejected if the response is not "pong".
    */
   async ping(): Promise<void> {
-    let resp = await this.sendRequest("ping", []);
+    const resp = await this.sendRequest("ping", []);
     if (resp !== "pong") throw new Error(`result is not pong: ${resp}`);
   }
 
@@ -455,22 +455,22 @@ export class BunkerSigner implements Signer {
    * @returns A Promise that resolves to the signed event.
    */
   async signEvent(event: EventTemplate): Promise<VerifiedEvent> {
-    let resp = await this.sendRequest("sign_event", [JSON.stringify(event)]);
-    let signed: NostrEvent = JSON.parse(resp);
+    const resp = await this.sendRequest("sign_event", [JSON.stringify(event)]);
+    const signed: NostrEvent = JSON.parse(resp);
     if (verifyEvent(signed)) {
       return signed;
     } else {
       throw new Error(
         `event returned from bunker is improperly signed: ${JSON.stringify(
-          signed
-        )}`
+          signed,
+        )}`,
       );
     }
   }
 
   async nip04Encrypt(
     thirdPartyPubkey: string,
-    plaintext: string
+    plaintext: string,
   ): Promise<string> {
     return await this.sendRequest("nip04_encrypt", [
       thirdPartyPubkey,
@@ -480,7 +480,7 @@ export class BunkerSigner implements Signer {
 
   async nip04Decrypt(
     thirdPartyPubkey: string,
-    ciphertext: string
+    ciphertext: string,
   ): Promise<string> {
     return await this.sendRequest("nip04_decrypt", [
       thirdPartyPubkey,
@@ -490,7 +490,7 @@ export class BunkerSigner implements Signer {
 
   async nip44Encrypt(
     thirdPartyPubkey: string,
-    plaintext: string
+    plaintext: string,
   ): Promise<string> {
     return await this.sendRequest("nip44_encrypt", [
       thirdPartyPubkey,
@@ -500,7 +500,7 @@ export class BunkerSigner implements Signer {
 
   async nip44Decrypt(
     thirdPartyPubkey: string,
-    ciphertext: string
+    ciphertext: string,
   ): Promise<string> {
     return await this.sendRequest("nip44_decrypt", [
       thirdPartyPubkey,
@@ -526,17 +526,17 @@ export async function createAccount(
   username: string,
   domain: string,
   email?: string,
-  localSecretKey: Uint8Array = generateSecretKey()
+  localSecretKey: Uint8Array = generateSecretKey(),
 ): Promise<BunkerSigner> {
   if (email && !EMAIL_REGEX.test(email)) throw new Error("Invalid email");
 
-  let rpc = BunkerSigner.fromBunker(
+  const rpc = BunkerSigner.fromBunker(
     localSecretKey,
     bunker.bunkerPointer,
-    params
+    params,
   );
 
-  let pubkey = await rpc.sendRequest("create_account", [
+  const pubkey = await rpc.sendRequest("create_account", [
     username,
     domain,
     email || "",
@@ -556,7 +556,7 @@ export async function createAccount(
  */
 export async function fetchBunkerProviders(
   pool: AbstractSimplePool,
-  relays: string[]
+  relays: string[],
 ): Promise<BunkerProfile[]> {
   const events = await pool.querySync(relays, {
     kinds: [Handlerinformation],
@@ -576,7 +576,7 @@ export async function fetchBunkerProviders(
         try {
           if (
             events.findIndex(
-              (ev) => JSON.parse(ev.content).nip05 === content.nip05
+              (ev) => JSON.parse(ev.content).nip05 === content.nip05,
             ) !== i
           )
             return undefined;
@@ -600,7 +600,7 @@ export async function fetchBunkerProviders(
       } catch (err) {
         return undefined;
       }
-    })
+    }),
   );
 
   return validatedBunkers.filter((b) => b !== undefined) as BunkerProfile[];

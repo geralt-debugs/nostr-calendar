@@ -1,53 +1,63 @@
-import React from "react"
-import { format, differenceInHours, addHours, addMinutes, getTime, addSeconds } from "date-fns"
+import React from "react";
+import {
+  format,
+  differenceInHours,
+  addHours,
+  addMinutes,
+  getTime,
+  addSeconds,
+} from "date-fns";
 
-const duration = 60
+const duration = 60;
 
 function getRandomInt(min: number, max: number) {
-    min = Math.ceil(min)
-    max = Math.floor(max)
-    return Math.floor(Math.random() * (max - min + 1)) + min
+  min = Math.ceil(min);
+  max = Math.floor(max);
+  return Math.floor(Math.random() * (max - min + 1)) + min;
 }
 
 const fakeEvents = (weekBegin: Date, weekEnd: Date) => {
-    const totalOfHours = differenceInHours(weekEnd, weekBegin)
+  const totalOfHours = differenceInHours(weekEnd, weekBegin);
 
-    return Array.from(Array(totalOfHours).keys()).reduce((event: any[], hour: number) => {
-        const datetime = addHours(weekBegin, hour)
+  return Array.from(Array(totalOfHours).keys()).reduce(
+    (event: any[], hour: number) => {
+      const datetime = addHours(weekBegin, hour);
 
-        event.push({
-            id: getTime(datetime),
-            title: `test ${hour} #1`,
-            begin: format(datetime, "yyyy/MM/dd H:mm:00"),
-            end: format(addMinutes(datetime, duration), "yyyy/MM/dd H:mm:00"),
-            description: `description: test ${hour}`,
-        })
+      event.push({
+        id: getTime(datetime),
+        title: `test ${hour} #1`,
+        begin: format(datetime, "yyyy/MM/dd H:mm:00"),
+        end: format(addMinutes(datetime, duration), "yyyy/MM/dd H:mm:00"),
+        description: `description: test ${hour}`,
+      });
 
-        let begin = addMinutes(datetime, getRandomInt(0, 10) % 2 === 0 ? 0 : 30)
-        let end = addMinutes(begin, duration)
+      let begin = addMinutes(datetime, getRandomInt(0, 10) % 2 === 0 ? 0 : 30);
+      let end = addMinutes(begin, duration);
 
-        event.push({
-            id: getTime(addSeconds(datetime, 1)),
-            title: `test ${hour} #2`,
-            begin: format(begin, "yyyy/MM/dd H:mm:00"),
-            end: format(end, "yyyy/MM/dd H:mm:00"),
-            description: `description: test ${hour}`,
-        })
+      event.push({
+        id: getTime(addSeconds(datetime, 1)),
+        title: `test ${hour} #2`,
+        begin: format(begin, "yyyy/MM/dd H:mm:00"),
+        end: format(end, "yyyy/MM/dd H:mm:00"),
+        description: `description: test ${hour}`,
+      });
 
-        begin = addMinutes(datetime, getRandomInt(0, 10) % 2 === 0 ? 15 : 45)
-        end = addMinutes(begin, duration)
+      begin = addMinutes(datetime, getRandomInt(0, 10) % 2 === 0 ? 15 : 45);
+      end = addMinutes(begin, duration);
 
-        event.push({
-            id: getTime(addSeconds(datetime, 2)),
-            title: `test ${hour} #3`,
-            begin: format(begin, "yyyy/MM/dd H:mm:00"),
-            end: format(end, "yyyy/MM/dd H:mm:00"),
-            description: `description: test ${hour}`,
-        })
+      event.push({
+        id: getTime(addSeconds(datetime, 2)),
+        title: `test ${hour} #3`,
+        begin: format(begin, "yyyy/MM/dd H:mm:00"),
+        end: format(end, "yyyy/MM/dd H:mm:00"),
+        description: `description: test ${hour}`,
+      });
 
-        return event
-    }, [])
-}
+      return event;
+    },
+    [],
+  );
+};
 
 // const fakeEvents = [
 //     {
@@ -58,4 +68,4 @@ const fakeEvents = (weekBegin: Date, weekEnd: Date) => {
 //         description: "teste",
 //     },
 // ]
-export default fakeEvents
+export default fakeEvents;

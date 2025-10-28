@@ -11,7 +11,7 @@ import { BunkerSigner } from "./nip46";
 
 export async function createNip46Signer(
   uri: string,
-  params: BunkerSignerParams = {}
+  params: BunkerSignerParams = {},
 ): Promise<NostrSigner> {
   const parsedUri = new URL(uri);
   const clientSecretKey: Uint8Array = getAppSecretKeyFromLocalStorage();
