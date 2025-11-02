@@ -214,6 +214,10 @@ export async function publishPrivateCalendarEvent({
     ["end", end / 1000],
     ["d", uniqueCalId],
   ];
+  if (repeat && repeat.frequency) {
+    eventData.push(["L", "recurring"]);
+    eventData.push(["l", repeat.frequency]);
+  }
 
   participants.forEach((participant) => {
     eventData.push(["p", participant]);
@@ -238,7 +242,6 @@ export async function publishPrivateCalendarEvent({
   const signedEvent = await signer.signEvent(unsignedCalendarEvent);
   const evtId = getEventHash(unsignedCalendarEvent);
   signedEvent.id = evtId;
-
   // Publish the private event to a relay
   await publishToRelays(signedEvent);
   const giftWraps: Event[] = [];

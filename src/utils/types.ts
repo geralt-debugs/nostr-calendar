@@ -6,6 +6,7 @@ export enum RSVPStatus {
 }
 
 export enum RepeatingFrequency {
+  None = "none",
   Daily = "daily",
   Weekly = "weekly",
   Monthly = "monthly",

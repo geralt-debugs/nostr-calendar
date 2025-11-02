@@ -1,4 +1,4 @@
-import React, { useContext, useState } from "react";
+import React, { useContext, useId, useState } from "react";
 import { CalendarContext } from "../common/CalendarContext";
 import {
   FormControlLabel,
@@ -10,6 +10,10 @@ import {
   Chip,
   CircularProgress,
   useMediaQuery,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
 } from "@mui/material";
 import Button from "@mui/material/Button";
 import Dialog from "@mui/material/Dialog";
@@ -43,6 +47,7 @@ import { ParticipantAdd } from "./ParticipantAdd";
 import { Participant } from "./Participant";
 import PersonRemoveIcon from "@mui/icons-material/PersonRemove";
 import InfoIcon from "@mui/icons-material/Info";
+import { RepeatingFrequency } from "../utils/types";
 
 const getStyles: IGetStyles = (theme: Theme) => ({
   dialogPaper: {
@@ -447,6 +452,8 @@ function CalendarEventDialog() {
   const open = !!eventDetails;
   const [fullScreen, setFullScreen] = useState(false);
 
+  const recurringHtmlID = useId();
+
   if (!eventDetails || action !== "create") {
     return null;
   }
@@ -709,6 +716,46 @@ function CalendarEventDialog() {
                     variant="outlined"
                   />
                 </Box>
+              </Box>
+              <Box sx={styles.timeRow}>
+                <FormControl>
+                  <InputLabel id={recurringHtmlID}>
+                    Recurring Frequency
+                  </InputLabel>
+                  <Select
+                    id={recurringHtmlID}
+                    labelId={recurringHtmlID}
+                    value={
+                      eventDetails.repeat.frequency || RepeatingFrequency.None
+                    }
+                    label="Recurring Frequency"
+                    onChange={(event) => {
+                      updateEventDetails("repeat", {
+                        frequency:
+                          event.target.value !== RepeatingFrequency.None
+                            ? (event.target.value as RepeatingFrequency)
+                            : null,
+                      });
+                    }}
+                  >
+                    <MenuItem value={RepeatingFrequency.None}>
+                      Non Recurring event
+                    </MenuItem>
+                    <MenuItem value={RepeatingFrequency.Daily}>Daily</MenuItem>
+                    <MenuItem value={RepeatingFrequency.Weekly}>
+                      Weekly
+                    </MenuItem>
+                    <MenuItem value={RepeatingFrequency.Monthly}>
+                      Monthly
+                    </MenuItem>
+                    <MenuItem value={RepeatingFrequency.Quarterly}>
+                      Quarterly
+                    </MenuItem>
+                    <MenuItem value={RepeatingFrequency.Yearly}>
+                      Yearly
+                    </MenuItem>
+                  </Select>
+                </FormControl>
               </Box>
             </Box>
           </Box>
