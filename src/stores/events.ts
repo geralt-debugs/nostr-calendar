@@ -109,7 +109,6 @@ const processPrivateEvent = (
     },
     rsvpResponses: [],
   };
-
   event.tags.forEach(([key, value], index) => {
     switch (key) {
       case "description":
@@ -148,7 +147,7 @@ const processPrivateEvent = (
         break;
       case "L":
         switch (value) {
-          case "repeat":
+          case "recurring":
             parsedEvent.repeat = {
               frequency: getRepeatFrequency(event.tags[index + 1]?.[1]),
             };

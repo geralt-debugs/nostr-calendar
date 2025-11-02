@@ -1,5 +1,5 @@
 import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import { format } from "date-fns";
+import { format, FormatOptions } from "date-fns";
 import Typography from "@mui/material/Typography";
 import Markdown from "react-markdown";
 import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
@@ -11,7 +11,8 @@ import { Participant } from "./Participant";
 import { getRSVPStatusColor, getRSVPButtonStyle } from "../utils/rsvpHelpers";
 import Grid from "@mui/material/Grid";
 import { RSVPResponse } from "../stores/events";
-import { RSVPStatus } from "../utils/types";
+import { RepeatingFrequency, RSVPStatus } from "../utils/types";
+import { TimeRenderer } from "./TimeRenderer";
 
 const RenderContent = ({
   isMobile,
@@ -30,21 +31,12 @@ const RenderContent = ({
       style={isMobile ? styles.contentContainer : styles.contentContainerWeb}
     >
       <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-        <AccessTimeIcon />
-        {calendarEvent.begin && (
-          <Typography>
-            {format(
-              new Date(calendarEvent.begin),
-              "ccc, d MMMM yyyy ⋅ HH:mm -",
-              {
-                locale: locale,
-              },
-            )}{" "}
-            {format(new Date(calendarEvent.end), "HH:mm", {
-              locale: locale,
-            })}
-          </Typography>
-        )}
+        <TimeRenderer
+          begin={calendarEvent.begin}
+          end={calendarEvent.end}
+          locale={locale as FormatOptions["locale"]}
+          repeat={calendarEvent.repeat}
+        />
       </div>
 
       {calendarEvent.participants.length > 0 && (
