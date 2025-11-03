@@ -4,3 +4,13 @@ export enum RSVPStatus {
   tentative = "tentative",
   pending = "pending",
 }
+
+export enum RepeatingFrequency {
+  None = "none",
+  Daily = "daily",
+  Weekly = "weekly",
+  Weekday = "weekdays",
+  Monthly = "monthly",
+  Quarterly = "quarterly",
+  Yearly = "yearly",
+}

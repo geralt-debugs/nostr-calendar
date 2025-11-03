@@ -27,7 +27,7 @@ const MarkerStyle = styled("div")<{
   backgroundColor: isPrivateEvent ? teal[100] : theme.palette.primary.main,
   padding: "4px 8px",
   cursor: "pointer",
-  boxShadow: isSelected 
+  boxShadow: isSelected
     ? "6px 6px 8px 0px rgba(0,0,0,0.4)"
     : "4px 4px 4px 0px rgba(0,0,0,0.25)",
   zIndex: isSelected ? 53 : 50,

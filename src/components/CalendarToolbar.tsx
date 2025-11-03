@@ -46,7 +46,7 @@ function CalendarToolbar({
   const {
     settings: { layout },
   } = useSettings((state) => state);
-  
+
   const styles: Record<string, HTMLAttributes<HTMLDivElement>["style"]> = {
     root: {
       flexGrow: 1,
@@ -104,7 +104,7 @@ function CalendarToolbar({
       marginRight: isMobile ? theme.spacing(2) : theme.spacing(2),
       height: isMobile ? 30 : 40,
       objectFit: "contain",
-      flexShrink: 0, 
+      flexShrink: 0,
     },
     toolbar: {
       minHeight: isMobile ? 56 : 64,
@@ -141,14 +141,14 @@ function CalendarToolbar({
     navigationButtons: {
       display: "flex",
       alignItems: "center",
-    }
+    },
   };
 
   const intl = useIntl();
 
   const { stateCalendar } = useContext(CalendarContext);
   const { selectedDate, locale, i18nLocale } = stateCalendar;
-  
+
   const weeks = getWeekDays(selectedDate, 7);
   const selectedWeekIndex = getSelectedWeekIndex(selectedDate, weeks, 0);
   const selectedWeek = weeks[selectedWeekIndex];
@@ -210,12 +210,8 @@ function CalendarToolbar({
               <MenuIcon />
             </IconButton>
           </Tooltip>
-          
-          <img 
-            src="/formstr.png" 
-            alt="Calendar Logo" 
-            style={styles.logo}
-          />
+
+          <img src="/formstr.png" alt="Calendar Logo" style={styles.logo} />
 
           <Tooltip
             title={`${format(new Date(), "ccc, d MMMM", { locale: locale })}`}
@@ -226,7 +222,7 @@ function CalendarToolbar({
               aria-label="Today"
               onClick={goToToday}
               edge="start"
-              style={{ 
+              style={{
                 ...styles.menuButton,
                 ...styles.iconButton,
               }}
@@ -243,10 +239,7 @@ function CalendarToolbar({
               title={intl.formatMessage({ id: i18nPreviousLabel(layout) })}
               style={{ ...styles.tooltip }}
             >
-              <IconButton 
-                onClick={previous}
-                style={styles.iconButton}
-              >
+              <IconButton onClick={previous} style={styles.iconButton}>
                 <ChevronLeftIcon />
               </IconButton>
             </Tooltip>
@@ -259,10 +252,7 @@ function CalendarToolbar({
               title={intl.formatMessage({ id: i18nNextLabel(layout) })}
               style={{ ...styles.tooltip }}
             >
-              <IconButton 
-                onClick={next}
-                style={styles.iconButton}
-              >
+              <IconButton onClick={next} style={styles.iconButton}>
                 <ChevronRightIcon />
               </IconButton>
             </Tooltip>
@@ -271,9 +261,7 @@ function CalendarToolbar({
 
         {/* Right Section - Dropdown and User Menu */}
         <div style={styles.rightSection}>
-          {!isMobile && (
-            <LayoutSelector style={styles.select} />
-          )}
+          {!isMobile && <LayoutSelector style={styles.select} />}
 
           <UserMenu />
         </div>

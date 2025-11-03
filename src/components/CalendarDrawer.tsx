@@ -15,12 +15,12 @@ import { styled } from "@mui/material/styles";
 
 const drawerWidth = 260;
 
-const DrawerHeader = styled('div')(({ theme }) => ({
-  display: 'flex',
-  alignItems: 'center',
+const DrawerHeader = styled("div")(({ theme }) => ({
+  display: "flex",
+  alignItems: "center",
   padding: theme.spacing(0, 1),
   ...theme.mixins.toolbar,
-  justifyContent: 'flex-end',
+  justifyContent: "flex-end",
 }));
 
 const getStyles = (
@@ -98,9 +98,7 @@ function CalendarDrawer(props: CalendarDrawerProps) {
       {isMobile && (
         <>
           <div style={styles.layoutSection}>
-            <Typography style={styles.layoutTitle}>
-              Calendar View
-            </Typography>
+            <Typography style={styles.layoutTitle}>Calendar View</Typography>
             <LayoutSelector style={styles.layoutSelect} />
           </div>
           <Divider />

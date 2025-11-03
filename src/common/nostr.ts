@@ -19,6 +19,7 @@ import * as nip59 from "./nip59";
 import { NSec } from "nostr-tools/nip19";
 import { signerManager } from "./signer";
 import { RSVPStatus } from "../utils/types";
+import { EventKinds } from "./EventConfigs";
 
 const defaultRelays = [
   "wss://relay.damus.io/",
@@ -64,11 +65,15 @@ export async function publishPrivateRSVPEvent({
   eventId, // The dtag of the event
   status, // Status of the RSVP event
   participants, // List of participant public keys
+  referenceKind,
 }: {
   eventId: string;
   authorpubKey: string;
   status: string;
   participants: string[];
+  referenceKind:
+    | EventKinds.PrivateCalendarEvent
+    | EventKinds.PrivateCalendarRecurringEvent;
 }) {
   const uniqueRSVPId = uuid();
   const userPublicKey = await getUserPublicKey();
@@ -77,7 +82,7 @@ export async function publishPrivateRSVPEvent({
   const viewPublicKey = getPublicKey(viewSecretKey);
   // Encrypt the RSVP data
   const eventData = [
-    ["a", `32678:${authorpubKey}:${eventId}`],
+    ["a", `${referenceKind}:${authorpubKey}:${eventId}`],
     ["d", uniqueRSVPId],
     ["L", "status"],
     ["l", `${status}`, "status"],
@@ -91,7 +96,7 @@ export async function publishPrivateRSVPEvent({
   const unsignedRSVPEvent: UnsignedEvent = {
     pubkey: userPublicKey, // Your public key here
     created_at: Math.floor(Date.now() / 1000),
-    kind: 32069,
+    kind: EventKinds.PrivateRSVPEvent,
     content: eventContent,
     tags: [
       ["d", uniqueRSVPId], // Unique identifier for the RSVP event
@@ -102,36 +107,25 @@ export async function publishPrivateRSVPEvent({
   signedRSVPEvent.id = getEventHash(unsignedRSVPEvent);
   await publishToRelays(signedRSVPEvent);
   const giftWraps: Event[] = [];
-  const ownGift = await nip59.wrapEvent(
-    {
-      pubkey: nip19.npubEncode(userPublicKey),
-      created_at: Math.floor(Date.now() / 1000),
-      kind: 55,
-      content: "",
-      tags: [
-        ["a", `32069:${userPublicKey}:${uniqueRSVPId}`],
-        ["viewKey", nip19.nsecEncode(viewSecretKey)],
-      ],
-    },
-    userPublicKey,
-    1055,
-  );
-  giftWraps.push(ownGift);
-  for (const participant of participants) {
+  const allParticipants = Array.from(new Set([...participants, userPublicKey]));
+  for (const participant of allParticipants) {
     // Create a rumor
     const giftWrap = await nip59.wrapEvent(
       {
         pubkey: nip19.npubEncode(userPublicKey),
         created_at: Math.floor(Date.now() / 1000),
-        kind: 55,
+        kind: EventKinds.RSVPRumor,
         content: "",
         tags: [
-          ["a", `32069:${participant}:${uniqueRSVPId}`],
+          [
+            "a",
+            `${EventKinds.PrivateRSVPEvent}:${participant}:${uniqueRSVPId}`,
+          ],
           ["viewKey", nip19.nsecEncode(viewSecretKey)],
         ],
       },
       participant,
-      1055,
+      EventKinds.RSVPGiftWrap,
     );
     giftWraps.push(giftWrap);
   }
@@ -161,11 +155,11 @@ export async function publishPublicRSVPEvent({
   const unsignedRSVPEvent: UnsignedEvent = {
     pubkey: userPublicKey, // Your public key here
     created_at: Math.floor(Date.now() / 1000),
-    kind: 31925,
+    kind: EventKinds.PublicRSVPEvent,
     content: "",
     tags: [
       ["d", uniqueRSVPId],
-      ["a", `31923:${authorpubKey}:${eventId}`],
+      ["a", `${EventKinds.PublicCalendarEvent}:${authorpubKey}:${eventId}`],
       ["d", uniqueRSVPId],
       ["L", "status"],
       ["l", `${status}`, "status"],
@@ -185,11 +179,11 @@ export async function publishPublicRSVPEvent({
 
 export const fetchPublicRSVPEvents = (
   { eventReference }: { eventReference?: string },
-  onEvent: (event: Event) => void
+  onEvent: (event: Event) => void,
 ) => {
   const relayList = getRelays();
   const filter: Filter = {
-    kinds: [31925],
+    kinds: [EventKinds.PublicRSVPEvent],
     ...(eventReference && { "#a": [eventReference] }),
   };
 
@@ -206,9 +200,13 @@ export async function publishPrivateCalendarEvent({
   begin: start,
   end,
   participants,
+  repeat,
 }: ICalendarEvent) {
   const viewSecretKey = generateSecretKey();
   const uniqueCalId = uuid();
+  const eventKind = repeat.frequency
+    ? EventKinds.PrivateCalendarRecurringEvent
+    : EventKinds.PrivateCalendarEvent;
   const eventData = [
     ["title", title],
     ["description", description],
@@ -216,10 +214,15 @@ export async function publishPrivateCalendarEvent({
     ["end", end / 1000],
     ["d", uniqueCalId],
   ];
+  if (repeat && repeat.frequency) {
+    eventData.push(["L", "recurring"]);
+    eventData.push(["l", repeat.frequency]);
+  }
 
   participants.forEach((participant) => {
     eventData.push(["p", participant]);
   });
+
   const viewPublicKey = getPublicKey(viewSecretKey);
   const userPublicKey = await getUserPublicKey();
   const eventContent = nip44.encrypt(
@@ -230,7 +233,7 @@ export async function publishPrivateCalendarEvent({
   const unsignedCalendarEvent: UnsignedEvent = {
     pubkey: userPublicKey, // Your public key here
     created_at: Math.floor(Date.now() / 1000),
-    kind: 32678,
+    kind: eventKind,
     content: eventContent,
     tags: [
       ["d", uniqueCalId], // Replace with a unique id for the event
@@ -240,27 +243,25 @@ export async function publishPrivateCalendarEvent({
   const signedEvent = await signer.signEvent(unsignedCalendarEvent);
   const evtId = getEventHash(unsignedCalendarEvent);
   signedEvent.id = evtId;
-
   // Publish the private event to a relay
   await publishToRelays(signedEvent);
   const giftWraps: Event[] = [];
   const targetPubKeys = Array.from(new Set([userPublicKey, ...participants]));
-  console.log(targetPubKeys);
   for (const participant of targetPubKeys) {
     // Create a rumor
     const giftWrap = await nip59.wrapEvent(
       {
         pubkey: userPublicKey,
         created_at: Math.floor(Date.now() / 1000),
-        kind: 52,
+        kind: EventKinds.CalendarEventRumor,
         content: "",
         tags: [
-          ["a", `32678:${participant}:${uniqueCalId}`],
+          ["a", `${eventKind}:${participant}:${uniqueCalId}`],
           ["viewKey", nip19.nsecEncode(viewSecretKey)],
         ],
       },
       participant,
-      1052,
+      EventKinds.CalendarEventGiftWrap,
     );
     giftWraps.push(giftWrap);
   }
@@ -294,12 +295,16 @@ export async function getDetailsFromGiftWrap(giftWrap: Event) {
 }
 
 export const fetchCalendarGiftWraps = (
-  { participants, since, until }: { participants: string[]; since?: number; until?: number },
+  {
+    participants,
+    since,
+    until,
+  }: { participants: string[]; since?: number; until?: number },
   onEvent: (event: { eventId: string; viewKey: string }) => void,
 ) => {
   const relayList = getRelays();
   const filter: Filter = {
-    kinds: [1052],
+    kinds: [EventKinds.CalendarEventGiftWrap],
     "#p": participants,
     ...(since && { since }),
     ...(until && { until }),
@@ -332,7 +337,7 @@ export async function getDetailsFromRSVPGiftWrap(giftWrap: Event) {
   // Fetch the RSVP event using the a tag reference
   const relayList = getRelays();
   const filter: Filter = {
-    kinds: [32069], // RSVP event kind
+    kinds: [EventKinds.PrivateRSVPEvent], // RSVP event kind
     "#d": [eventId], // Match the dtag
   };
 
@@ -397,7 +402,7 @@ export const fetchAndDecryptPrivateRSVPEvents = (
 ) => {
   const relayList = getRelays();
   const filter: Filter = {
-    kinds: [1055],
+    kinds: [EventKinds.RSVPGiftWrap],
     "#p": participants,
   };
 
@@ -427,18 +432,26 @@ export async function viewPrivateEvent(calendarEvent: Event, viewKey: string) {
 }
 
 export async function fetchPrivateCalendarEvents(
-  { eventIds, since, until }: { eventIds: string[]; since?: number; until?: number },
+  {
+    eventIds,
+    since,
+    until,
+  }: { eventIds: string[]; since?: number; until?: number },
   onEvent: (event: Event) => void,
 ) {
   const relayList = getRelays();
   const filter: Filter = {
-    kinds: [32678],
+    kinds: [EventKinds.PrivateCalendarEvent],
     "#d": eventIds,
     ...(since && { since }),
     ...(until && { until }),
   };
+  const recurringFilter: Filter = {
+    kinds: [EventKinds.PrivateCalendarRecurringEvent],
+    "#d": eventIds,
+  };
 
-  const closer = pool.subscribeMany(relayList, [filter], {
+  const closer = pool.subscribeMany(relayList, [filter, recurringFilter], {
     onevent: async (event: Event) => {
       onEvent(event);
       closer.close();
@@ -481,12 +494,12 @@ export const publishToRelays = (
 };
 
 export const fetchCalendarEvents = (
-  { since , until }: { since?: number; until?: number },
-  onEvent: (event: Event) => void
+  { since, until }: { since?: number; until?: number },
+  onEvent: (event: Event) => void,
 ) => {
   const relayList = getRelays();
   const filter: Filter = {
-    kinds: [31923],
+    kinds: [EventKinds.PublicCalendarEvent],
     ...(since && { since }),
     ...(until && { until }),
   };
@@ -520,7 +533,7 @@ export const publishPublicCalendarEvent = async (
     });
   }
   const baseEvent: UnsignedEvent = {
-    kind: 31923,
+    kind: EventKinds.PublicCalendarEvent,
     pubkey: pubKey,
     tags: tags,
     content: event.description,
@@ -538,7 +551,7 @@ export const fetchUserInfo = (
 ) => {
   const relayList = getRelays();
   const filter: Filter = {
-    kinds: [0],
+    kinds: [EventKinds.UserProfile],
     authors: userPublicKeys,
   };
 

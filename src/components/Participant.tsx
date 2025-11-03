@@ -48,17 +48,20 @@ const getRSVPIcon = (response: RSVPResponse, theme: any) => {
 
 const truncateText = (text: string, maxLength: number = 20) => {
   if (text.length <= maxLength) return text;
-  
+
   // For npub, show first 25 and last 4 characters
   if (text.startsWith("npub")) {
     return `${text.slice(0, 25)}...${text.slice(-4)}`;
   }
-  
+
   // For regular names, truncate with ellipsis
   return `${text.slice(0, maxLength)}...`;
 };
 
-export const Participant = ({ pubKey, rsvpResponse = RSVPResponse.pending }: ParticipantProps) => {
+export const Participant = ({
+  pubKey,
+  rsvpResponse = RSVPResponse.pending,
+}: ParticipantProps) => {
   const theme = useTheme();
   const { participant, loading } = useGetParticipant({ pubKey });
   const npub = nip19.npubEncode(pubKey);
@@ -105,7 +108,7 @@ export const Participant = ({ pubKey, rsvpResponse = RSVPResponse.pending }: Par
       </div>
     );
   }
-  
+
   return (
     <div
       style={{
@@ -141,18 +144,16 @@ export const Participant = ({ pubKey, rsvpResponse = RSVPResponse.pending }: Par
         }}
       >
         <div
-        style={{
-          overflow: "hidden",
-          textOverflow: "ellipsis",
-          maxWidth: "100%",
-          display: "flex",
-          alignItems: "center",
-          gap: "4px",
-        }}
+          style={{
+            overflow: "hidden",
+            textOverflow: "ellipsis",
+            maxWidth: "100%",
+            display: "flex",
+            alignItems: "center",
+            gap: "4px",
+          }}
         >
-          <span>
-            {truncateText(displayName)}
-          </span>
+          <span>{truncateText(displayName)}</span>
           {isLongText && (
             <Tooltip title={copyTooltip} arrow>
               <IconButton

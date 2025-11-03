@@ -72,7 +72,7 @@ const Nip46Section: React.FC<Nip46SectionProps> = ({ onSuccess }) => {
 
   const showMessage = (
     message: string,
-    severity: "success" | "error" = "success"
+    severity: "success" | "error" = "success",
   ) => {
     setSnackbar({ open: true, message, severity });
   };
@@ -228,7 +228,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onClose }) => {
 
   const showMessage = (
     message: string,
-    severity: "success" | "error" = "success"
+    severity: "success" | "error" = "success",
   ) => {
     setSnackbar({ open: true, message, severity });
   };

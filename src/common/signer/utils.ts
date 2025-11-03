@@ -22,7 +22,7 @@ export const getAppSecretKeyFromLocalStorage = () => {
 
 export const getBunkerUriInLocalStorage = () => {
   return JSON.parse(
-    localStorage.getItem(LOCAL_BUNKER_URI) || "{}"
+    localStorage.getItem(LOCAL_BUNKER_URI) || "{}",
   ) as BunkerUri;
 };
 

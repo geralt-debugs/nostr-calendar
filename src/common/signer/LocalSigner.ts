@@ -22,17 +22,17 @@ export function createLocalSigner(privkey: string): NostrSigner {
     },
 
     nip44Encrypt: async (peerPubkey, plaintext) => {
-      let conversationKey = nip44.v2.utils.getConversationKey(
+      const conversationKey = nip44.v2.utils.getConversationKey(
         hexToBytes(privkey),
-        peerPubkey
+        peerPubkey,
       );
       return nip44.v2.encrypt(plaintext, conversationKey);
     },
 
     nip44Decrypt: async (peerPubkey, ciphertext) => {
-      let conversationKey = nip44.v2.utils.getConversationKey(
+      const conversationKey = nip44.v2.utils.getConversationKey(
         hexToBytes(privkey),
-        peerPubkey
+        peerPubkey,
       );
       return nip44.v2.decrypt(ciphertext, conversationKey);
     },
