@@ -745,6 +745,9 @@ function CalendarEventDialog() {
                     <MenuItem value={RepeatingFrequency.Weekly}>
                       Weekly
                     </MenuItem>
+                    <MenuItem value={RepeatingFrequency.Weekday}>
+                      Weekdays Only
+                    </MenuItem>
                     <MenuItem value={RepeatingFrequency.Monthly}>
                       Monthly
                     </MenuItem>

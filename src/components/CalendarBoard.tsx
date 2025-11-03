@@ -11,6 +11,7 @@ import { IGetStyles } from "../common/types";
 import { useTimeBasedEvents } from "../stores/events";
 import { useEventDetails } from "../stores/eventDetails";
 import { useSettings } from "../stores/settings";
+import { isEventInDateRange } from "../utils/repeatingEventsHelper";
 
 const getStyles: IGetStyles = () => ({
   board: {
@@ -95,9 +96,12 @@ function CalendarBoard({
   );
 
   const getEventData: (day: Date) => JSX.Element[][] = (day) => {
-    const dayEvents = events.filter(
-      (event) =>
-        format(new Date(event.begin), "yyyyMMdd") === format(day, "yyyyMMdd"),
+    const dayEvents = events.filter((event) =>
+      isEventInDateRange(
+        event,
+        day.getTime(),
+        day.getTime() + 24 * 60 * 60 * 1000,
+      ),
     );
 
     const dayHoursEvents = dayEvents

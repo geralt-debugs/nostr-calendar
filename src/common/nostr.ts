@@ -222,6 +222,7 @@ export async function publishPrivateCalendarEvent({
   participants.forEach((participant) => {
     eventData.push(["p", participant]);
   });
+
   const viewPublicKey = getPublicKey(viewSecretKey);
   const userPublicKey = await getUserPublicKey();
   const eventContent = nip44.encrypt(
@@ -255,7 +256,7 @@ export async function publishPrivateCalendarEvent({
         kind: EventKinds.CalendarEventRumor,
         content: "",
         tags: [
-          ["a", `32678:${participant}:${uniqueCalId}`],
+          ["a", `${eventKind}:${participant}:${uniqueCalId}`],
           ["viewKey", nip19.nsecEncode(viewSecretKey)],
         ],
       },
@@ -447,6 +448,7 @@ export async function fetchPrivateCalendarEvents(
   };
   const recurringFilter: Filter = {
     kinds: [EventKinds.PrivateCalendarRecurringEvent],
+    "#d": eventIds,
   };
 
   const closer = pool.subscribeMany(relayList, [filter, recurringFilter], {

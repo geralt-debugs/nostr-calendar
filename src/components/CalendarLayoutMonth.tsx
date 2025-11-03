@@ -8,6 +8,7 @@ import { IGetStyles } from "../common/types";
 import clsx from "clsx";
 import { useTimeBasedEvents } from "../stores/events";
 import { useEventDetails } from "../stores/eventDetails";
+import { isEventInDateRange } from "../utils/repeatingEventsHelper";
 
 const DayStyle = styled("div")<{
   paperColour: string;
@@ -190,9 +191,12 @@ function CalendarLayoutMonth({ weeks }: { weeks: Date[][] }) {
   };
 
   const getEventData = (day: Date) => {
-    const dayEvents = events.filter(
-      (event) =>
-        format(new Date(event.begin), "yyyMMdd") === format(day, "yyyMMdd"),
+    const dayEvents = events.filter((event) =>
+      isEventInDateRange(
+        event,
+        day.getTime(),
+        day.getTime() + 24 * 60 * 60 * 1000,
+      ),
     );
 
     const dayHoursEvents = dayEvents

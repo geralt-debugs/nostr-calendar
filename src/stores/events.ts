@@ -85,7 +85,7 @@ const getTimeRange = (customConfig?: {
 
 const processPrivateEvent = (
   event: Event,
-  timeRange: ReturnType<typeof getTimeRange>,
+  _timeRange: ReturnType<typeof getTimeRange>,
 ) => {
   const { events } = useTimeBasedEvents.getState();
   let store = normalize(events);
@@ -158,15 +158,6 @@ const processPrivateEvent = (
   });
   // Check if we have valid begin/end times after processing all tags
   if (parsedEvent.begin === 0 || parsedEvent.end === 0) {
-    return;
-  }
-
-  // Filter: check if event is within our time range
-  const eventStart = parsedEvent.begin / 1000;
-  const eventEnd = parsedEvent.end / 1000;
-
-  // Skip events that are completely outside our time range
-  if (eventEnd < timeRange.since || eventStart > timeRange.until) {
     return;
   }
 
