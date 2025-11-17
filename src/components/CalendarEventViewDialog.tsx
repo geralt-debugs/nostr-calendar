@@ -4,7 +4,6 @@ import { useTheme, useMediaQuery } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
 import Button from "@mui/material/Button";
@@ -16,6 +15,7 @@ import { useRSVPManager } from "./rsvpManager";
 import { DEFAULT_TIME_RANGE_CONFIG } from "./useRSVPTimeRange";
 import RenderContent from "./RenderContent";
 import DownloadIcon from "@mui/icons-material/Download";
+import { exportICS } from "../common/utils";
 
 function CalendarEventViewDialog() {
   const theme = useTheme();
@@ -63,92 +63,6 @@ function CalendarEventViewDialog() {
     closeEventDetails();
   };
 
-  const exportICS = () => {
-    const start =
-      new Date(calendarEvent.begin)
-        .toISOString()
-        .replace(/[-:]/g, "")
-        .split(".")[0] + "Z";
-    const end =
-      new Date(calendarEvent.end)
-        .toISOString()
-        .replace(/[-:]/g, "")
-        .split(".")[0] + "Z";
-    const dtstamp =
-      new Date().toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
-    const uid = `${calendarEvent.id}@calendar.formstr.app`;
-
-    let title = calendarEvent.title?.trim();
-    if (!title) {
-      title = calendarEvent.description
-        ? calendarEvent.description.split(" ").slice(0, 8).join(" ") + "..."
-        : "Event";
-    }
-
-    let icsContent = `BEGIN:VCALENDAR
-VERSION:2.0
-PRODID:-//Formstr Inc//Calendar By Formstr//EN
-BEGIN:VEVENT
-UID:${uid}
-DTSTAMP:${dtstamp}
-DTSTART:${start}
-DTEND:${end}
-SUMMARY:${title}
-DESCRIPTION:${calendarEvent.description || ""}
-`;
-
-    if (calendarEvent.location.length > 0) {
-      icsContent += `LOCATION:${calendarEvent.location.join(", ")}\n`;
-    }
-
-    if (calendarEvent.image) {
-      icsContent += `ATTACH;FMTTYPE=image/jpeg:${calendarEvent.image}\n`;
-    }
-
-    if (
-      calendarEvent.repeat?.frequency &&
-      calendarEvent.repeat.frequency !== "none"
-    ) {
-      let rule = "RRULE:";
-
-      switch (calendarEvent.repeat.frequency) {
-        case "daily":
-          rule += "FREQ=DAILY";
-          break;
-        case "weekly":
-          rule += "FREQ=WEEKLY";
-          break;
-        case "weekdays":
-          rule += "FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR";
-          break;
-        case "monthly":
-          rule += "FREQ=MONTHLY";
-          break;
-        case "quarterly":
-          rule += "FREQ=MONTHLY;INTERVAL=3";
-          break;
-        case "yearly":
-          rule += "FREQ=YEARLY";
-          break;
-      }
-
-      icsContent += rule + "\n";
-    }
-
-    icsContent += `END:VEVENT
-END:VCALENDAR`;
-
-    const blob = new Blob([icsContent], {
-      type: "text/calendar;charset=utf-8",
-    });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `${title}.ics`;
-    link.click();
-    URL.revokeObjectURL(url);
-  };
-
   return (
     <Dialog
       fullScreen={false}
@@ -175,7 +89,7 @@ END:VCALENDAR`;
             variant="contained"
             size="small"
             startIcon={<DownloadIcon />}
-            onClick={exportICS}
+            onClick={() => exportICS(calendarEvent)}
             style={{ borderRadius: "10px", fontWeight: 600 }}
           >
             Export ICS
