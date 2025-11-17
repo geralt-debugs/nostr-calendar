@@ -1,3 +1,4 @@
+import { ICalendarEvent } from "../stores/events";
 import { NestedObject } from "./dictionary";
 
 export function flattenMessages(
@@ -23,5 +24,91 @@ export function flattenMessages(
     )
   );
 }
+
+export const exportICS = (calendarEvent: ICalendarEvent) => {
+  const start =
+    new Date(calendarEvent.begin)
+      .toISOString()
+      .replace(/[-:]/g, "")
+      .split(".")[0] + "Z";
+  const end =
+    new Date(calendarEvent.end)
+      .toISOString()
+      .replace(/[-:]/g, "")
+      .split(".")[0] + "Z";
+  const dtstamp =
+    new Date().toISOString().replace(/[-:]/g, "").split(".")[0] + "Z";
+  const uid = `${calendarEvent.id}@calendar.formstr.app`;
+
+  let title = calendarEvent.title?.trim();
+  if (!title) {
+    title = calendarEvent.description
+      ? calendarEvent.description.split(" ").slice(0, 8).join(" ") + "..."
+      : "Event";
+  }
+
+  let icsContent = `BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Formstr Inc//Calendar By Formstr//EN
+BEGIN:VEVENT
+UID:${uid}
+DTSTAMP:${dtstamp}
+DTSTART:${start}
+DTEND:${end}
+SUMMARY:${title}
+DESCRIPTION:${calendarEvent.description || ""}
+`;
+
+  if (calendarEvent.location.length > 0) {
+    icsContent += `LOCATION:${calendarEvent.location.join(", ")}\n`;
+  }
+
+  if (calendarEvent.image) {
+    icsContent += `ATTACH;FMTTYPE=image/jpeg:${calendarEvent.image}\n`;
+  }
+
+  if (
+    calendarEvent.repeat?.frequency &&
+    calendarEvent.repeat.frequency !== "none"
+  ) {
+    let rule = "RRULE:";
+
+    switch (calendarEvent.repeat.frequency) {
+      case "daily":
+        rule += "FREQ=DAILY";
+        break;
+      case "weekly":
+        rule += "FREQ=WEEKLY";
+        break;
+      case "weekdays":
+        rule += "FREQ=WEEKLY;BYDAY=MO,TU,WE,TH,FR";
+        break;
+      case "monthly":
+        rule += "FREQ=MONTHLY";
+        break;
+      case "quarterly":
+        rule += "FREQ=MONTHLY;INTERVAL=3";
+        break;
+      case "yearly":
+        rule += "FREQ=YEARLY";
+        break;
+    }
+
+    icsContent += rule + "\n";
+  }
+
+  icsContent += `END:VEVENT
+END:VCALENDAR`;
+
+  const blob = new Blob([icsContent], {
+    type: "text/calendar;charset=utf-8",
+  });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = `${title}.ics`;
+  link.click();
+  URL.revokeObjectURL(url);
+};
 
 export const isMobile = window.innerWidth <= 800 && window.innerHeight <= 1000;

@@ -4,9 +4,9 @@ import { useTheme, useMediaQuery } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
+import Button from "@mui/material/Button";
 import { useEventDetails } from "../stores/eventDetails";
 import { useIntl } from "react-intl";
 import { getUserPublicKey } from "../common/nostr";
@@ -14,6 +14,8 @@ import { getStyles } from "../styles/calendarEventStyles";
 import { useRSVPManager } from "./rsvpManager";
 import { DEFAULT_TIME_RANGE_CONFIG } from "./useRSVPTimeRange";
 import RenderContent from "./RenderContent";
+import DownloadIcon from "@mui/icons-material/Download";
+import { exportICS } from "../common/utils";
 
 function CalendarEventViewDialog() {
   const theme = useTheme();
@@ -27,7 +29,7 @@ function CalendarEventViewDialog() {
   const { formatMessage } = useIntl();
   const { stateCalendar } = useContext(CalendarContext);
 
-  const [userPublicKey, setUserPublicKey] = useState<string>("");
+  const [userPublicKey, setUserPublicKey] = useState("");
   const customTimeRange = DEFAULT_TIME_RANGE_CONFIG;
 
   const {
@@ -71,9 +73,28 @@ function CalendarEventViewDialog() {
       aria-labelledby="max-width-dialog-title"
       keepMounted={false}
     >
-      <DialogTitle>
-        {calendarEvent.title || ""}
-        <div style={{ ...styles.divTitleButton }}>
+      <DialogTitle
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+        }}
+      >
+        <div style={{ fontSize: "1.25rem", fontWeight: 600 }}>
+          {calendarEvent.title || ""}
+        </div>
+
+        <div style={{ display: "flex", gap: "0.5rem" }}>
+          <Button
+            variant="contained"
+            size="small"
+            startIcon={<DownloadIcon />}
+            onClick={() => exportICS(calendarEvent)}
+            style={{ borderRadius: "10px", fontWeight: 600 }}
+          >
+            Export ICS
+          </Button>
+
           <IconButton aria-label="Close" onClick={handleCloseViewDialog}>
             <CloseIcon />
           </IconButton>
@@ -112,8 +133,6 @@ function CalendarEventViewDialog() {
           formatMessage,
         })}
       </DialogContent>
-
-      <DialogActions />
     </Dialog>
   );
 }
