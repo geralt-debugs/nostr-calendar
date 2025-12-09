@@ -20,7 +20,7 @@ export const UserMenu = () => {
         <UserIcon />
       </IconButton>
       <Menu open={open} anchorEl={anchorEl} onClose={handleClose}>
-        <Auth />
+        <Auth onMenuClose={handleClose} />
       </Menu>
     </>
   );

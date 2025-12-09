@@ -12,6 +12,7 @@ import { useTimeBasedEvents } from "../stores/events";
 import { useEventDetails } from "../stores/eventDetails";
 import { useSettings } from "../stores/settings";
 import { isEventInDateRange } from "../utils/repeatingEventsHelper";
+import { useUser } from "../stores/user";
 
 const getStyles: IGetStyles = () => ({
   board: {
@@ -72,7 +73,8 @@ function CalendarBoard({
 
   const openEventDetails = useEventDetails((state) => state.updateEvent);
   const { filters, layout } = useSettings((state) => state.settings);
-
+  const { user } = useUser((state) => state);
+  const { updateLoginModal } = useUser((state) => state);
   let events = useTimeBasedEvents((state) => state.events);
   if (!filters?.showPublicEvents) {
     events = events.filter((event) => event.isPrivateEvent);
@@ -209,6 +211,10 @@ function CalendarBoard({
         key={`board-day-column-${layout}-${selectedWeekIndex}-${day}-${index}`}
         onClick={async (event) => {
           event.persist();
+          if (!user) {
+            updateLoginModal(true);
+            return;
+          }
           const tempEvent = await createEditEvent({
             event,
             defaultEventDuration,
