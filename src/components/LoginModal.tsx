@@ -26,10 +26,9 @@ import LinkIcon from "@mui/icons-material/Link";
 // NIP-46 Section (Manual + QR)
 interface Nip46SectionProps {
   onSuccess: () => void;
-  showMessage: (message: string, severity?: "success" | "error") => void;
 }
 
-const Nip46Section: React.FC<Nip46SectionProps> = ({ onSuccess, showMessage }) => {
+const Nip46Section: React.FC<Nip46SectionProps> = ({ onSuccess }) => {
   const [activeTab, setActiveTab] = useState("manual");
   const [bunkerUri, setBunkerUri] = useState("");
   const [loadingConnect, setLoadingConnect] = useState(false);
@@ -65,6 +64,22 @@ const Nip46Section: React.FC<Nip46SectionProps> = ({ onSuccess, showMessage }) =
     console.log("FINAL URL is", finalUrl);
     return finalUrl;
   }
+
+  const [snackbar, setSnackbar] = useState<{
+    open: boolean;
+    message: string;
+    severity: "success" | "error";
+  }>({ open: false, message: "", severity: "success" });
+
+  const showMessage = (
+    message: string,
+    severity: "success" | "error" = "success",
+  ) => {
+    setSnackbar({ open: true, message, severity });
+  };
+  const handleCloseSnackbar = () => {
+    setSnackbar({ ...snackbar, open: false });
+  };
 
   const connectToBunkerUri = async (bunkerUri: string) => {
     await signerManager.loginWithNip46(bunkerUri);
@@ -127,6 +142,20 @@ const Nip46Section: React.FC<Nip46SectionProps> = ({ onSuccess, showMessage }) =
           </Typography>
         </div>
       )}
+      <Snackbar
+        open={snackbar.open}
+        autoHideDuration={4000}
+        onClose={handleCloseSnackbar}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <Alert
+          onClose={handleCloseSnackbar}
+          severity={snackbar.severity}
+          sx={{ width: "100%" }}
+        >
+          {snackbar.message}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };
@@ -250,7 +279,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onClose }) => {
               text="Connect with Remote Signer (NIP-46)"
               onClick={() => setShowNip46(!showNip46)}
             />
-            {showNip46 && <Nip46Section onSuccess={onClose} showMessage={showMessage} />}
+            {showNip46 && <Nip46Section onSuccess={onClose} />}
           </Stack>
         </DialogContent>
         <DialogActions>
