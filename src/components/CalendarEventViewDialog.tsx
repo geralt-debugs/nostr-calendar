@@ -16,6 +16,7 @@ import { DEFAULT_TIME_RANGE_CONFIG } from "./useRSVPTimeRange";
 import RenderContent from "./RenderContent";
 import DownloadIcon from "@mui/icons-material/Download";
 import { exportICS } from "../common/utils";
+import { useUser } from "../stores/user";
 
 function CalendarEventViewDialog() {
   const theme = useTheme();
@@ -28,6 +29,7 @@ function CalendarEventViewDialog() {
   } = useEventDetails((state) => state);
   const { formatMessage } = useIntl();
   const { stateCalendar } = useContext(CalendarContext);
+  const { user } = useUser();
 
   const [userPublicKey, setUserPublicKey] = useState("");
   const customTimeRange = DEFAULT_TIME_RANGE_CONFIG;
@@ -47,11 +49,12 @@ function CalendarEventViewDialog() {
         setUserPublicKey(pubKey);
       } catch (error) {
         console.error("Failed to get user public key:", error);
+        setUserPublicKey("");
       }
     };
 
     initializeUser();
-  }, []);
+  }, [user]);
 
   if (!calendarEvent || action === "create") {
     return null;
@@ -130,6 +133,7 @@ function CalendarEventViewDialog() {
           currentRSVPStatus,
           isUpdatingRSVP,
           handleRSVPUpdate,
+          userPublicKey,
           formatMessage,
         })}
       </DialogContent>

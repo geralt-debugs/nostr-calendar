@@ -1,5 +1,4 @@
-import AccessTimeIcon from "@mui/icons-material/AccessTime";
-import { format, FormatOptions } from "date-fns";
+import { FormatOptions } from "date-fns";
 import Typography from "@mui/material/Typography";
 import Markdown from "react-markdown";
 import LocationOnOutlinedIcon from "@mui/icons-material/LocationOnOutlined";
@@ -11,7 +10,7 @@ import { Participant } from "./Participant";
 import { getRSVPStatusColor, getRSVPButtonStyle } from "../utils/rsvpHelpers";
 import Grid from "@mui/material/Grid";
 import { RSVPResponse } from "../stores/events";
-import { RepeatingFrequency, RSVPStatus } from "../utils/types";
+import { RSVPStatus } from "../utils/types";
 import { TimeRenderer } from "./TimeRenderer";
 
 const RenderContent = ({
@@ -24,8 +23,11 @@ const RenderContent = ({
   currentRSVPStatus,
   isUpdatingRSVP,
   handleRSVPUpdate,
+  userPublicKey,
   formatMessage,
 }: any) => {
+  const isUserPresent = Boolean(userPublicKey);
+
   return (
     <div
       style={isMobile ? styles.contentContainer : styles.contentContainerWeb}
@@ -117,11 +119,11 @@ const RenderContent = ({
             style={getRSVPButtonStyle(
               RSVPStatus.accepted,
               currentRSVPStatus === RSVPStatus.accepted,
-              isUpdatingRSVP,
+              isUpdatingRSVP || !isUserPresent,
               styles,
             )}
             onClick={() => handleRSVPUpdate(RSVPStatus.accepted)}
-            disabled={isUpdatingRSVP}
+            disabled={isUpdatingRSVP || !isUserPresent}
           >
             <CheckIcon style={{ fontSize: "18px" }} />
             Accept
@@ -131,11 +133,11 @@ const RenderContent = ({
             style={getRSVPButtonStyle(
               RSVPStatus.declined,
               currentRSVPStatus === RSVPStatus.declined,
-              isUpdatingRSVP,
+              isUpdatingRSVP || !isUserPresent,
               styles,
             )}
             onClick={() => handleRSVPUpdate(RSVPStatus.declined)}
-            disabled={isUpdatingRSVP}
+            disabled={isUpdatingRSVP || !isUserPresent}
           >
             <CloseOutlinedIcon style={{ fontSize: "18px" }} />
             Decline
@@ -145,11 +147,11 @@ const RenderContent = ({
             style={getRSVPButtonStyle(
               RSVPStatus.tentative,
               currentRSVPStatus === RSVPStatus.tentative,
-              isUpdatingRSVP,
+              isUpdatingRSVP || !isUserPresent,
               styles,
             )}
             onClick={() => handleRSVPUpdate(RSVPStatus.tentative)}
-            disabled={isUpdatingRSVP}
+            disabled={isUpdatingRSVP || !isUserPresent}
           >
             <HelpOutlineIcon style={{ fontSize: "18px" }} />
             Maybe
@@ -159,6 +161,12 @@ const RenderContent = ({
         {isUpdatingRSVP && (
           <Typography variant="body2" color="textSecondary" align="center">
             Updating RSVP...
+          </Typography>
+        )}
+
+        {!isUserPresent && (
+          <Typography variant="body2" color="textSecondary" align="center">
+            Sign in to update your RSVP.
           </Typography>
         )}
       </div>

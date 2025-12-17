@@ -1,8 +1,10 @@
+import { useEffect, useRef } from "react";
 import { styled, Theme, useTheme } from "@mui/material/styles";
 import Grid from "@mui/material/Grid";
 import { cyan } from "@mui/material/colors";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
+import { differenceInMinutes, startOfDay } from "date-fns";
 import CalendarHeader from "./CalendarHeader";
 import CalendarBoard from "./CalendarBoard";
 import CalendarBoardDragLayer from "./CalendarBoardDragLayer";
@@ -123,6 +125,23 @@ function CalendarLayoutDayWeek({
 }) {
   const theme = useTheme();
   const styles = getStyles(theme);
+  const bodyRef = useRef<HTMLDivElement | null>(null);
+  const boardRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const containers = [bodyRef.current, boardRef.current];
+    const now = new Date();
+    const minutesFromMidnight = differenceInMinutes(now, startOfDay(now));
+    const targetScroll = Math.max(minutesFromMidnight - 120, 0);
+
+    requestAnimationFrame(() => {
+      containers.forEach((container) => {
+        if (container) {
+          container.scrollTop = targetScroll;
+        }
+      });
+    });
+  }, []);
 
   return (
     <div style={styles.root}>
@@ -137,6 +156,7 @@ function CalendarLayoutDayWeek({
         direction="row"
         justifyContent="center"
         alignItems="stretch"
+        ref={bodyRef}
       >
         <Grid size={1} style={{ ...styles.timeColumnContainer }}>
           <div style={{ ...styles.timeColumn }}>
@@ -155,7 +175,7 @@ function CalendarLayoutDayWeek({
           </div>
         </Grid>
 
-        <Grid style={{ ...styles.boardContainer }}>
+        <Grid style={{ ...styles.boardContainer }} ref={boardRef}>
           <DndProvider backend={HTML5Backend}>
             {/* <Container /> */}
             <CalendarBoard

@@ -27,6 +27,7 @@ import LinkIcon from "@mui/icons-material/Link";
 interface Nip46SectionProps {
   onSuccess: () => void;
 }
+
 const Nip46Section: React.FC<Nip46SectionProps> = ({ onSuccess }) => {
   const [activeTab, setActiveTab] = useState("manual");
   const [bunkerUri, setBunkerUri] = useState("");
@@ -76,7 +77,6 @@ const Nip46Section: React.FC<Nip46SectionProps> = ({ onSuccess }) => {
   ) => {
     setSnackbar({ open: true, message, severity });
   };
-
   const handleCloseSnackbar = () => {
     setSnackbar({ ...snackbar, open: false });
   };
@@ -101,6 +101,7 @@ const Nip46Section: React.FC<Nip46SectionProps> = ({ onSuccess }) => {
       setLoadingConnect(false);
     }
   };
+
   return (
     <div style={{ marginTop: 16 }}>
       <Tabs
@@ -164,7 +165,7 @@ const FooterInfo: React.FC = () => {
   // const [isFAQModalVisible, setIsFAQModalVisible] = useState(false);
 
   return (
-    <div style={{ marginTop: 24, textAlign: "center" }}>
+    <div style={{ marginTop: 24, textAlign: "center", width: "100%" }}>
       <Typography color="textSecondary" sx={{ fontSize: 12 }}>
         Your keys never leave your control.
       </Typography>
@@ -256,35 +257,35 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onClose }) => {
   };
 
   return (
-    <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
-      <DialogTitle>
-        <Typography variant="h6" align="center">
+    <>
+      <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
+        <DialogTitle sx={{ textAlign: 'center' }}>
           Sign in to Formstr
-        </Typography>
-        <Typography variant="body2" color="textSecondary" align="center">
-          Choose your preferred login method
-        </Typography>
-      </DialogTitle>
-      <DialogContent>
-        <Stack spacing={2} sx={{ width: "100%" }}>
-          <LoginOptionButton
-            icon={<KeyIcon />}
-            text="Sign in with Nostr Extension (NIP-07)"
-            type="contained"
-            onClick={handleNip07}
-            loading={loadingNip07}
-          />
-          <LoginOptionButton
-            icon={<LinkIcon />}
-            text="Connect with Remote Signer (NIP-46)"
-            onClick={() => setShowNip46(!showNip46)}
-          />
-          {showNip46 && <Nip46Section onSuccess={onClose} />}
-        </Stack>
-      </DialogContent>
-      <DialogActions>
-        <FooterInfo />
-      </DialogActions>
+          <Typography variant="body2" color="textSecondary" align="center" sx={{ mt: 0.5 }}>
+            Choose your preferred login method
+          </Typography>
+        </DialogTitle>
+        <DialogContent>
+          <Stack spacing={2} sx={{ width: "100%" }}>
+            <LoginOptionButton
+              icon={<KeyIcon />}
+              text="Sign in with Nostr Extension (NIP-07)"
+              type="contained"
+              onClick={handleNip07}
+              loading={loadingNip07}
+            />
+            <LoginOptionButton
+              icon={<LinkIcon />}
+              text="Connect with Remote Signer (NIP-46)"
+              onClick={() => setShowNip46(!showNip46)}
+            />
+            {showNip46 && <Nip46Section onSuccess={onClose} />}
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <FooterInfo />
+        </DialogActions>
+      </Dialog>
       <Snackbar
         open={snackbar.open}
         autoHideDuration={4000}
@@ -299,7 +300,7 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onClose }) => {
           {snackbar.message}
         </Alert>
       </Snackbar>
-    </Dialog>
+    </>
   );
 };
 
