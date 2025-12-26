@@ -8,7 +8,12 @@ import {
   viewPrivateEvent,
 } from "../common/nostr";
 import { isValid } from "date-fns";
-import { appendOne, denormalize, normalize, removeOne } from "normal-store";
+import {
+  appendOne,
+  denormalize,
+  normalize,
+  removeOne,
+} from "@voiceflow/normal-store";
 import { SubCloser } from "nostr-tools/abstract-pool";
 import { RepeatingFrequency } from "../utils/types";
 import { getRepeatFrequency } from "../utils/repeatingEventsHelper";
