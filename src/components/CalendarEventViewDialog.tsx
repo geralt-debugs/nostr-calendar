@@ -1,6 +1,6 @@
 import { useContext, useState, useEffect } from "react";
 import { CalendarContext } from "../common/CalendarContext";
-import { useTheme, useMediaQuery } from "@mui/material";
+import { useTheme, useMediaQuery, Link, Tooltip } from "@mui/material";
 import IconButton from "@mui/material/IconButton";
 import CloseIcon from "@mui/icons-material/Close";
 import Dialog from "@mui/material/Dialog";
@@ -9,14 +9,17 @@ import DialogTitle from "@mui/material/DialogTitle";
 import Button from "@mui/material/Button";
 import { useEventDetails } from "../stores/eventDetails";
 import { useIntl } from "react-intl";
-import { getUserPublicKey } from "../common/nostr";
+import { encodeNAddr, getUserPublicKey } from "../common/nostr";
 import { getStyles } from "../styles/calendarEventStyles";
 import { useRSVPManager } from "./rsvpManager";
 import { DEFAULT_TIME_RANGE_CONFIG } from "./useRSVPTimeRange";
 import RenderContent from "./RenderContent";
 import DownloadIcon from "@mui/icons-material/Download";
 import { exportICS } from "../common/utils";
+import OpenInNewIcon from "@mui/icons-material/OpenInNew";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
 import { useUser } from "../stores/user";
+import { getEventPage } from "../utils/routingHelper";
 
 function CalendarEventViewDialog() {
   const theme = useTheme();
@@ -66,6 +69,19 @@ function CalendarEventViewDialog() {
     closeEventDetails();
   };
 
+  const linkToEvent = getEventPage(
+    encodeNAddr({
+      pubkey: calendarEvent.user,
+      identifier: calendarEvent.eventId,
+      kind: calendarEvent.kind,
+    }),
+    calendarEvent.viewKey
+  );
+
+  const copyLinkToEvent = () => {
+    navigator.clipboard.writeText(linkToEvent);
+  };
+
   return (
     <Dialog
       fullScreen={false}
@@ -87,7 +103,17 @@ function CalendarEventViewDialog() {
           {calendarEvent.title || ""}
         </div>
 
-        <div style={{ display: "flex", gap: "0.5rem" }}>
+        <div style={{ display: "flex", gap: "0.75rem" }}>
+          <IconButton onClick={copyLinkToEvent}>
+            <Tooltip title="Copy link to this event">
+              <ContentCopyIcon />
+            </Tooltip>
+          </IconButton>
+
+          <IconButton component={Link} href={linkToEvent}>
+            <OpenInNewIcon />
+          </IconButton>
+
           <Button
             variant="contained"
             size="small"

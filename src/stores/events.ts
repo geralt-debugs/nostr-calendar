@@ -34,8 +34,10 @@ export interface IRSVPResponse {
 export interface ICalendarEvent {
   begin: number;
   description: string;
+  kind: number;
   end: number;
   id: string;
+  eventId: string;
   title: string;
   createdAt: number;
   categories: string[];
@@ -48,6 +50,7 @@ export interface ICalendarEvent {
   website: string;
   user: string;
   isPrivateEvent: boolean;
+  viewKey?: string;
   repeat: {
     frequency: RepeatingFrequency | null;
   };
@@ -91,6 +94,7 @@ const getTimeRange = (customConfig?: {
 const processPrivateEvent = (
   event: Event,
   _timeRange: ReturnType<typeof getTimeRange>,
+  viewKey?: string
 ) => {
   const { events } = useTimeBasedEvents.getState();
   let store = normalize(events);
@@ -99,6 +103,8 @@ const processPrivateEvent = (
     user: event.pubkey,
     begin: 0,
     end: 0,
+    eventId: event.id,
+    kind: event.kind,
     id: "",
     title: "",
     createdAt: event.created_at,
@@ -108,6 +114,7 @@ const processPrivateEvent = (
     location: [],
     geoHash: [],
     participants: [],
+    viewKey: viewKey,
     isPrivateEvent: true,
     repeat: {
       frequency: null,
@@ -199,8 +206,8 @@ const processGiftWraps = (
   }
   processedEventIds.push(rumor.eventId);
   fetchPrivateCalendarEvents({ eventIds: [rumor.eventId] }, async (event) => {
-    const decryptedEvent = await viewPrivateEvent(event, rumor.viewKey);
-    processPrivateEvent(decryptedEvent, timeRange);
+    const decryptedEvent = viewPrivateEvent(event, rumor.viewKey);
+    processPrivateEvent(decryptedEvent, timeRange, rumor.viewKey);
   });
 };
 
@@ -277,7 +284,9 @@ export const useTimeBasedEvents = create<{
           const parsedEvent: ICalendarEvent = {
             description: event.content,
             user: event.pubkey,
+            kind: event.kind,
             begin: 0,
+            eventId: event.id,
             end: 0,
             id: "",
             title: "",
