@@ -16,7 +16,7 @@ import { ICalendarEvent } from "../stores/events";
 import { TEMP_CALENDAR_ID } from "../stores/eventDetails";
 import { AbstractRelay } from "nostr-tools/abstract-relay";
 import * as nip59 from "./nip59";
-import { NSec } from "nostr-tools/nip19";
+import { AddressPointer, NAddr, NPub, NSec, decode, naddrEncode } from "nostr-tools/nip19";
 import { signerManager } from "./signer";
 import { RSVPStatus } from "../utils/types";
 import { EventKinds } from "./EventConfigs";
@@ -418,7 +418,7 @@ export const fetchAndDecryptPrivateRSVPEvents = (
   });
 };
 
-export async function viewPrivateEvent(calendarEvent: Event, viewKey: string) {
+export function viewPrivateEvent(calendarEvent: Event, viewKey: string) {
   const viewPrivateKey = nip19.decode(viewKey as NSec).data;
   const decryptedContent = nip44.decrypt(
     calendarEvent.content,
@@ -561,3 +561,34 @@ export const fetchUserInfo = (
     },
   });
 };
+
+export const encodeNAddr = (address: Omit<AddressPointer, "relays">) => {
+  return naddrEncode({ ...address, relays: defaultRelays });
+};
+
+export const fetchCalendarEvent = (naddr: NAddr): Promise<Event> => {
+  const {data} = decode(naddr as NAddr);
+  console.log(data)
+  return new Promise((resolve, reject) => {
+    const relays = data.relays ?? defaultRelays
+  const filter: Filter = {
+    ids: [data.identifier],
+    kinds: [data.kind],
+    authors: [data.pubkey],
+  };
+
+  const maxWait = 10000
+
+  const closer = pool.subscribeMany(relays, [filter], {
+    maxWait,
+    onevent: (event: Event) => {
+      resolve(event);
+      closer.close()
+    },
+  });
+  setTimeout(() => {
+    reject(new Error('EVENT_NOT_FOUND'))
+    closer.close()
+  }, maxWait)
+  })
+}

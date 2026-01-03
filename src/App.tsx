@@ -8,6 +8,8 @@ import { IntlProvider } from "react-intl";
 import { flattenMessages } from "./common/utils";
 import dictionary from "./common/dictionary";
 import LoginModal from "./components/LoginModal";
+import { BrowserRouter } from "react-router";
+import { Routing } from "./components/Routing";
 
 let _locale =
   (navigator.languages && navigator.languages[0]) ||
@@ -15,7 +17,7 @@ let _locale =
   "en-US";
 _locale = ~Object.keys(dictionary).indexOf(_locale) ? _locale : "en-US";
 
-function App() {
+function Application() {
   const {
     user,
     isInitialized,
@@ -55,16 +57,8 @@ function App() {
     setShowModeSelection(false);
   };
 
-  const i18nLocale = _locale;
-  const locale_dictionary = {
-    ...flattenMessages(dictionary["en-US"]),
-    ...flattenMessages(dictionary[i18nLocale]),
-  };
-
   return (
-    <IntlProvider locale={i18nLocale} messages={locale_dictionary}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
+    <>
 
         {/* Mode Selection Modal */}
         <ModeSelectionModal
@@ -94,9 +88,24 @@ function App() {
           open={showLoginModal}
           onClose={() => updateLoginModal(false)}
         />
-      </ThemeProvider>
-    </IntlProvider>
+      </>
   );
 }
 
-export default App;
+export default function App() {
+    const i18nLocale = _locale;
+  const locale_dictionary = {
+    ...flattenMessages(dictionary["en-US"]),
+    ...flattenMessages(dictionary[i18nLocale]),
+  };
+  return (
+    <IntlProvider locale={i18nLocale} messages={locale_dictionary}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+    <BrowserRouter>
+      <Routing indexNode={<Application />} />
+    </BrowserRouter>
+    </ThemeProvider>
+    </IntlProvider>
+  );
+}
