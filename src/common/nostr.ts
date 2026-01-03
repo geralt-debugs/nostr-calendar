@@ -566,7 +566,7 @@ export const encodeNAddr = (address: Omit<AddressPointer, "relays">) => {
   return naddrEncode({ ...address, relays: defaultRelays });
 };
 
-export const fetchCalendarEvent = (naddr: NAddr) => {
+export const fetchCalendarEvent = (naddr: NAddr): Promise<Event> => {
   const {data} = decode(naddr as NAddr);
   console.log(data)
   return new Promise((resolve, reject) => {

@@ -15,49 +15,14 @@ import {
   removeOne,
 } from "@voiceflow/normal-store";
 import { SubCloser } from "nostr-tools/abstract-pool";
-import { RepeatingFrequency } from "../utils/types";
-import { getRepeatFrequency } from "../utils/repeatingEventsHelper";
-
-export enum RSVPResponse {
-  accepted = "accepted",
-  declined = "declined",
-  tentative = "tentative",
-  pending = "pending",
-}
-
-export interface IRSVPResponse {
-  participantId: string;
-  response: RSVPResponse;
-  timestamp: number;
-}
-
-export interface ICalendarEvent {
-  begin: number;
-  description: string;
-  kind: number;
-  end: number;
-  id: string;
-  eventId: string;
-  title: string;
-  createdAt: number;
-  categories: string[];
-  participants: string[];
-  rsvpResponses: IRSVPResponse[];
-  reference: string[];
-  image?: string;
-  location: string[];
-  geoHash: string[];
-  website: string;
-  user: string;
-  isPrivateEvent: boolean;
-  viewKey?: string;
-  repeat: {
-    frequency: RepeatingFrequency | null;
-  };
-}
+import { nostrEventToCalendar } from "../utils/parser";
+import { RSVPResponse } from "../utils/types";
+import type {ICalendarEvent} from "../utils/types";
 
 let subscriptionCloser: SubCloser | undefined;
 let privateSubloser: SubCloser | undefined;
+
+export { ICalendarEvent, RSVPResponse }
 
 interface TimeRangeConfig {
   daysBefore: number;
@@ -98,76 +63,7 @@ const processPrivateEvent = (
 ) => {
   const { events } = useTimeBasedEvents.getState();
   let store = normalize(events);
-  const parsedEvent: ICalendarEvent = {
-    description: "",
-    user: event.pubkey,
-    begin: 0,
-    end: 0,
-    eventId: event.id,
-    kind: event.kind,
-    id: "",
-    title: "",
-    createdAt: event.created_at,
-    categories: [],
-    reference: [],
-    website: "",
-    location: [],
-    geoHash: [],
-    participants: [],
-    viewKey: viewKey,
-    isPrivateEvent: true,
-    repeat: {
-      frequency: null,
-    },
-    rsvpResponses: [],
-  };
-  event.tags.forEach(([key, value], index) => {
-    switch (key) {
-      case "description":
-        parsedEvent.description = value;
-        break;
-      case "start":
-        parsedEvent.begin = Number(value) * 1000;
-        break;
-      case "end":
-        parsedEvent.end = Number(value) * 1000;
-        break;
-      case "d":
-        parsedEvent.id = value;
-        break;
-      case "title":
-      case "name":
-        parsedEvent.title = value;
-        break;
-      case "r":
-        parsedEvent.reference.push(value);
-        break;
-      case "image":
-        parsedEvent.image = value;
-        break;
-      case "t":
-        parsedEvent.categories.push(value);
-        break;
-      case "location":
-        parsedEvent.location.push(value);
-        break;
-      case "p":
-        parsedEvent.participants.push(value);
-        break;
-      case "g":
-        parsedEvent.geoHash.push(value);
-        break;
-      case "L":
-        switch (value) {
-          case "recurring":
-            parsedEvent.repeat = {
-              frequency: getRepeatFrequency(event.tags[index + 1]?.[1]),
-            };
-            break;
-        }
-        break;
-    }
-  });
+  const parsedEvent = nostrEventToCalendar(event, {viewKey, isPrivateEvent: true})
   // Check if we have valid begin/end times after processing all tags
   if (parsedEvent.begin === 0 || parsedEvent.end === 0) {
     return;
@@ -281,72 +177,7 @@ export const useTimeBasedEvents = create<{
       (event: Event) => {
         set(({ events, eventById }) => {
           let store = normalize(events);
-          const parsedEvent: ICalendarEvent = {
-            description: event.content,
-            user: event.pubkey,
-            kind: event.kind,
-            begin: 0,
-            eventId: event.id,
-            end: 0,
-            id: "",
-            title: "",
-            createdAt: event.created_at,
-            categories: [],
-            reference: [],
-            website: "",
-            location: [],
-            geoHash: [],
-            participants: [],
-            isPrivateEvent: false,
-            rsvpResponses: [],
-            repeat: {
-              frequency: null,
-            },
-          };
-
-          event.tags.forEach(([key, value], index) => {
-            switch (key) {
-              case "start":
-                parsedEvent.begin = Number(value) * 1000;
-                break;
-              case "end":
-                parsedEvent.end = Number(value) * 1000;
-                break;
-              case "d":
-                parsedEvent.id = value;
-                break;
-              case "name":
-                parsedEvent.title = value;
-                break;
-              case "r":
-                parsedEvent.reference.push(value);
-                break;
-              case "image":
-                parsedEvent.image = value;
-                break;
-              case "t":
-                parsedEvent.categories.push(value);
-                break;
-              case "location":
-                parsedEvent.location.push(value);
-                break;
-              case "p":
-                parsedEvent.participants.push(value);
-                break;
-              case "g":
-                parsedEvent.geoHash.push(value);
-                break;
-              case "L":
-                switch (value) {
-                  case "repeat":
-                    parsedEvent.repeat = {
-                      frequency: getRepeatFrequency(event.tags[index + 1]?.[1]),
-                    };
-                    break;
-                }
-                break;
-            }
-          });
+          const parsedEvent = nostrEventToCalendar(event)
 
           // Check if we have valid begin/end times after processing all tags
           if (parsedEvent.begin === 0 || parsedEvent.end === 0) {

@@ -57,16 +57,8 @@ function Application() {
     setShowModeSelection(false);
   };
 
-  const i18nLocale = _locale;
-  const locale_dictionary = {
-    ...flattenMessages(dictionary["en-US"]),
-    ...flattenMessages(dictionary[i18nLocale]),
-  };
-
   return (
-    <IntlProvider locale={i18nLocale} messages={locale_dictionary}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
+    <>
 
         {/* Mode Selection Modal */}
         <ModeSelectionModal
@@ -96,15 +88,24 @@ function Application() {
           open={showLoginModal}
           onClose={() => updateLoginModal(false)}
         />
-      </ThemeProvider>
-    </IntlProvider>
+      </>
   );
 }
 
 export default function App() {
+    const i18nLocale = _locale;
+  const locale_dictionary = {
+    ...flattenMessages(dictionary["en-US"]),
+    ...flattenMessages(dictionary[i18nLocale]),
+  };
   return (
+    <IntlProvider locale={i18nLocale} messages={locale_dictionary}>
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
     <BrowserRouter>
       <Routing indexNode={<Application />} />
     </BrowserRouter>
+    </ThemeProvider>
+    </IntlProvider>
   );
 }
