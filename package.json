@@ -7,7 +7,11 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "simulate-android": "ANDROID_SDK_ROOT=/home/rama/Android/Sdk pnpm cap run android",
+    "build-android": "ANDROID_SDK_ROOT=/home/rama/Android/Sdk pnpm cap build android",
+    "simulate-ios": "pnpm cap run ios",
+    "build-ios": "pnpm cap build ios"
   },
   "dependencies": {
     "@capacitor/android": "^8.0.0",
