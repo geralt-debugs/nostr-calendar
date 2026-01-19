@@ -92,8 +92,8 @@ export default function App() {
     <IntlProvider locale={i18nLocale} messages={locale_dictionary}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <Application />
         <BrowserRouter>
+          <Application />
           <Routing />
         </BrowserRouter>
       </ThemeProvider>
