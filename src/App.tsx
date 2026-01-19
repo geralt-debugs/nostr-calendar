@@ -1,4 +1,3 @@
-import Calendar from "./components/Calendar";
 import ModeSelectionModal from "./components/ModeSelectionModal";
 import { ThemeProvider, CssBaseline, Box, Typography } from "@mui/material";
 import { theme } from "./theme";
@@ -59,41 +58,32 @@ function Application() {
 
   return (
     <>
-
-        {/* Mode Selection Modal */}
-        <ModeSelectionModal
-          isOpen={showModeSelection}
-          onModeSelect={handleModeSelection}
-        />
-
-        {/* Main App Content */}
-        {(appMode || user) && !showModeSelection && (
-          <div className="App">
-            <Calendar />
-          </div>
-        )}
-
-        {/* Loading State */}
-        {!showModeSelection && !appMode && !user && (
-          <Box
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            minHeight="100vh"
-          >
-            <Typography>Loading...</Typography>
-          </Box>
-        )}
-        <LoginModal
-          open={showLoginModal}
-          onClose={() => updateLoginModal(false)}
-        />
-      </>
+      {/* Mode Selection Modal */}
+      <ModeSelectionModal
+        isOpen={showModeSelection}
+        onModeSelect={handleModeSelection}
+      />
+      {/* Loading State */}
+      {!showModeSelection && !appMode && !user && (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight="100vh"
+        >
+          <Typography>Loading...</Typography>
+        </Box>
+      )}
+      <LoginModal
+        open={showLoginModal}
+        onClose={() => updateLoginModal(false)}
+      />
+    </>
   );
 }
 
 export default function App() {
-    const i18nLocale = _locale;
+  const i18nLocale = _locale;
   const locale_dictionary = {
     ...flattenMessages(dictionary["en-US"]),
     ...flattenMessages(dictionary[i18nLocale]),
@@ -102,10 +92,11 @@ export default function App() {
     <IntlProvider locale={i18nLocale} messages={locale_dictionary}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-    <BrowserRouter>
-      <Routing indexNode={<Application />} />
-    </BrowserRouter>
-    </ThemeProvider>
+        <Application />
+        <BrowserRouter>
+          <Routing />
+        </BrowserRouter>
+      </ThemeProvider>
     </IntlProvider>
   );
 }

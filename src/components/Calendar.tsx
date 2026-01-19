@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { isMobile } from "../common/utils";
 import dictionary from "../common/dictionary";
 import {
   addMonths,
@@ -11,14 +10,18 @@ import {
 } from "date-fns";
 import { de } from "date-fns/locale/de"; // <<<< I18N   (DO NOT REMOVE!!!)
 import { CalendarContext } from "../common/CalendarContext";
-import CalendarToolbar from "./CalendarToolbar";
-import CalendarDrawer from "./CalendarDrawer";
-import CalendarMain from "./CalendarMain";
 import CalendarEventViewDialog from "./CalendarEventViewDialog";
 import CalendarEventDialog from "./CalendarEventDialog";
 import { useTimeBasedEvents } from "../stores/events";
 import { useSettings } from "../stores/settings";
 import { useUser } from "../stores/user";
+import { useTheme, useMediaQuery, Box } from "@mui/material";
+import { DayView } from "./DayView";
+import { MonthView } from "./MonthView";
+import { WeekView } from "./WeekView";
+import dayjs from "dayjs";
+import { useLayout } from "../hooks/useLayout";
+import { CalendarHeader } from "./CalendarHeader";
 
 let _locale =
   (navigator.languages && navigator.languages[0]) ||
@@ -37,7 +40,7 @@ function Calendar() {
   // const { history, match } = props
   // const theme = useTheme()
   const {
-    settings: { layout, filters },
+    settings: { filters },
   } = useSettings((state) => state);
   const { user } = useUser();
   const events = useTimeBasedEvents((state) => state);
@@ -47,6 +50,11 @@ function Calendar() {
   if (user) {
     events.fetchPrivateEvents();
   }
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
+
+  const { layout } = useLayout();
+
   const changeLanguage = (newLang: { value: string; label: string } | null) => {
     if (!newLang) return;
 
@@ -58,23 +66,6 @@ function Calendar() {
     console.groupEnd();
     setStateCalendar({ ...stateCalendar, locale: newDateFnLocale, i18nLocale });
   };
-
-  // const handleCloseDialog = () => {
-  //     console.group('on handleCloseDialog')
-  //     console.log({ stateCalendar })
-  //     console.groupEnd()
-  //     // const {open} = props
-  //     setStateCalendar({ ...stateCalendar, openDialog: false })
-  // }
-
-  // const handleCloseViewDialog = () => {
-  //     console.group('on handleCloseViewDialog')
-  //     console.log({ stateCalendar })
-  //     console.groupEnd()
-
-  //     // const {open} = props
-  //     setStateCalendar({ ...stateCalendar, openViewDialog: false })
-  // }
 
   const [stateCalendar, setStateCalendar] = useState({
     selectedDate,
@@ -102,26 +93,6 @@ function Calendar() {
     // handleCloseDialog,
     // handleCloseViewDialog,
   });
-
-  const [open, setOpen] = useState(!isMobile); // Start closed on mobile, open on desktop
-
-  const handleDrawerOpen = () => {
-    setOpen(true);
-  };
-
-  const handleDrawerClose = () => {
-    setOpen(false);
-  };
-
-  const toggleDrawer = () => {
-    setOpen(!open);
-  };
-
-  const [runAnimation, setRunAnimation] = useState(true);
-
-  // const applyLink = (newDate: Date) => {
-  //     history.push(`/d/${layout}/${format(newDate, "yyyy/MM/dd")}`)
-  // }
 
   const goToToday = () => {
     setRunAnimation(false);
@@ -174,52 +145,39 @@ function Calendar() {
     // applyLink(newDate)
   };
 
-  // useEffect(() => {
-  //     // selectedDate !== null && applyLink(selectedDate)
-  //     setTimeout(() => {
-  //         setRunAnimation(true)
-  //     }, 1)
-  // }, [selectedDate])
-
   return (
     <CalendarContext.Provider value={{ stateCalendar, setStateCalendar }}>
-      <div
-        style={{
-          width: "100%",
-          height: "100%",
-          display: "flex",
-        }}
-      >
-        <CalendarToolbar
-          goToToday={goToToday}
-          next={next}
-          previous={previous}
-          open={open}
-          handleDrawerOpen={handleDrawerOpen}
-          handleDrawerClose={handleDrawerClose}
-          toggleDrawer={toggleDrawer}
-          changeLanguage={changeLanguage}
+      <Box p={2}>
+        <CalendarHeader
+          view={layout}
+          date={dayjs(stateCalendar.selectedDate)}
+          setDate={console.log.bind(console, "setDate")}
+          setView={console.log.bind(console, "setView")}
         />
-        <CalendarDrawer
-          selectedDate={selectedDate}
-          next={next}
-          previous={previous}
-          open={open}
-          handleDrawerClose={handleDrawerClose}
-          layout={"month"}
-          locale={locale}
-        />
-
-        <CalendarMain
-          // selectedDate={selectedDate}
-          open={open}
-          // layout={layout}
-          runAnimation={runAnimation}
-        />
-
-        <CalendarEventDialog />
-        <CalendarEventViewDialog />
-      </div>
+        {layout === "day" && (
+          <DayView
+            date={dayjs(stateCalendar.selectedDate)}
+            events={events.events}
+          />
+        )}
+        {layout === "week" && (
+          <WeekView
+            date={dayjs(stateCalendar.selectedDate)}
+            events={events.events}
+            setDate={console.log.bind(console, "setDate")}
+            setView={console.log.bind(console, "setView")}
+            setEvents={console.log.bind(console, "setEvents")}
+          />
+        )}
+        {layout === "month" && (
+          <MonthView
+            date={dayjs(stateCalendar.selectedDate)}
+            events={events.events}
+          />
+        )}
+      </Box>
+      <CalendarEventDialog />
+      <CalendarEventViewDialog />
     </CalendarContext.Provider>
   );
 }
