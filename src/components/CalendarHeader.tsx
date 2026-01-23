@@ -1,30 +1,40 @@
+import React from "react";
 import ChevronLeft from "@mui/icons-material/ChevronLeft";
 import ChevronRight from "@mui/icons-material/ChevronRight";
+import TodayIcon from "@mui/icons-material/Today";
+import KeyboardArrowDown from "@mui/icons-material/KeyboardArrowDown";
 import {
   Box,
   IconButton,
   Typography,
-  ToggleButtonGroup,
-  ToggleButton,
+  Menu,
+  MenuItem,
+  Button,
+  useTheme,
 } from "@mui/material";
-import { Layout } from "../hooks/useLayout";
-import { Dayjs } from "dayjs";
+import { useLayout } from "../hooks/useLayout";
+import dayjs, { Dayjs } from "dayjs";
+import { getRouteFromDate } from "../utils/dateBasedRouting";
+import { useNavigate } from "react-router";
 
 interface CalendarHeaderProps {
-  view: Layout;
   date: Dayjs;
   setDate: (d: Dayjs) => void;
-  setView: (v: Layout) => void;
 }
 
-export function CalendarHeader({
-  view,
-  date,
-  setDate,
-  setView,
-}: CalendarHeaderProps) {
-  const move = (dir: number) => setDate(date.add(dir, view));
-
+export function CalendarHeader({ date, setDate }: CalendarHeaderProps) {
+  const { layout, updateLayout } = useLayout();
+  const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
+  const open = Boolean(anchorEl);
+  const theme = useTheme();
+  const navigate = useNavigate();
+  const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+  const handleClose = () => {
+    setAnchorEl(null);
+  };
+  const move = (dir: number) => setDate(date.add(dir, layout));
   return (
     <Box
       display="flex"
@@ -40,22 +50,63 @@ export function CalendarHeader({
           <ChevronRight />
         </IconButton>
         <Typography ml={2} fontWeight={600}>
-          {view === "month" && date.format("MMMM YYYY")}
-          {view === "week" &&
+          {layout === "month" && date.format("MMMM YYYY")}
+          {layout === "week" &&
             `${date.startOf("week").format("MMM D")} – ${date.endOf("week").format("MMM D")}`}
-          {view === "day" && date.format("MMMM D, YYYY")}
+          {layout === "day" && date.format("MMMM D, YYYY")}
         </Typography>
       </Box>
-
-      <ToggleButtonGroup
-        value={view}
-        exclusive
-        onChange={(_, v) => v && setView(v)}
-      >
-        <ToggleButton value="day">Day</ToggleButton>
-        <ToggleButton value="week">Week</ToggleButton>
-        <ToggleButton value="month">Month</ToggleButton>
-      </ToggleButtonGroup>
+      <Box display="flex" gap={theme.spacing(2)} alignItems="center">
+        <IconButton
+          onClick={() => {
+            const route = getRouteFromDate(dayjs(), layout);
+            if (route !== location.pathname) {
+              navigate(route);
+            }
+          }}
+        >
+          <TodayIcon />
+        </IconButton>
+        <Button
+          onClick={handleClick}
+          variant="outlined"
+          startIcon={<KeyboardArrowDown />}
+        >
+          {layout}
+        </Button>
+        <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
+          <MenuItem
+            selected={layout === "day"}
+            disabled={layout === "day"}
+            onClick={() => {
+              updateLayout("day");
+              handleClose();
+            }}
+          >
+            Day
+          </MenuItem>
+          <MenuItem
+            selected={layout === "week"}
+            disabled={layout === "week"}
+            onClick={() => {
+              updateLayout("week");
+              handleClose();
+            }}
+          >
+            Week
+          </MenuItem>
+          <MenuItem
+            selected={layout === "month"}
+            disabled={layout === "month"}
+            onClick={() => {
+              updateLayout("month");
+              handleClose();
+            }}
+          >
+            Month
+          </MenuItem>
+        </Menu>
+      </Box>
     </Box>
   );
 }

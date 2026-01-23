@@ -1,4 +1,11 @@
 import { createTheme } from "@mui/material/styles";
+import { alpha } from "@mui/material/styles";
+
+declare module "@mui/material/IconButton" {
+  interface IconButtonOwnProps {
+    variant?: "highlighted";
+  }
+}
 
 export const theme = createTheme({
   cssVariables: true,
@@ -13,10 +20,26 @@ export const theme = createTheme({
         arrow: true,
       },
     },
+    MuiIconButton: {
+      variants: [
+        {
+          props: {
+            variant: "highlighted",
+          },
+          style: ({ theme }) => ({
+            background: theme.palette.primary.main,
+            color: theme.palette.primary.contrastText,
+            [":hover"]: {
+              background: alpha(theme.palette.primary.main, 0.3),
+            },
+          }),
+        },
+      ],
+    },
   },
   palette: {
     primary: {
-      main: "#fbb17b",
+      main: "#000000ff",
     },
     secondary: {
       main: "#163f5e",

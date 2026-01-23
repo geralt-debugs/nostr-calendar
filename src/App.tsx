@@ -9,6 +9,7 @@ import dictionary from "./common/dictionary";
 import LoginModal from "./components/LoginModal";
 import { BrowserRouter } from "react-router";
 import { Routing } from "./components/Routing";
+import { Header, HEADER_HEIGHT } from "./components/Header";
 
 let _locale =
   (navigator.languages && navigator.languages[0]) ||
@@ -58,6 +59,7 @@ function Application() {
 
   return (
     <>
+      <Header />
       {/* Mode Selection Modal */}
       <ModeSelectionModal
         isOpen={showModeSelection}
@@ -78,6 +80,9 @@ function Application() {
         open={showLoginModal}
         onClose={() => updateLoginModal(false)}
       />
+      <Box style={{ marginTop: `${HEADER_HEIGHT}px` }}>
+        <Routing />
+      </Box>
     </>
   );
 }
@@ -94,7 +99,6 @@ export default function App() {
         <CssBaseline />
         <BrowserRouter>
           <Application />
-          <Routing />
         </BrowserRouter>
       </ThemeProvider>
     </IntlProvider>

@@ -1,4 +1,4 @@
-import { Box, Divider, Typography } from "@mui/material";
+import { Box, Divider, IconButton, Typography, useTheme } from "@mui/material";
 import dayjs, { Dayjs } from "dayjs";
 import weekday from "dayjs/plugin/weekday";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
@@ -10,6 +10,7 @@ import { DndContext, DragEndEvent } from "@dnd-kit/core";
 import { PX_PER_MINUTE } from "../utils/constants";
 import { layoutDayEvents } from "../common/calendarEngine";
 import { CalendarEvent } from "./CalendarEvent";
+import { DateLabel } from "./DateLabel";
 
 dayjs.extend(weekday);
 dayjs.extend(isSameOrBefore);
@@ -53,12 +54,13 @@ export function WeekView({
       ),
     );
   };
+  const theme = useTheme();
 
   return (
     <DndContext onDragEnd={onDragEnd}>
       <Box display="flex" height={24 * 60}>
         {/* Time column */}
-        <Box width={60} borderRight="1px solid #ddd">
+        <Box width={60}>
           {Array.from({ length: 24 }).map((_, h) => (
             <Box key={h} height={60} px={0.5}>
               <Typography variant="caption">{h}:00</Typography>
@@ -68,7 +70,7 @@ export function WeekView({
 
         {/* Days */}
         <Box flex={1} display="grid" gridTemplateColumns="repeat(7, 1fr)">
-          {days.map((day) => {
+          {days.map((day, index) => {
             const laidOut = layoutDayEvents(
               events.filter((e) => dayjs(e.begin).isSame(day, "day")),
             );
@@ -89,12 +91,16 @@ export function WeekView({
                   top={0}
                   zIndex={1}
                   bgcolor="background.paper"
-                  borderBottom="1px solid #ddd"
                   textAlign="center"
+                  display={"flex"}
+                  flexDirection={"column"}
+                  alignItems={"center"}
+                  marginBottom={theme.spacing(1)}
                 >
-                  <Typography variant="caption" fontWeight={600}>
-                    {day.format("ddd D")}
+                  <Typography variant="body1" fontWeight={600}>
+                    {day.format("ddd")}
                   </Typography>
+                  <DateLabel day={day}></DateLabel>
                 </Box>
                 {Array.from({ length: 24 }).map((_, h) => (
                   <Box key={h} height={60} px={0.5}>

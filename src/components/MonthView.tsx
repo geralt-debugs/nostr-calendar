@@ -2,6 +2,7 @@ import { Box, Paper, Typography } from "@mui/material";
 import dayjs, { Dayjs } from "dayjs";
 import { ICalendarEvent } from "../utils/types";
 import { Layout } from "../hooks/useLayout";
+import { DateLabel } from "./DateLabel";
 
 interface MonthViewProps {
   date: Dayjs;
@@ -32,17 +33,17 @@ export function MonthView({ date, events, setDate, setView }: MonthViewProps) {
             setView("week");
           }}
         >
-          <Typography variant="caption" fontWeight={600}>
-            {day.date()}
-          </Typography>
-          {events
-            .filter((e) => dayjs(e.begin).isSame(day, "day"))
-            .slice(0, 3)
-            .map((e) => (
-              <Typography key={e.id} variant="caption" noWrap>
-                • {e.title}
-              </Typography>
-            ))}
+          <DateLabel day={day} />
+          <Box display={"flex"} flexDirection={"column"}>
+            {events
+              .filter((e) => dayjs(e.begin).isSame(day, "day"))
+              .slice(0, 3)
+              .map((e) => (
+                <Typography key={e.id} variant="caption" noWrap>
+                  • {e.title}
+                </Typography>
+              ))}
+          </Box>
         </Paper>
       ))}
     </Box>

@@ -15,7 +15,6 @@ dayjs.extend(isSameOrAfter);
 interface DayViewProps {
   date: Dayjs;
   events: ICalendarEvent[];
-  setEvents: React.Dispatch<React.SetStateAction<ICalendarEvent[]>>;
 }
 
 export function DayView({ date, events }: DayViewProps) {

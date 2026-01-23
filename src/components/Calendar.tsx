@@ -94,65 +94,12 @@ function Calendar() {
     // handleCloseViewDialog,
   });
 
-  const goToToday = () => {
-    setRunAnimation(false);
-    const newDate = new Date();
-    setStateCalendar({ ...stateCalendar, selectedDate: newDate });
-    // applyLink(newDate)
-  };
-
-  const next = () => {
-    setRunAnimation(false);
-    let newDate;
-
-    switch (layout) {
-      case "week":
-        newDate = addWeeks(stateCalendar.selectedDate, 1);
-        break;
-
-      case "day":
-        newDate = addDays(stateCalendar.selectedDate, 1);
-        break;
-
-      default:
-        // month
-        newDate = addMonths(stateCalendar.selectedDate, 1);
-        break;
-    }
-    setStateCalendar({ ...stateCalendar, selectedDate: newDate });
-    // applyLink(newDate)
-  };
-
-  const previous = () => {
-    setRunAnimation(false);
-    let newDate;
-
-    switch (layout) {
-      case "week":
-        newDate = subWeeks(stateCalendar.selectedDate, 1);
-        break;
-
-      case "day":
-        newDate = subDays(stateCalendar.selectedDate, 1);
-        break;
-
-      default:
-        // month
-        newDate = subMonths(stateCalendar.selectedDate, 1);
-        break;
-    }
-    setStateCalendar({ ...stateCalendar, selectedDate: newDate });
-    // applyLink(newDate)
-  };
-
   return (
     <CalendarContext.Provider value={{ stateCalendar, setStateCalendar }}>
       <Box p={2}>
         <CalendarHeader
-          view={layout}
           date={dayjs(stateCalendar.selectedDate)}
           setDate={console.log.bind(console, "setDate")}
-          setView={console.log.bind(console, "setView")}
         />
         {layout === "day" && (
           <DayView
@@ -173,6 +120,8 @@ function Calendar() {
           <MonthView
             date={dayjs(stateCalendar.selectedDate)}
             events={events.events}
+            setDate={console.log.bind(console, "setDate")}
+            setView={console.log.bind(console, "setView")}
           />
         )}
       </Box>
