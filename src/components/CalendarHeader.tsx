@@ -13,28 +13,25 @@ import {
   useTheme,
 } from "@mui/material";
 import { useLayout } from "../hooks/useLayout";
-import dayjs, { Dayjs } from "dayjs";
+import dayjs from "dayjs";
 import { getRouteFromDate } from "../utils/dateBasedRouting";
 import { useNavigate } from "react-router";
+import { useDateWithRouting } from "../hooks/useDateWithRouting";
 
-interface CalendarHeaderProps {
-  date: Dayjs;
-  setDate: (d: Dayjs) => void;
-}
-
-export function CalendarHeader({ date, setDate }: CalendarHeaderProps) {
+export function CalendarHeader() {
   const { layout, updateLayout } = useLayout();
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const open = Boolean(anchorEl);
   const theme = useTheme();
   const navigate = useNavigate();
+  const { date, setDate } = useDateWithRouting();
   const handleClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
   };
   const handleClose = () => {
     setAnchorEl(null);
   };
-  const move = (dir: number) => setDate(date.add(dir, layout));
+  const move = (dir: number) => setDate(date.add(dir, layout), layout);
   return (
     <Box
       display="flex"

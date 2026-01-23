@@ -1,5 +1,11 @@
 import ModeSelectionModal from "./components/ModeSelectionModal";
-import { ThemeProvider, CssBaseline, Box, Typography } from "@mui/material";
+import {
+  ThemeProvider,
+  CssBaseline,
+  Box,
+  Typography,
+  Toolbar,
+} from "@mui/material";
 import { theme } from "./theme";
 import { useEffect, useState } from "react";
 import { useUser } from "./stores/user";
@@ -80,7 +86,8 @@ function Application() {
         open={showLoginModal}
         onClose={() => updateLoginModal(false)}
       />
-      <Box style={{ marginTop: `${HEADER_HEIGHT}px` }}>
+      <Toolbar />
+      <Box>
         <Routing />
       </Box>
     </>

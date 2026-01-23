@@ -1,5 +1,13 @@
-import { Box, Divider, IconButton, Typography, useTheme } from "@mui/material";
-import dayjs, { Dayjs } from "dayjs";
+import {
+  alpha,
+  Box,
+  Divider,
+  styled,
+  Toolbar,
+  Typography,
+  useTheme,
+} from "@mui/material";
+import dayjs from "dayjs";
 import weekday from "dayjs/plugin/weekday";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
@@ -11,26 +19,34 @@ import { PX_PER_MINUTE } from "../utils/constants";
 import { layoutDayEvents } from "../common/calendarEngine";
 import { CalendarEvent } from "./CalendarEvent";
 import { DateLabel } from "./DateLabel";
+import { useDateWithRouting } from "../hooks/useDateWithRouting";
+import { isWeekend } from "../utils/dateHelper";
+import { HEADER_HEIGHT } from "./Header";
 
 dayjs.extend(weekday);
 dayjs.extend(isSameOrBefore);
 dayjs.extend(isSameOrAfter);
 
 interface WeekViewProps {
-  date: Dayjs;
   events: ICalendarEvent[];
   setEvents: React.Dispatch<React.SetStateAction<ICalendarEvent[]>>;
   setView: (v: Layout) => void;
-  setDate: (d: Dayjs) => void;
 }
 
-export function WeekView({
-  date,
-  events,
-  setEvents,
-  setView,
-  setDate,
-}: WeekViewProps) {
+const StyledBoxHeader = styled(Box)({
+  "@media (min-width:0px)": {
+    "@media (orientation: landscape)": {
+      top: `48px`,
+    },
+  },
+  "@media (min-width:600px)": {
+    top: `64px`,
+  },
+  top: `56px`,
+});
+
+export function WeekView({ events, setEvents }: WeekViewProps) {
+  const { date, setDate } = useDateWithRouting();
   const start = date.startOf("week");
   const days = Array.from({ length: 7 }, (_, i) => start.add(i, "day"));
 
@@ -60,7 +76,7 @@ export function WeekView({
     <DndContext onDragEnd={onDragEnd}>
       <Box display="flex" height={24 * 60}>
         {/* Time column */}
-        <Box width={60}>
+        <Box width={60} marginTop={"65px"}>
           {Array.from({ length: 24 }).map((_, h) => (
             <Box key={h} height={60} px={0.5}>
               <Typography variant="caption">{h}:00</Typography>
@@ -70,7 +86,7 @@ export function WeekView({
 
         {/* Days */}
         <Box flex={1} display="grid" gridTemplateColumns="repeat(7, 1fr)">
-          {days.map((day, index) => {
+          {days.map((day) => {
             const laidOut = layoutDayEvents(
               events.filter((e) => dayjs(e.begin).isSame(day, "day")),
             );
@@ -80,39 +96,35 @@ export function WeekView({
                 key={day.toString()}
                 position="relative"
                 borderLeft="1px solid #eee"
-                onDoubleClick={() => {
-                  setDate(day);
-                  setView("day");
+                sx={{
+                  background: isWeekend(day)
+                    ? alpha(theme.palette.primary.main, 0.1)
+                    : "transparent",
                 }}
               >
                 {/* Day header */}
-                <Box
+                <StyledBoxHeader
                   position="sticky"
-                  top={0}
                   zIndex={1}
-                  bgcolor="background.paper"
                   textAlign="center"
                   display={"flex"}
                   flexDirection={"column"}
                   alignItems={"center"}
-                  marginBottom={theme.spacing(1)}
+                  paddingY={theme.spacing(1)}
+                  bgcolor={"white"}
                 >
                   <Typography variant="body1" fontWeight={600}>
                     {day.format("ddd")}
                   </Typography>
                   <DateLabel day={day}></DateLabel>
-                </Box>
+                </StyledBoxHeader>
                 {Array.from({ length: 24 }).map((_, h) => (
                   <Box key={h} height={60} px={0.5}>
                     <Divider />
                   </Box>
                 ))}
                 {laidOut.map((e) => (
-                  <CalendarEvent
-                    key={e.id}
-                    event={e}
-                    onClick={() => setDate(day)}
-                  />
+                  <CalendarEvent key={e.id} event={e} />
                 ))}
               </Box>
             );

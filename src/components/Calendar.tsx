@@ -97,33 +97,10 @@ function Calendar() {
   return (
     <CalendarContext.Provider value={{ stateCalendar, setStateCalendar }}>
       <Box p={2}>
-        <CalendarHeader
-          date={dayjs(stateCalendar.selectedDate)}
-          setDate={console.log.bind(console, "setDate")}
-        />
-        {layout === "day" && (
-          <DayView
-            date={dayjs(stateCalendar.selectedDate)}
-            events={events.events}
-          />
-        )}
-        {layout === "week" && (
-          <WeekView
-            date={dayjs(stateCalendar.selectedDate)}
-            events={events.events}
-            setDate={console.log.bind(console, "setDate")}
-            setView={console.log.bind(console, "setView")}
-            setEvents={console.log.bind(console, "setEvents")}
-          />
-        )}
-        {layout === "month" && (
-          <MonthView
-            date={dayjs(stateCalendar.selectedDate)}
-            events={events.events}
-            setDate={console.log.bind(console, "setDate")}
-            setView={console.log.bind(console, "setView")}
-          />
-        )}
+        <CalendarHeader />
+        {layout === "day" && <DayView events={events.events} />}
+        {layout === "week" && <WeekView events={events.events} />}
+        {layout === "month" && <MonthView events={events.events} />}
       </Box>
       <CalendarEventDialog />
       <CalendarEventViewDialog />
