@@ -2,8 +2,8 @@ import { useState } from "react";
 import dictionary from "../common/dictionary";
 import { de } from "date-fns/locale/de"; // <<<< I18N   (DO NOT REMOVE!!!)
 import { CalendarContext } from "../common/CalendarContext";
-import CalendarEventViewDialog from "./CalendarEventViewDialog";
-import CalendarEventDialog from "./CalendarEventDialog";
+// import CalendarEventViewDialog from "./CalendarEventViewDialog";
+// import CalendarEventDialog from "./CalendarEventDialog";
 import { useTimeBasedEvents } from "../stores/events";
 import { useSettings } from "../stores/settings";
 import { useUser } from "../stores/user";
@@ -79,8 +79,8 @@ function Calendar() {
         {layout === "week" && <WeekView events={events.events} />}
         {layout === "month" && <MonthView events={events.events} />}
       </Box>
-      <CalendarEventDialog />
-      <CalendarEventViewDialog />
+      {/* <CalendarEventDialog /> */}
+      {/* <CalendarEventViewDialog /> */}
     </CalendarContext.Provider>
   );
 }

@@ -8,6 +8,7 @@ import { layoutDayEvents } from "../common/calendarEngine";
 import { CalendarEvent } from "./CalendarEvent";
 import { DndContext } from "@dnd-kit/core";
 import { useDateWithRouting } from "../hooks/useDateWithRouting";
+import { TimeMarker } from "./TimeMarker";
 
 dayjs.extend(weekday);
 dayjs.extend(isSameOrBefore);
@@ -36,8 +37,11 @@ export function DayView({ events }: DayViewProps) {
           ))}
         </Box>
 
+        
+
         {/* Events */}
         <Box flex={1} position="relative" border="1px solid #eee">
+          <TimeMarker offset="0px" />
           {/* Hour Divider */}
           <Box display={"flex"} flexDirection={"column"}>
             {Array.from({ length: 24 }).map((_, h) => (

@@ -2,7 +2,6 @@ import {
   alpha,
   Box,
   Divider,
-  styled,
   Typography,
   useTheme,
 } from "@mui/material";
@@ -11,16 +10,14 @@ import weekday from "dayjs/plugin/weekday";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import { ICalendarEvent } from "../utils/types";
-import React from "react";
-import { Layout } from "../hooks/useLayout";
 import { DndContext, DragEndEvent } from "@dnd-kit/core";
-import { PX_PER_MINUTE } from "../utils/constants";
 import { layoutDayEvents } from "../common/calendarEngine";
 import { CalendarEvent } from "./CalendarEvent";
 import { DateLabel } from "./DateLabel";
 import { useDateWithRouting } from "../hooks/useDateWithRouting";
 import { isWeekend } from "../utils/dateHelper";
 import { StyledSecondaryHeader } from "./StyledComponents";
+import { TimeMarker } from "./TimeMarker";
 
 dayjs.extend(weekday);
 dayjs.extend(isSameOrBefore);
@@ -87,6 +84,7 @@ export function WeekView({ events }: WeekViewProps) {
                     : "transparent",
                 }}
               >
+                
                 {/* Day header */}
                 <StyledSecondaryHeader
                   zIndex={1}
@@ -102,6 +100,7 @@ export function WeekView({ events }: WeekViewProps) {
                   </Typography>
                   <DateLabel day={day}></DateLabel>
                 </StyledSecondaryHeader>
+                <TimeMarker offset={'76px'} />
                 {Array.from({ length: 24 }).map((_, h) => (
                   <Box key={h} height={60} px={0.5}>
                     <Divider />
