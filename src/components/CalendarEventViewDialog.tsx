@@ -75,7 +75,7 @@ function CalendarEventViewDialog() {
       identifier: calendarEvent.eventId,
       kind: calendarEvent.kind,
     }),
-    calendarEvent.viewKey
+    calendarEvent.viewKey,
   );
 
   const copyLinkToEvent = () => {

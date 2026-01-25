@@ -17,12 +17,12 @@ import {
 import { SubCloser } from "nostr-tools/abstract-pool";
 import { nostrEventToCalendar } from "../utils/parser";
 import { RSVPResponse } from "../utils/types";
-import type {ICalendarEvent} from "../utils/types";
+import type { ICalendarEvent } from "../utils/types";
 
 let subscriptionCloser: SubCloser | undefined;
 let privateSubloser: SubCloser | undefined;
 
-export { ICalendarEvent, RSVPResponse }
+export { ICalendarEvent, RSVPResponse };
 
 interface TimeRangeConfig {
   daysBefore: number;
@@ -59,11 +59,14 @@ const getTimeRange = (customConfig?: {
 const processPrivateEvent = (
   event: Event,
   _timeRange: ReturnType<typeof getTimeRange>,
-  viewKey?: string
+  viewKey?: string,
 ) => {
   const { events } = useTimeBasedEvents.getState();
   let store = normalize(events);
-  const parsedEvent = nostrEventToCalendar(event, {viewKey, isPrivateEvent: true})
+  const parsedEvent = nostrEventToCalendar(event, {
+    viewKey,
+    isPrivateEvent: true,
+  });
   // Check if we have valid begin/end times after processing all tags
   if (parsedEvent.begin === 0 || parsedEvent.end === 0) {
     return;
@@ -177,7 +180,7 @@ export const useTimeBasedEvents = create<{
       (event: Event) => {
         set(({ events, eventById }) => {
           let store = normalize(events);
-          const parsedEvent = nostrEventToCalendar(event)
+          const parsedEvent = nostrEventToCalendar(event);
 
           // Check if we have valid begin/end times after processing all tags
           if (parsedEvent.begin === 0 || parsedEvent.end === 0) {

@@ -1,6 +1,7 @@
 import { Toolbar } from "@mui/material";
 import AppBar from "@mui/material/AppBar";
 import { Link } from "react-router";
+import { UserMenu } from "./UserMenu";
 
 export const HEADER_HEIGHT = 56;
 
@@ -14,7 +15,12 @@ export const Header = () => {
         backgroundColor: "white",
       }}
     >
-      <Toolbar>
+      <Toolbar
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+        }}
+      >
         <Link
           to={"/"}
           style={{
@@ -33,6 +39,7 @@ export const Header = () => {
             alt="Calendar Logo"
           />
         </Link>
+        <UserMenu />
       </Toolbar>
     </AppBar>
   );

@@ -1,13 +1,5 @@
 import { useState } from "react";
 import dictionary from "../common/dictionary";
-import {
-  addMonths,
-  addWeeks,
-  addDays,
-  subMonths,
-  subWeeks,
-  subDays,
-} from "date-fns";
 import { de } from "date-fns/locale/de"; // <<<< I18N   (DO NOT REMOVE!!!)
 import { CalendarContext } from "../common/CalendarContext";
 import CalendarEventViewDialog from "./CalendarEventViewDialog";
@@ -15,11 +7,9 @@ import CalendarEventDialog from "./CalendarEventDialog";
 import { useTimeBasedEvents } from "../stores/events";
 import { useSettings } from "../stores/settings";
 import { useUser } from "../stores/user";
-import { useTheme, useMediaQuery, Box } from "@mui/material";
 import { DayView } from "./DayView";
 import { MonthView } from "./MonthView";
 import { WeekView } from "./WeekView";
-import dayjs from "dayjs";
 import { useLayout } from "../hooks/useLayout";
 import { CalendarHeader } from "./CalendarHeader";
 
@@ -50,22 +40,8 @@ function Calendar() {
   if (user) {
     events.fetchPrivateEvents();
   }
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down("md"));
 
   const { layout } = useLayout();
-
-  const changeLanguage = (newLang: { value: string; label: string } | null) => {
-    if (!newLang) return;
-
-    const i18nLocale = newLang.value;
-    const newDateFnLocale = i18nLocale === "de-DE" ? de : null;
-
-    console.group("changeLanguage");
-    console.log("locale: ", newDateFnLocale);
-    console.groupEnd();
-    setStateCalendar({ ...stateCalendar, locale: newDateFnLocale, i18nLocale });
-  };
 
   const [stateCalendar, setStateCalendar] = useState({
     selectedDate,

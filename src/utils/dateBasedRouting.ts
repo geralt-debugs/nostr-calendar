@@ -1,8 +1,8 @@
 import dayjs, { Dayjs } from "dayjs";
-import isoWeek from "dayjs/plugin/isoWeek";
+import utc from "dayjs/plugin/utc";
 import type { Layout } from "../hooks/useLayout";
 
-dayjs.extend(isoWeek);
+dayjs.extend(utc);
 
 type DayRouteParams = {
   year: string;
@@ -43,9 +43,10 @@ export function getDateFromRoute(params: CalendarRouteParams): Dayjs {
   if (year && "weekNumber" in params) {
     // ISO week → Monday
     return dayjs()
+      .utc()
       .year(Number(year))
-      .isoWeek(Number(params.weekNumber))
-      .startOf("isoWeek");
+      .week(Number(params.weekNumber))
+      .startOf("week");
   }
 
   // fallback (optional)
@@ -70,7 +71,7 @@ export function getRouteFromDate(date: Dayjs, type: Layout): string {
     }
 
     case "week": {
-      const weekNumber = date.isoWeek();
+      const weekNumber = date.week();
 
       return `/w/${year}/${weekNumber}`;
     }

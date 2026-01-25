@@ -3,7 +3,6 @@ import {
   Box,
   Divider,
   styled,
-  Toolbar,
   Typography,
   useTheme,
 } from "@mui/material";
@@ -21,7 +20,7 @@ import { CalendarEvent } from "./CalendarEvent";
 import { DateLabel } from "./DateLabel";
 import { useDateWithRouting } from "../hooks/useDateWithRouting";
 import { isWeekend } from "../utils/dateHelper";
-import { HEADER_HEIGHT } from "./Header";
+import { StyledSecondaryHeader } from "./StyledComponents";
 
 dayjs.extend(weekday);
 dayjs.extend(isSameOrBefore);
@@ -29,46 +28,32 @@ dayjs.extend(isSameOrAfter);
 
 interface WeekViewProps {
   events: ICalendarEvent[];
-  setEvents: React.Dispatch<React.SetStateAction<ICalendarEvent[]>>;
-  setView: (v: Layout) => void;
 }
 
-const StyledBoxHeader = styled(Box)({
-  "@media (min-width:0px)": {
-    "@media (orientation: landscape)": {
-      top: `48px`,
-    },
-  },
-  "@media (min-width:600px)": {
-    top: `64px`,
-  },
-  top: `56px`,
-});
-
-export function WeekView({ events, setEvents }: WeekViewProps) {
-  const { date, setDate } = useDateWithRouting();
+export function WeekView({ events }: WeekViewProps) {
+  const { date } = useDateWithRouting();
   const start = date.startOf("week");
   const days = Array.from({ length: 7 }, (_, i) => start.add(i, "day"));
 
   const onDragEnd = ({ delta, active }: DragEndEvent) => {
     if (!delta.y) return;
-    setEvents((prev) =>
-      prev.map((e) =>
-        e.id === active.id
-          ? {
-              ...e,
-              start: dayjs(e.begin)
-                .add(delta.y / PX_PER_MINUTE, "minute")
-                .toDate()
-                .getTime(),
-              end: dayjs(e.end)
-                .add(delta.y / PX_PER_MINUTE, "minute")
-                .toDate()
-                .getTime(),
-            }
-          : e,
-      ),
-    );
+    // setEvents((prev) =>
+    //   prev.map((e) =>
+    //     e.id === active.id
+    //       ? {
+    //           ...e,
+    //           start: dayjs(e.begin)
+    //             .add(delta.y / PX_PER_MINUTE, "minute")
+    //             .toDate()
+    //             .getTime(),
+    //           end: dayjs(e.end)
+    //             .add(delta.y / PX_PER_MINUTE, "minute")
+    //             .toDate()
+    //             .getTime(),
+    //         }
+    //       : e,
+    //   ),
+    // );
   };
   const theme = useTheme();
 
@@ -103,8 +88,7 @@ export function WeekView({ events, setEvents }: WeekViewProps) {
                 }}
               >
                 {/* Day header */}
-                <StyledBoxHeader
-                  position="sticky"
+                <StyledSecondaryHeader
                   zIndex={1}
                   textAlign="center"
                   display={"flex"}
@@ -117,7 +101,7 @@ export function WeekView({ events, setEvents }: WeekViewProps) {
                     {day.format("ddd")}
                   </Typography>
                   <DateLabel day={day}></DateLabel>
-                </StyledBoxHeader>
+                </StyledSecondaryHeader>
                 {Array.from({ length: 24 }).map((_, h) => (
                   <Box key={h} height={60} px={0.5}>
                     <Divider />

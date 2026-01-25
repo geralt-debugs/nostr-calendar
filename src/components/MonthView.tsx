@@ -54,7 +54,7 @@ export function MonthView({ events }: MonthViewProps) {
               fontWeight={600}
               marginBottom={theme.spacing(1)}
             >
-              {dayjs().isoWeekday(index).format("ddd")}
+              {dayjs().weekday(index).format("ddd")}
             </Typography>
           );
         })}

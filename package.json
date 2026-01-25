@@ -22,6 +22,7 @@
     "@emotion/styled": "^11.14.1",
     "@mui/icons-material": "^7.2.0",
     "@mui/material": "^7.2.0",
+    "@mui/x-date-pickers": "^8.26.0",
     "@noble/hashes": "^2.0.0",
     "@voiceflow/normal-store": "^2.4.1",
     "clsx": "^2.1.1",

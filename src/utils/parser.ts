@@ -2,7 +2,13 @@ import { Event } from "nostr-tools";
 import type { ICalendarEvent } from "./types";
 import { getRepeatFrequency } from "./repeatingEventsHelper";
 
-export const nostrEventToCalendar = (event: Event, {viewKey, isPrivateEvent}: {viewKey?: string, isPrivateEvent?: boolean} = {}): ICalendarEvent => {
+export const nostrEventToCalendar = (
+  event: Event,
+  {
+    viewKey,
+    isPrivateEvent,
+  }: { viewKey?: string; isPrivateEvent?: boolean } = {},
+): ICalendarEvent => {
   const parsedEvent: ICalendarEvent = {
     description: event.content,
     user: event.pubkey,
@@ -73,5 +79,5 @@ export const nostrEventToCalendar = (event: Event, {viewKey, isPrivateEvent}: {v
         break;
     }
   });
-  return parsedEvent
-}
+  return parsedEvent;
+};

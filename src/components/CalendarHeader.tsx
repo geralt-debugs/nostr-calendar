@@ -1,5 +1,6 @@
 import React from "react";
 import ChevronLeft from "@mui/icons-material/ChevronLeft";
+import MenuIcon from "@mui/icons-material/Menu";
 import ChevronRight from "@mui/icons-material/ChevronRight";
 import TodayIcon from "@mui/icons-material/Today";
 import KeyboardArrowDown from "@mui/icons-material/KeyboardArrowDown";
@@ -11,12 +12,14 @@ import {
   MenuItem,
   Button,
   useTheme,
+  Drawer,
 } from "@mui/material";
 import { useLayout } from "../hooks/useLayout";
 import dayjs from "dayjs";
 import { getRouteFromDate } from "../utils/dateBasedRouting";
 import { useNavigate } from "react-router";
 import { useDateWithRouting } from "../hooks/useDateWithRouting";
+import { DatePicker } from "./DatePicker";
 
 export function CalendarHeader() {
   const { layout, updateLayout } = useLayout();
@@ -31,79 +34,92 @@ export function CalendarHeader() {
   const handleClose = () => {
     setAnchorEl(null);
   };
+  const [drawerOpen, updateDrawerOpen] = React.useState(false);
+  const closeDrawer = () => updateDrawerOpen(false);
+  const openDrawer = () => updateDrawerOpen(true);
   const move = (dir: number) => setDate(date.add(dir, layout), layout);
   return (
-    <Box
-      display="flex"
-      justifyContent="space-between"
-      alignItems="center"
-      mb={2}
-    >
-      <Box display="flex" alignItems="center">
-        <IconButton onClick={() => move(-1)}>
-          <ChevronLeft />
-        </IconButton>
-        <IconButton onClick={() => move(1)}>
-          <ChevronRight />
-        </IconButton>
-        <Typography ml={2} fontWeight={600}>
-          {layout === "month" && date.format("MMMM YYYY")}
-          {layout === "week" &&
-            `${date.startOf("week").format("MMM D")} – ${date.endOf("week").format("MMM D")}`}
-          {layout === "day" && date.format("MMMM D, YYYY")}
-        </Typography>
+    <>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={2}
+      >
+        <Box display="flex" alignItems="center">
+          <IconButton onClick={openDrawer}>
+            <MenuIcon />
+          </IconButton>
+          <IconButton onClick={() => move(-1)}>
+            <ChevronLeft />
+          </IconButton>
+          <IconButton onClick={() => move(1)}>
+            <ChevronRight />
+          </IconButton>
+          <Typography ml={2} fontWeight={600}>
+            {layout === "month" && date.format("MMMM YYYY")}
+            {layout === "week" &&
+              `${date.startOf("week").format("MMM D")} – ${date.endOf("week").format("MMM D")}`}
+            {layout === "day" && date.format("MMMM D, YYYY")}
+          </Typography>
+        </Box>
+        <Box display="flex" gap={theme.spacing(2)} alignItems="center">
+          <IconButton
+            onClick={() => {
+              const route = getRouteFromDate(dayjs(), layout);
+              if (route !== location.pathname) {
+                navigate(route);
+              }
+            }}
+          >
+            <TodayIcon />
+          </IconButton>
+          <Button
+            onClick={handleClick}
+            variant="outlined"
+            startIcon={<KeyboardArrowDown />}
+          >
+            {layout}
+          </Button>
+          <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
+            <MenuItem
+              selected={layout === "day"}
+              disabled={layout === "day"}
+              onClick={() => {
+                updateLayout("day");
+                handleClose();
+              }}
+            >
+              Day
+            </MenuItem>
+            <MenuItem
+              selected={layout === "week"}
+              disabled={layout === "week"}
+              onClick={() => {
+                updateLayout("week");
+                handleClose();
+              }}
+            >
+              Week
+            </MenuItem>
+            <MenuItem
+              selected={layout === "month"}
+              disabled={layout === "month"}
+              onClick={() => {
+                updateLayout("month");
+                handleClose();
+              }}
+            >
+              Month
+            </MenuItem>
+          </Menu>
+        </Box>
       </Box>
-      <Box display="flex" gap={theme.spacing(2)} alignItems="center">
-        <IconButton
-          onClick={() => {
-            const route = getRouteFromDate(dayjs(), layout);
-            if (route !== location.pathname) {
-              navigate(route);
-            }
-          }}
-        >
-          <TodayIcon />
-        </IconButton>
-        <Button
-          onClick={handleClick}
-          variant="outlined"
-          startIcon={<KeyboardArrowDown />}
-        >
-          {layout}
-        </Button>
-        <Menu anchorEl={anchorEl} open={open} onClose={handleClose}>
-          <MenuItem
-            selected={layout === "day"}
-            disabled={layout === "day"}
-            onClick={() => {
-              updateLayout("day");
-              handleClose();
-            }}
-          >
-            Day
-          </MenuItem>
-          <MenuItem
-            selected={layout === "week"}
-            disabled={layout === "week"}
-            onClick={() => {
-              updateLayout("week");
-              handleClose();
-            }}
-          >
-            Week
-          </MenuItem>
-          <MenuItem
-            selected={layout === "month"}
-            disabled={layout === "month"}
-            onClick={() => {
-              updateLayout("month");
-              handleClose();
-            }}
-          >
-            Month
-          </MenuItem>
-        </Menu>
-      </Box>
-    </Box>
+      <Drawer open={drawerOpen} onClose={closeDrawer}>
+        <Box padding={(theme) => theme.spacing(2)}>
+          <DatePicker />
+        </Box>
+      </Drawer>
+    </>
   );
 }

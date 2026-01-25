@@ -259,9 +259,14 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onClose }) => {
   return (
     <>
       <Dialog open={open} onClose={onClose} maxWidth="xs" fullWidth>
-        <DialogTitle sx={{ textAlign: 'center' }}>
+        <DialogTitle sx={{ textAlign: "center" }}>
           Sign in to Formstr
-          <Typography variant="body2" color="textSecondary" align="center" sx={{ mt: 0.5 }}>
+          <Typography
+            variant="body2"
+            color="textSecondary"
+            align="center"
+            sx={{ mt: 0.5 }}
+          >
             Choose your preferred login method
           </Typography>
         </DialogTitle>

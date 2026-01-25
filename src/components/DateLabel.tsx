@@ -9,7 +9,7 @@ const today = dayjs();
 export function DateLabel({ day }: { day: Dayjs }) {
   const isToday = today.isSame(day, "date");
   const navigate = useNavigate();
-  console.log(isToday, day.toISOString());
+
   const onDateClick: React.MouseEventHandler<HTMLButtonElement> = (e) => {
     navigate(getRouteFromDate(day, "day"));
     e.stopPropagation();

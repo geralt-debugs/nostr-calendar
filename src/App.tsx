@@ -15,7 +15,7 @@ import dictionary from "./common/dictionary";
 import LoginModal from "./components/LoginModal";
 import { BrowserRouter } from "react-router";
 import { Routing } from "./components/Routing";
-import { Header, HEADER_HEIGHT } from "./components/Header";
+import { Header } from "./components/Header";
 
 let _locale =
   (navigator.languages && navigator.languages[0]) ||
