@@ -37,8 +37,6 @@ export function DayView({ events }: DayViewProps) {
           ))}
         </Box>
 
-        
-
         {/* Events */}
         <Box flex={1} position="relative" border="1px solid #eee">
           <TimeMarker offset="0px" />

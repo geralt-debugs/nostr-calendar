@@ -1,10 +1,4 @@
-import {
-  alpha,
-  Box,
-  Divider,
-  Typography,
-  useTheme,
-} from "@mui/material";
+import { alpha, Box, Divider, Typography, useTheme } from "@mui/material";
 import dayjs from "dayjs";
 import weekday from "dayjs/plugin/weekday";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
@@ -84,7 +78,6 @@ export function WeekView({ events }: WeekViewProps) {
                     : "transparent",
                 }}
               >
-                
                 {/* Day header */}
                 <StyledSecondaryHeader
                   zIndex={1}
@@ -100,7 +93,7 @@ export function WeekView({ events }: WeekViewProps) {
                   </Typography>
                   <DateLabel day={day}></DateLabel>
                 </StyledSecondaryHeader>
-                <TimeMarker offset={'76px'} />
+                <TimeMarker offset={"76px"} />
                 {Array.from({ length: 24 }).map((_, h) => (
                   <Box key={h} height={60} px={0.5}>
                     <Divider />
