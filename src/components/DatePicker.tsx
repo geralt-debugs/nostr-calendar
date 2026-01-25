@@ -23,7 +23,7 @@ export const DatePicker = () => {
   const views: DateCalendarProps["views"] =
     layout === "month" ? ["month", "year"] : undefined;
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="de-de">
+    <LocalizationProvider dateAdapter={AdapterDayjs}>
       <DateCalendar
         onChange={onChange}
         views={views}
