@@ -12,6 +12,7 @@ import { MonthView } from "./MonthView";
 import { WeekView } from "./WeekView";
 import { useLayout } from "../hooks/useLayout";
 import { CalendarHeader } from "./CalendarHeader";
+import { Box } from "@mui/material";
 
 let _locale =
   (navigator.languages && navigator.languages[0]) ||
