@@ -6,7 +6,7 @@ import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import { ICalendarEvent } from "../utils/types";
 import { DndContext, DragEndEvent } from "@dnd-kit/core";
 import { layoutDayEvents } from "../common/calendarEngine";
-import { CalendarEvent } from "./CalendarEvent";
+import { CalendarEventCard } from "./CalendarEvent";
 import { DateLabel } from "./DateLabel";
 import { useDateWithRouting } from "../hooks/useDateWithRouting";
 import { isWeekend } from "../utils/dateHelper";
@@ -101,7 +101,7 @@ export function WeekView({ events }: WeekViewProps) {
                   </Box>
                 ))}
                 {laidOut.map((e) => (
-                  <CalendarEvent key={e.id} event={e} />
+                  <CalendarEventCard key={e.id} event={e} />
                 ))}
               </Box>
             );

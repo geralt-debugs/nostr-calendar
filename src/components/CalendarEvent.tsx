@@ -1,37 +1,220 @@
-import { useDraggable } from "@dnd-kit/core";
-import { Paper, Typography } from "@mui/material";
+// import { useDraggable } from "@dnd-kit/core";
+import {
+  Box,
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  Divider,
+  IconButton,
+  Link,
+  Paper,
+  Stack,
+  Tooltip,
+  Typography,
+  useTheme,
+} from "@mui/material";
 import { ICalendarEvent } from "../utils/types";
 import { PositionedEvent } from "../common/calendarEngine";
+import { TimeRenderer } from "./TimeRenderer";
+import { useState } from "react";
+import { Participant } from "./Participant";
+import Markdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import CloseIcon from "@mui/icons-material/Close";
+import ContentCopy from "@mui/icons-material/ContentCopy";
+import OpenInNew from "@mui/icons-material/OpenInNew";
+import Download from "@mui/icons-material/Download";
+import { exportICS } from "../common/utils";
+import { encodeNAddr } from "../common/nostr";
+import { getEventPage } from "../utils/routingHelper";
 
-interface CalendarEventProps {
+interface CalendarEventCardProps {
   event: PositionedEvent;
   onClick: (e: ICalendarEvent) => void;
 }
 
-export function CalendarEvent({ event, onClick }: CalendarEventProps) {
-  const { attributes, listeners, setNodeRef } = useDraggable({ id: event.id });
+interface CalendarEventViewProps {
+  event: ICalendarEvent;
+}
 
+export function CalendarEventCard({ event }: CalendarEventCardProps) {
+  // const { attributes, listeners, setNodeRef } = useDraggable({ id: event.id });
+  const [open, setOpen] = useState(false);
+  const handleClose = () => setOpen(false);
+  const maxDescLength = 20;
+  console.log(event.title);
+  const title =
+    event.title ??
+    (event.description.length > maxDescLength
+      ? `${event.description.substring(0, maxDescLength)}...`
+      : event.description);
   return (
-    <Paper
-      ref={setNodeRef}
-      {...listeners}
-      {...attributes}
-      onClick={() => onClick(event)}
+    <>
+      <Paper
+        // ref={setNodeRef}
+        // {...listeners}
+        // {...attributes}
+        onClick={() => setOpen(true)}
+        sx={{
+          position: "absolute",
+          top: event.top,
+          left: `${(event.col / event.colSpan) * 100}%`,
+          width: `${100 / event.colSpan}%`,
+          height: event.height,
+          bgcolor: "primary.light",
+          p: 0.5,
+          cursor: "pointer",
+          userSelect: "none",
+        }}
+      >
+        <Typography variant="caption" color="#fff" fontWeight={600}>
+          {title}
+        </Typography>
+      </Paper>
+      <Dialog
+        fullWidth
+        maxWidth="lg"
+        slotProps={{
+          paper: {
+            sx: {
+              height: {
+                sm: "100vh",
+                md: "60vh",
+              },
+            },
+          },
+        }}
+        open={open}
+        onClose={handleClose}
+      >
+        <DialogTitle
+          sx={{
+            display: "flex",
+            justifyContent: "space-between",
+          }}
+        >
+          <Typography variant="h5">{title}</Typography>
+          <ActionButtons event={event} closeModal={handleClose} />
+        </DialogTitle>
+        <DialogContent dividers>
+          <CalendarEvent event={event}></CalendarEvent>
+        </DialogContent>
+      </Dialog>
+    </>
+  );
+}
+
+function ActionButtons({
+  event,
+  closeModal,
+}: {
+  event: ICalendarEvent;
+  closeModal: () => void;
+}) {
+  const linkToEvent = getEventPage(
+    encodeNAddr({
+      pubkey: event.user,
+      identifier: event.eventId,
+      kind: event.kind,
+    }),
+    event.viewKey,
+  );
+  const copyLinkToEvent = () => {
+    navigator.clipboard.writeText(`${window.location.origin}${linkToEvent}`);
+  };
+  return (
+    <Box>
+      <IconButton onClick={copyLinkToEvent}>
+        <Tooltip title="Copy link to this event">
+          <ContentCopy />
+        </Tooltip>
+      </IconButton>
+
+      <IconButton component={Link} href={linkToEvent}>
+        <Tooltip title="Open event in new tab">
+          <OpenInNew />
+        </Tooltip>
+      </IconButton>
+
+      <IconButton onClick={() => exportICS(event)}>
+        <Tooltip title="Download event details">
+          <Download />
+        </Tooltip>
+      </IconButton>
+      <IconButton aria-label="close" onClick={closeModal}>
+        <CloseIcon />
+      </IconButton>
+    </Box>
+  );
+}
+
+function CalendarEvent({ event }: CalendarEventViewProps) {
+  const theme = useTheme();
+  return (
+    <Box
       sx={{
-        position: "absolute",
-        top: event.top,
-        left: `${(event.col / event.colSpan) * 100}%`,
-        width: `${100 / event.colSpan}%`,
-        height: event.height,
-        bgcolor: "primary.light",
-        p: 0.5,
-        cursor: "pointer",
-        userSelect: "none",
+        display: "flex",
+        gap: theme.spacing(4),
+        height: "100%",
       }}
     >
-      <Typography variant="caption" fontWeight={600}>
-        {event.title}
-      </Typography>
-    </Paper>
+      {event.image && (
+        <Box
+          sx={{
+            flex: 1,
+            backgroundImage: `url(${event.image})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            borderRadius: "8px",
+          }}
+        />
+      )}
+      <Box
+        sx={{
+          overflowY: "auto",
+          flex: "1",
+          padding: 3,
+        }}
+      >
+        <Stack spacing={2}>
+          <TimeRenderer
+            begin={event.begin}
+            end={event.end}
+            repeat={event.repeat}
+          ></TimeRenderer>
+
+          {event.description && (
+            <>
+              <Typography variant="subtitle1">Description</Typography>
+              <Typography variant="body2">
+                <Markdown remarkPlugins={[remarkGfm]}>
+                  {event.description}
+                </Markdown>
+              </Typography>
+
+              <Divider />
+            </>
+          )}
+
+          {event.location.length > 0 && (
+            <>
+              <Typography variant="subtitle1">Location</Typography>
+              <Typography>{event.location.join(", ")}</Typography>
+
+              <Divider />
+            </>
+          )}
+
+          <Box>
+            <Typography fontWeight={600}>Participants</Typography>
+            <Stack direction="row" spacing={1} flexWrap="wrap">
+              {event.participants.map((p) => (
+                <Participant pubKey={p} />
+              ))}
+            </Stack>
+          </Box>
+        </Stack>
+      </Box>
+    </Box>
   );
 }

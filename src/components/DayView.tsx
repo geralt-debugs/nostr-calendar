@@ -5,7 +5,7 @@ import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import { ICalendarEvent } from "../utils/types";
 import { layoutDayEvents } from "../common/calendarEngine";
-import { CalendarEvent } from "./CalendarEvent";
+import { CalendarEventCard } from "./CalendarEvent";
 import { DndContext } from "@dnd-kit/core";
 import { useDateWithRouting } from "../hooks/useDateWithRouting";
 import { TimeMarker } from "./TimeMarker";
@@ -49,7 +49,7 @@ export function DayView({ events }: DayViewProps) {
             ))}
           </Box>
           {dayEvents.map((e) => (
-            <CalendarEvent key={e.id} event={e} onClick={() => {}} />
+            <CalendarEventCard key={e.id} event={e} onClick={() => {}} />
           ))}
         </Box>
       </Box>

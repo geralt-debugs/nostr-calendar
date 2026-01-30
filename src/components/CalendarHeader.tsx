@@ -21,6 +21,7 @@ import { useNavigate } from "react-router";
 import { useDateWithRouting } from "../hooks/useDateWithRouting";
 import { DatePicker } from "./DatePicker";
 import { StyledSecondaryHeader } from "./StyledComponents";
+import { Filters } from "./Filters";
 
 export function CalendarHeader() {
   const { layout, updateLayout } = useLayout();
@@ -120,6 +121,7 @@ export function CalendarHeader() {
       <Drawer open={drawerOpen} onClose={closeDrawer}>
         <Box padding={(theme) => theme.spacing(2)}>
           <DatePicker />
+          <Filters />
         </Box>
       </Drawer>
     </>
