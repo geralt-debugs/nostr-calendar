@@ -47,7 +47,7 @@ export const TimeMarker = ({ offset }: { offset: string }) => {
         "--mui-palette-divider": "var(--fc-time-marker-color)",
         width: "100%",
         position: "absolute",
-        height: "5px",
+        height: "4px",
         display: "flex",
         alignItems: "center",
       }}

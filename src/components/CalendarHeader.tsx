@@ -20,6 +20,7 @@ import { getRouteFromDate } from "../utils/dateBasedRouting";
 import { useNavigate } from "react-router";
 import { useDateWithRouting } from "../hooks/useDateWithRouting";
 import { DatePicker } from "./DatePicker";
+import { StyledSecondaryHeader } from "./StyledComponents";
 
 export function CalendarHeader() {
   const { layout, updateLayout } = useLayout();
@@ -40,11 +41,12 @@ export function CalendarHeader() {
   const move = (dir: number) => setDate(date.add(dir, layout), layout);
   return (
     <>
-      <Box
+      <StyledSecondaryHeader
         display="flex"
         justifyContent="space-between"
         alignItems="center"
-        mb={2}
+        position={"sticky"}
+        paddingBottom={2}
       >
         <Box display="flex" alignItems="center">
           <IconButton onClick={openDrawer}>
@@ -114,7 +116,7 @@ export function CalendarHeader() {
             </MenuItem>
           </Menu>
         </Box>
-      </Box>
+      </StyledSecondaryHeader>
       <Drawer open={drawerOpen} onClose={closeDrawer}>
         <Box padding={(theme) => theme.spacing(2)}>
           <DatePicker />

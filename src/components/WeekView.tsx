@@ -81,6 +81,7 @@ export function WeekView({ events }: WeekViewProps) {
                 {/* Day header */}
                 <StyledSecondaryHeader
                   zIndex={1}
+                  topOffset={40 + 8}
                   textAlign="center"
                   display={"flex"}
                   flexDirection={"column"}
