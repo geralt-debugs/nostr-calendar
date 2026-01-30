@@ -36,13 +36,24 @@ export function layoutDayEvents(events: ICalendarEvent[]): PositionedEvent[] {
 
   const colSpan = columns.length;
 
+  const DAY_MINUTES = 24 * 60;
+
   return columns.flatMap((col, colIndex) =>
-    col.map((e) => ({
-      ...e,
-      col: colIndex,
-      colSpan,
-      top: dayjs(e.begin).hour() * 60 + dayjs(e.begin).minute(),
-      height: dayjs(e.end).diff(dayjs(e.begin), "minute") * PX_PER_MINUTE,
-    })),
+    col.map((e) => {
+      const startMinutes = dayjs(e.begin).hour() * 60 + dayjs(e.begin).minute();
+      const rawDuration = dayjs(e.end).diff(dayjs(e.begin), "minute");
+
+      const clippedDuration = Math.max(
+        0,
+        Math.min(rawDuration, DAY_MINUTES - startMinutes),
+      );
+      return {
+        ...e,
+        col: colIndex,
+        colSpan,
+        top: dayjs(e.begin).hour() * 60 + dayjs(e.begin).minute(),
+        height: clippedDuration * PX_PER_MINUTE,
+      };
+    }),
   );
 }

@@ -67,6 +67,8 @@ export function MonthView({ events }: MonthViewProps) {
             position: "relative",
             minHeight: 120,
             p: 0.5,
+            wordBreak: "break-word",
+            minWidth: 0,
             background: isWeekend(day)
               ? alpha(theme.palette.primary.main, 0.1)
               : "transparent",

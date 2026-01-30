@@ -101,7 +101,7 @@ export function WeekView({ events }: WeekViewProps) {
                   </Box>
                 ))}
                 {laidOut.map((e) => (
-                  <CalendarEventCard key={e.id} event={e} />
+                  <CalendarEventCard offset={"76px"} key={e.id} event={e} />
                 ))}
               </Box>
             );

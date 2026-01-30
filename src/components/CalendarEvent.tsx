@@ -1,5 +1,6 @@
 // import { useDraggable } from "@dnd-kit/core";
 import {
+  alpha,
   Box,
   Dialog,
   DialogContent,
@@ -9,6 +10,7 @@ import {
   Link,
   Paper,
   Stack,
+  Theme,
   Tooltip,
   Typography,
   useTheme,
@@ -30,19 +32,37 @@ import { getEventPage } from "../utils/routingHelper";
 
 interface CalendarEventCardProps {
   event: PositionedEvent;
-  onClick: (e: ICalendarEvent) => void;
+  offset?: string;
 }
 
 interface CalendarEventViewProps {
   event: ICalendarEvent;
 }
 
-export function CalendarEventCard({ event }: CalendarEventCardProps) {
+function getColorScheme(event: ICalendarEvent, theme: Theme) {
+  if (event.isPrivateEvent) {
+    return {
+      color: "#fff",
+      backgroundColor: theme.palette.primary.light,
+    };
+  } else {
+    return {
+      backgroundColor: alpha(theme.palette.primary.main, 0.3),
+      color: "#fff",
+    };
+  }
+}
+
+export function CalendarEventCard({
+  event,
+  offset = "0px",
+}: CalendarEventCardProps) {
   // const { attributes, listeners, setNodeRef } = useDraggable({ id: event.id });
   const [open, setOpen] = useState(false);
   const handleClose = () => setOpen(false);
   const maxDescLength = 20;
-  console.log(event.title);
+  const theme = useTheme();
+  const colorScheme = getColorScheme(event, theme);
   const title =
     event.title ??
     (event.description.length > maxDescLength
@@ -57,17 +77,23 @@ export function CalendarEventCard({ event }: CalendarEventCardProps) {
         onClick={() => setOpen(true)}
         sx={{
           position: "absolute",
-          top: event.top,
+          backgroundColor: colorScheme.backgroundColor,
+          top: `calc(${event.top}px + ${offset})`,
           left: `${(event.col / event.colSpan) * 100}%`,
           width: `${100 / event.colSpan}%`,
           height: event.height,
-          bgcolor: "primary.light",
           p: 0.5,
           cursor: "pointer",
           userSelect: "none",
+          overflow: "hidden",
+          textOverflow: "clip",
         }}
       >
-        <Typography variant="caption" color="#fff" fontWeight={600}>
+        <Typography
+          variant="caption"
+          color={colorScheme.color}
+          fontWeight={600}
+        >
           {title}
         </Typography>
       </Paper>
@@ -150,6 +176,7 @@ function ActionButtons({
 
 function CalendarEvent({ event }: CalendarEventViewProps) {
   const theme = useTheme();
+  console.log(event);
   return (
     <Box
       sx={{
