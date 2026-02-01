@@ -22,7 +22,7 @@ export function SwipeableView({ events, View }: SwipeableViewProps) {
   const { date, setDate } = useDateWithRouting();
   const { layout } = useLayout();
   const previousDay = date.subtract(1, layout);
-  const nextDay = date.add(1, layout);
+  // const nextDay = date.add(1, layout);
   const [direction, setDirection] = useState(0);
   const [key, setKey] = useState(0); // forces re-mount to snap back
   const move = (dir: number) => setDate(date.add(dir, layout), layout);
@@ -80,13 +80,12 @@ export function SwipeableView({ events, View }: SwipeableViewProps) {
           }}
           style={{
             display: "flex",
-            width: "300%",
+            width: "200%",
             x,
           }}
         >
           <Box width="100%">{<View events={events} date={previousDay} />}</Box>
           <Box width="100%">{<View events={events} date={date} />}</Box>
-          <Box width="100%">{<View events={events} date={nextDay} />}</Box>
         </motion.div>
       </AnimatePresence>
     </Box>

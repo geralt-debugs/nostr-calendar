@@ -36,7 +36,12 @@ export const WeekHeader = ({ date }: { date: Dayjs }) => {
       paddingLeft={"60px"}
     >
       {days.map((day) => (
-        <Box display={"flex"} flexDirection={"column"} alignItems={"center"}>
+        <Box
+          display={"flex"}
+          key={day.format("YYYY-MMM-ddd")}
+          flexDirection={"column"}
+          alignItems={"center"}
+        >
           <Typography variant="body1" fontWeight={600}>
             {day.format("ddd")}
           </Typography>
