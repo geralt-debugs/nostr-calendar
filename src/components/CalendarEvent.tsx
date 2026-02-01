@@ -152,7 +152,7 @@ function ActionButtons({
     navigator.clipboard.writeText(`${window.location.origin}${linkToEvent}`);
   };
   return (
-    <Box>
+    <Box minWidth={"160px"}>
       <IconButton onClick={copyLinkToEvent}>
         <Tooltip title="Copy link to this event">
           <ContentCopy />
