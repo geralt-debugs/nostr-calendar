@@ -9,7 +9,7 @@ const Dot = styled("div")`
   border-radius: 100%;
 `;
 
-export const TimeMarker = ({ offset }: { offset: string }) => {
+export const TimeMarker = ({ offset = "0px" }: { offset?: string }) => {
   const getCurrentTimeInHour = () => dayjs().hour() + dayjs().minute() / 60;
 
   const [currentTimeInHour, updateCurrentTimeInHour] =

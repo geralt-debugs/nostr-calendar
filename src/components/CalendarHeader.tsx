@@ -13,6 +13,7 @@ import {
   Button,
   useTheme,
   Drawer,
+  useMediaQuery,
 } from "@mui/material";
 import { useLayout } from "../hooks/useLayout";
 import dayjs from "dayjs";
@@ -23,6 +24,8 @@ import { DatePicker } from "./DatePicker";
 import { StyledSecondaryHeader } from "./StyledComponents";
 import { Filters } from "./Filters";
 import CloseIcon from "@mui/icons-material/Close";
+import { DateLabel } from "./DateLabel";
+import { WeekHeader } from "./WeekView";
 
 export function CalendarHeader() {
   const { layout, updateLayout } = useLayout();
@@ -37,6 +40,7 @@ export function CalendarHeader() {
   const handleClose = () => {
     setAnchorEl(null);
   };
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const [drawerOpen, updateDrawerOpen] = React.useState(false);
   const closeDrawer = () => updateDrawerOpen(false);
   const openDrawer = () => updateDrawerOpen(true);
@@ -51,18 +55,27 @@ export function CalendarHeader() {
         paddingBottom={2}
       >
         <Box display="flex" alignItems="center">
-          <IconButton onClick={openDrawer}>
-            <MenuIcon />
-          </IconButton>
-          <IconButton onClick={() => move(-1)}>
-            <ChevronLeft />
-          </IconButton>
-          <IconButton onClick={() => move(1)}>
-            <ChevronRight />
-          </IconButton>
+          {!isMobile && (
+            <>
+              <IconButton onClick={openDrawer}>
+                <MenuIcon />
+              </IconButton>
+              <IconButton onClick={() => move(-1)}>
+                <ChevronLeft />
+              </IconButton>
+              <IconButton onClick={() => move(1)}>
+                <ChevronRight />
+              </IconButton>
+            </>
+          )}
           <Typography ml={2} fontWeight={600}>
             {layout === "month" && date.format("MMMM YYYY")}
-            {layout === "week" && date.format("MMM YY")}
+            {layout === "week" && (
+              <>
+                {date.startOf("week").format("DD")}-
+                {date.endOf("week").format("DD")} {date.format("MMM YY")}
+              </>
+            )}
             {layout === "day" && date.format("MMM D, YYYY")}
           </Typography>
         </Box>
@@ -118,6 +131,7 @@ export function CalendarHeader() {
           </Menu>
         </Box>
       </StyledSecondaryHeader>
+      <WeekHeader date={date} />
       <Drawer open={drawerOpen} onClose={closeDrawer}>
         <Box padding={(theme) => theme.spacing(2)}>
           <Box width={"100%"} justifyContent={"end"} display={"flex"}>

@@ -13,6 +13,7 @@ import { WeekView } from "./WeekView";
 import { useLayout } from "../hooks/useLayout";
 import { CalendarHeader } from "./CalendarHeader";
 import { Box } from "@mui/material";
+import { SwipeableView } from "./SwipeableView";
 
 let _locale =
   (navigator.languages && navigator.languages[0]) ||
@@ -75,8 +76,12 @@ function Calendar() {
     <CalendarContext.Provider value={{ stateCalendar, setStateCalendar }}>
       <Box p={2}>
         <CalendarHeader />
-        {layout === "day" && <DayView events={events.events} />}
-        {layout === "week" && <WeekView events={events.events} />}
+        {layout === "day" && (
+          <SwipeableView View={DayView} events={events.events} />
+        )}
+        {layout === "week" && (
+          <SwipeableView View={WeekView} events={events.events} />
+        )}
         {layout === "month" && <MonthView events={events.events} />}
       </Box>
       {/* <CalendarEventDialog /> */}

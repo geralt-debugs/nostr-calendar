@@ -3,26 +3,19 @@ import dayjs from "dayjs";
 import weekday from "dayjs/plugin/weekday";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
-import { ICalendarEvent } from "../utils/types";
 import { getTimeFromCell, layoutDayEvents } from "../common/calendarEngine";
 import { CalendarEventCard } from "./CalendarEvent";
 import { DndContext } from "@dnd-kit/core";
-import { useDateWithRouting } from "../hooks/useDateWithRouting";
 import { TimeMarker } from "./TimeMarker";
 import { useRef, useState } from "react";
 import CalendarEventEdit from "./CalendarEventEdit";
+import { ViewProps } from "./SwipeableView";
 
 dayjs.extend(weekday);
 dayjs.extend(isSameOrBefore);
 dayjs.extend(isSameOrAfter);
 
-interface DayViewProps {
-  events: ICalendarEvent[];
-}
-
-export function DayView({ events }: DayViewProps) {
-  const { date } = useDateWithRouting();
-
+export function DayView({ events, date }: ViewProps) {
   const dayEvents = layoutDayEvents(
     events.filter((e) => dayjs(e.begin).isSame(date, "day")),
   );
@@ -76,7 +69,7 @@ export function DayView({ events }: DayViewProps) {
               ))}
             </Box>
             {dayEvents.map((e) => (
-              <CalendarEventCard key={e.id} event={e} onClick={() => {}} />
+              <CalendarEventCard key={e.id} event={e} />
             ))}
           </Box>
         </Box>
