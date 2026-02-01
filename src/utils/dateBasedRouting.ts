@@ -54,7 +54,7 @@ export function getDateFromRoute(params: CalendarRouteParams): Dayjs {
 }
 
 export function getRouteFromDate(date: Dayjs, type: Layout): string {
-  const year = date.year();
+  let year = date.year();
 
   switch (type) {
     case "day": {
@@ -72,7 +72,9 @@ export function getRouteFromDate(date: Dayjs, type: Layout): string {
 
     case "week": {
       const weekNumber = date.week();
-
+      if (weekNumber === 1) {
+        year = date.endOf("week").year();
+      }
       return `/w/${year}/${weekNumber}`;
     }
   }

@@ -141,7 +141,7 @@ export function CalendarHeader() {
             )}
           </Box>
           <DatePicker onSelect={closeDrawer} />
-          <Filters />
+          {!isMobile && <Filters />}
         </Box>
       </Drawer>
     </>
