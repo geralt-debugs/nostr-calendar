@@ -14,16 +14,28 @@ import {
   MenuItem,
   IconButton,
   SelectChangeEvent,
+  Divider,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { format } from "date-fns";
 import { ICalendarEvent, RepeatingFrequency } from "../utils/types";
 import { ParticipantAdd } from "./ParticipantAdd";
+import ScheduleIcon from "@mui/icons-material/Schedule";
 import { Participant } from "./Participant";
 import {
   publishPrivateCalendarEvent,
   publishPublicCalendarEvent,
 } from "../common/nostr";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import dayjs, { Dayjs } from "dayjs";
+import LocationPinIcon from "@mui/icons-material/LocationPin";
+import EventRepeatIcon from "@mui/icons-material/EventRepeat";
+import PeopleIcon from "@mui/icons-material/People";
+import DescriptionIcon from "@mui/icons-material/Description";
+import { EventAttributeEditContainer } from "./StyledComponents";
+import LockIcon from "@mui/icons-material/Lock";
+import PublicIcon from "@mui/icons-material/Public";
 
 interface CalendarEventEditProps {
   open: boolean;
@@ -83,6 +95,10 @@ export function CalendarEventEdit({
     onClose();
   };
 
+  const theme = useTheme();
+
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+
   const updateField = <K extends keyof ICalendarEvent>(
     key: K,
     value: ICalendarEvent[K],
@@ -113,56 +129,14 @@ export function CalendarEventEdit({
     }
   };
 
-  const onChangeBeginDate = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newDate = new Date(e.target.value);
-    const currentBeginTime = new Date(eventDetails.begin);
-    const newBegin = new Date(
-      newDate.getFullYear(),
-      newDate.getMonth(),
-      newDate.getDate(),
-      currentBeginTime.getHours(),
-      currentBeginTime.getMinutes(),
-    );
-    updateField("begin", newBegin.getTime());
+  const onChangeBeginDate = (value: Dayjs | null) => {
+    if (!value) return;
+    updateField("begin", value.unix() * 1000);
   };
 
-  const onChangeEndDate = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newDate = new Date(e.target.value);
-    const currentEndTime = new Date(eventDetails.end);
-    const newEnd = new Date(
-      newDate.getFullYear(),
-      newDate.getMonth(),
-      newDate.getDate(),
-      currentEndTime.getHours(),
-      currentEndTime.getMinutes(),
-    );
-    updateField("end", newEnd.getTime());
-  };
-
-  const onChangeBeginTime = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const [hours, minutes] = e.target.value.split(":").map(Number);
-    const currentBeginDate = new Date(eventDetails.begin);
-    const newBegin = new Date(
-      currentBeginDate.getFullYear(),
-      currentBeginDate.getMonth(),
-      currentBeginDate.getDate(),
-      hours,
-      minutes,
-    );
-    updateField("begin", newBegin.getTime());
-  };
-
-  const onChangeEndTime = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const [hours, minutes] = e.target.value.split(":").map(Number);
-    const currentEndDate = new Date(eventDetails.end);
-    const newEnd = new Date(
-      currentEndDate.getFullYear(),
-      currentEndDate.getMonth(),
-      currentEndDate.getDate(),
-      hours,
-      minutes,
-    );
-    updateField("end", newEnd.getTime());
+  const onChangeEndDate = (value: Dayjs | null) => {
+    if (!value) return;
+    updateField("end", value.unix() * 1000);
   };
 
   const handleFrequencyChange = (e: SelectChangeEvent<string>) => {
@@ -188,17 +162,7 @@ export function CalendarEventEdit({
   }
 
   return (
-    <Dialog
-      open={open}
-      onClose={handleClose}
-      maxWidth="md"
-      fullWidth
-      PaperProps={{
-        style: {
-          borderRadius: 8,
-        },
-      }}
-    >
+    <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
       <DialogTitle>
         <Box
           style={{
@@ -218,19 +182,12 @@ export function CalendarEventEdit({
 
       <DialogContent dividers>
         <Box style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-          {/* Title */}
           <Box>
-            <Typography
-              variant="subtitle2"
-              style={{ marginBottom: 8, fontWeight: 500 }}
-            >
-              Title *
-            </Typography>
             <TextField
               fullWidth
               placeholder="Enter event title"
               value={eventDetails.title}
-              onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+              onChange={(e) => {
                 updateField("title", e.target.value);
               }}
               required
@@ -240,15 +197,9 @@ export function CalendarEventEdit({
 
           {/* Image URL */}
           <Box>
-            <Typography
-              variant="subtitle2"
-              style={{ marginBottom: 8, fontWeight: 500 }}
-            >
-              Image URL
-            </Typography>
             <TextField
               fullWidth
-              placeholder="https://example.com/image.jpg"
+              placeholder="Image URL eg. https://example.com/image.jpg"
               value={eventDetails.image || ""}
               onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
                 updateField("image", e.target.value);
@@ -256,82 +207,31 @@ export function CalendarEventEdit({
               size="small"
             />
           </Box>
-
+          <Divider />
           {/* Date and Time */}
-          <Box>
-            <Typography
-              variant="subtitle2"
-              style={{ marginBottom: 8, fontWeight: 500 }}
-            >
-              Date and Time *
-            </Typography>
-            <Box style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              {/* Start Date/Time */}
-              <Box>
-                <Typography
-                  variant="caption"
-                  style={{ marginBottom: 4, display: "block", color: "#666" }}
-                >
-                  Start
-                </Typography>
-                <Box style={{ display: "flex", gap: 8 }}>
-                  <TextField
-                    type="date"
-                    value={format(new Date(eventDetails.begin), "yyyy-MM-dd")}
-                    onChange={onChangeBeginDate}
-                    size="small"
-                    style={{ flex: 1 }}
-                    InputLabelProps={{ shrink: true }}
-                  />
-                  <TextField
-                    type="time"
-                    value={format(new Date(eventDetails.begin), "HH:mm")}
-                    onChange={onChangeBeginTime}
-                    size="small"
-                    style={{ width: 120 }}
-                    InputLabelProps={{ shrink: true }}
-                  />
-                </Box>
-              </Box>
 
-              {/* End Date/Time */}
-              <Box>
-                <Typography
-                  variant="caption"
-                  style={{ marginBottom: 4, display: "block", color: "#666" }}
-                >
-                  End
-                </Typography>
-                <Box style={{ display: "flex", gap: 8 }}>
-                  <TextField
-                    type="date"
-                    value={format(new Date(eventDetails.end), "yyyy-MM-dd")}
-                    onChange={onChangeEndDate}
-                    size="small"
-                    style={{ flex: 1 }}
-                    InputLabelProps={{ shrink: true }}
-                  />
-                  <TextField
-                    type="time"
-                    value={format(new Date(eventDetails.end), "HH:mm")}
-                    onChange={onChangeEndTime}
-                    size="small"
-                    style={{ width: 120 }}
-                    InputLabelProps={{ shrink: true }}
-                  />
-                </Box>
-              </Box>
-            </Box>
-          </Box>
-
+          <EventAttributeEditContainer>
+            <ScheduleIcon />
+            <DateTimePicker
+              sx={{
+                width: "100%",
+              }}
+              value={dayjs(eventDetails.begin)}
+              onChange={onChangeBeginDate}
+            />
+            {!isMobile && "-"}
+            <DateTimePicker
+              sx={{
+                width: "100%",
+              }}
+              onChange={onChangeEndDate}
+              value={dayjs(eventDetails.end)}
+            />
+          </EventAttributeEditContainer>
+          <Divider />
           {/* Location */}
-          <Box>
-            <Typography
-              variant="subtitle2"
-              style={{ marginBottom: 8, fontWeight: 500 }}
-            >
-              Location
-            </Typography>
+          <EventAttributeEditContainer>
+            <LocationPinIcon />
             <TextField
               fullWidth
               placeholder="Enter location"
@@ -344,16 +244,11 @@ export function CalendarEventEdit({
               }}
               size="small"
             />
-          </Box>
-
+          </EventAttributeEditContainer>
+          <Divider />
           {/* Recurrence */}
-          <Box>
-            <Typography
-              variant="subtitle2"
-              style={{ marginBottom: 8, fontWeight: 500 }}
-            >
-              Recurrence
-            </Typography>
+          <EventAttributeEditContainer>
+            <EventRepeatIcon />
             <FormControl fullWidth size="small">
               <InputLabel>Select recurrence pattern</InputLabel>
               <Select
@@ -376,16 +271,11 @@ export function CalendarEventEdit({
                 <MenuItem value={RepeatingFrequency.Yearly}>Yearly</MenuItem>
               </Select>
             </FormControl>
-          </Box>
-
+          </EventAttributeEditContainer>
+          <Divider />
           {/* Participants */}
           <Box>
-            <Typography
-              variant="subtitle2"
-              style={{ marginBottom: 8, fontWeight: 500 }}
-            >
-              Participants
-            </Typography>
+            <PeopleIcon />
             <Box style={{ display: "flex", flexDirection: "column", gap: 12 }}>
               <ParticipantAdd
                 onAdd={(pubKey) => {
@@ -432,15 +322,10 @@ export function CalendarEventEdit({
               )}
             </Box>
           </Box>
-
+          <Divider />
           {/* Description */}
           <Box>
-            <Typography
-              variant="subtitle2"
-              style={{ marginBottom: 8, fontWeight: 500 }}
-            >
-              Description
-            </Typography>
+            <DescriptionIcon />
             <TextField
               fullWidth
               multiline
@@ -466,13 +351,14 @@ export function CalendarEventEdit({
             }}
           >
             <Typography variant="body2" style={{ fontWeight: 500 }}>
-              Private Event
+              Event Type
             </Typography>
             <Button
               variant={isPrivate ? "contained" : "outlined"}
               size="small"
               onClick={() => setIsPrivate(!isPrivate)}
               style={{ minWidth: 100 }}
+              startIcon={isPrivate ? <LockIcon /> : <PublicIcon />}
             >
               {isPrivate ? "Private" : "Public"}
             </Button>

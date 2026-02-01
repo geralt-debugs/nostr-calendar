@@ -16,6 +16,8 @@ import LoginModal from "./components/LoginModal";
 import { BrowserRouter } from "react-router";
 import { Routing } from "./components/Routing";
 import { Header } from "./components/Header";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 let _locale =
   (navigator.languages && navigator.languages[0]) ||
@@ -102,12 +104,14 @@ export default function App() {
   };
   return (
     <IntlProvider locale={i18nLocale} messages={locale_dictionary}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <BrowserRouter>
-          <Application />
-        </BrowserRouter>
-      </ThemeProvider>
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <BrowserRouter>
+            <Application />
+          </BrowserRouter>
+        </ThemeProvider>
+      </LocalizationProvider>
     </IntlProvider>
   );
 }

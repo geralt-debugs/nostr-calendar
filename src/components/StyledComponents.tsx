@@ -1,5 +1,4 @@
-import styled from "@emotion/styled";
-import { Box, BoxProps } from "@mui/material";
+import { Box, BoxProps, styled } from "@mui/material";
 
 interface SecondaryHeaderProps extends BoxProps {
   topOffset?: number;
@@ -23,5 +22,16 @@ export const StyledSecondaryHeader = styled(Box, {
   // desktop
   "@media (min-width:600px)": {
     top: 64 + topOffset,
+  },
+}));
+
+export const EventAttributeEditContainer = styled(Box)(({ theme }) => ({
+  display: "flex",
+  gap: theme.spacing(2),
+  alignItems: "center",
+
+  [theme.breakpoints.down("sm")]: {
+    alignItems: "start",
+    flexDirection: "column",
   },
 }));
