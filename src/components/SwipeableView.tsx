@@ -1,6 +1,6 @@
 import { useMediaQuery, Box, useTheme } from "@mui/material";
 import { MotionNodeDragHandlers, AnimatePresence, motion } from "framer-motion";
-import React, { useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { useDateWithRouting } from "../hooks/useDateWithRouting";
 import { Dayjs } from "dayjs";
 import { ICalendarEvent } from "../utils/types";
@@ -26,6 +26,21 @@ export function SwipeableView({ events, View }: SwipeableViewProps) {
   const [direction, setDirection] = useState(0);
   const [key, setKey] = useState(0); // forces re-mount to snap back
   const move = (dir: number) => setDate(date.add(dir, layout), layout);
+  const ref = useRef<HTMLDivElement | null>(null);
+  const [width, setWidth] = useState(0);
+
+  useLayoutEffect(() => {
+    if (ref.current) {
+      setWidth(ref.current?.offsetWidth);
+    }
+  }, []);
+
+  const [x, setX] = useState(0);
+
+  useEffect(() => {
+    setX(width);
+  }, [width]);
+
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
@@ -37,18 +52,19 @@ export function SwipeableView({ events, View }: SwipeableViewProps) {
       setDirection(1);
       setTimeout(() => {
         move(1);
-      }, 300);
+      }, 600);
       setKey((k) => k + 1);
     } else if (info.offset.x > SWIPE_THRESHOLD) {
       setDirection(-1);
       setTimeout(() => {
         move(-1);
-      }, 300);
+      }, 600);
       setKey((k) => k + 1);
     }
   };
+
   return (
-    <Box overflow="hidden" width="100%" className="test">
+    <Box overflow="hidden" width="100%" ref={ref}>
       <AnimatePresence initial={false} custom={direction}>
         <motion.div
           key={key}
@@ -61,12 +77,11 @@ export function SwipeableView({ events, View }: SwipeableViewProps) {
           exit={{ x: direction > 0 ? -300 : 300 }}
           transition={{
             type: "spring",
-            stiffness: 300,
-            damping: 30,
           }}
           style={{
             display: "flex",
             width: "300%",
+            x,
           }}
         >
           <Box width="100%">{<View events={events} date={previousDay} />}</Box>

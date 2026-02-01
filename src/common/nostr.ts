@@ -19,7 +19,6 @@ import * as nip59 from "./nip59";
 import {
   AddressPointer,
   NAddr,
-  NPub,
   NSec,
   decode,
   naddrEncode,
@@ -209,6 +208,7 @@ export async function publishPrivateCalendarEvent({
   participants,
   repeat,
   image,
+  location,
 }: ICalendarEvent) {
   const viewSecretKey = generateSecretKey();
   const uniqueCalId = uuid();
@@ -222,6 +222,7 @@ export async function publishPrivateCalendarEvent({
     ["end", end / 1000],
     ["image", image],
     ["d", uniqueCalId],
+    ["location", location],
   ];
   if (repeat && repeat.frequency) {
     eventData.push(["L", "recurring"]);
@@ -532,6 +533,7 @@ export const publishPublicCalendarEvent = async (
     ["start", String(Math.floor(event.begin / 1000))],
     ["end", String(Math.floor(event.end / 1000))],
     ["image", event.image],
+    ["location", event.location],
   ];
   if (event.image) {
     tags.push(["image", event.image]);

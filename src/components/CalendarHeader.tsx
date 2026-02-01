@@ -24,7 +24,6 @@ import { DatePicker } from "./DatePicker";
 import { StyledSecondaryHeader } from "./StyledComponents";
 import { Filters } from "./Filters";
 import CloseIcon from "@mui/icons-material/Close";
-import { DateLabel } from "./DateLabel";
 import { WeekHeader } from "./WeekView";
 
 export function CalendarHeader() {
@@ -131,13 +130,15 @@ export function CalendarHeader() {
           </Menu>
         </Box>
       </StyledSecondaryHeader>
-      <WeekHeader date={date} />
+      {layout === "week" && <WeekHeader date={date} />}
       <Drawer open={drawerOpen} onClose={closeDrawer}>
         <Box padding={(theme) => theme.spacing(2)}>
           <Box width={"100%"} justifyContent={"end"} display={"flex"}>
-            <IconButton onClick={closeDrawer}>
-              <CloseIcon />
-            </IconButton>
+            {isMobile && (
+              <IconButton onClick={closeDrawer}>
+                <CloseIcon />
+              </IconButton>
+            )}
           </Box>
           <DatePicker onSelect={closeDrawer} />
           <Filters />

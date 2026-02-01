@@ -2,8 +2,6 @@ import {
   DateCalendar,
   DateCalendarProps,
 } from "@mui/x-date-pickers/DateCalendar";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import { useLayout } from "../hooks/useLayout";
@@ -24,13 +22,11 @@ export const DatePicker = ({ onSelect }: { onSelect?: () => void }) => {
   const views: DateCalendarProps["views"] =
     layout === "month" ? ["month", "year"] : undefined;
   return (
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
-      <DateCalendar
-        onChange={onChange}
-        views={views}
-        referenceDate={dayjs(parsedDate)}
-        displayWeekNumber
-      />
-    </LocalizationProvider>
+    <DateCalendar
+      onChange={onChange}
+      views={views}
+      referenceDate={dayjs(parsedDate)}
+      displayWeekNumber
+    />
   );
 };

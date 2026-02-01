@@ -44,12 +44,7 @@ export function DayView({ events, date }: ViewProps) {
           </Box>
 
           {/* Events */}
-          <Box
-            flex={1}
-            position="relative"
-            border="1px solid #eee"
-            ref={containerRef}
-          >
+          <Box flex={1} position="relative" ref={containerRef}>
             <TimeMarker offset="0px" />
             {/* Hour Divider */}
             <Box display={"flex"} flexDirection={"column"}>
