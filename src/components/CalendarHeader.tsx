@@ -22,6 +22,7 @@ import { useDateWithRouting } from "../hooks/useDateWithRouting";
 import { DatePicker } from "./DatePicker";
 import { StyledSecondaryHeader } from "./StyledComponents";
 import { Filters } from "./Filters";
+import CloseIcon from "@mui/icons-material/Close";
 
 export function CalendarHeader() {
   const { layout, updateLayout } = useLayout();
@@ -61,9 +62,8 @@ export function CalendarHeader() {
           </IconButton>
           <Typography ml={2} fontWeight={600}>
             {layout === "month" && date.format("MMMM YYYY")}
-            {layout === "week" &&
-              `${date.startOf("week").format("MMM D")} – ${date.endOf("week").format("MMM D")}`}
-            {layout === "day" && date.format("MMMM D, YYYY")}
+            {layout === "week" && date.format("MMM YY")}
+            {layout === "day" && date.format("MMM D, YYYY")}
           </Typography>
         </Box>
         <Box display="flex" gap={theme.spacing(2)} alignItems="center">
@@ -120,7 +120,12 @@ export function CalendarHeader() {
       </StyledSecondaryHeader>
       <Drawer open={drawerOpen} onClose={closeDrawer}>
         <Box padding={(theme) => theme.spacing(2)}>
-          <DatePicker />
+          <Box width={"100%"} justifyContent={"end"} display={"flex"}>
+            <IconButton onClick={closeDrawer}>
+              <CloseIcon />
+            </IconButton>
+          </Box>
+          <DatePicker onSelect={closeDrawer} />
           <Filters />
         </Box>
       </Drawer>

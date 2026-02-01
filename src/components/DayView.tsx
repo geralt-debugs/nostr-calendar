@@ -4,11 +4,13 @@ import weekday from "dayjs/plugin/weekday";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import { ICalendarEvent } from "../utils/types";
-import { layoutDayEvents } from "../common/calendarEngine";
+import { getTimeFromCell, layoutDayEvents } from "../common/calendarEngine";
 import { CalendarEventCard } from "./CalendarEvent";
 import { DndContext } from "@dnd-kit/core";
 import { useDateWithRouting } from "../hooks/useDateWithRouting";
 import { TimeMarker } from "./TimeMarker";
+import { useRef, useState } from "react";
+import CalendarEventEdit from "./CalendarEventEdit";
 
 dayjs.extend(weekday);
 dayjs.extend(isSameOrBefore);
@@ -24,35 +26,70 @@ export function DayView({ events }: DayViewProps) {
   const dayEvents = layoutDayEvents(
     events.filter((e) => dayjs(e.begin).isSame(date, "day")),
   );
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [clickedDateTime, setClickedDateTime] = useState<number | undefined>();
+  const handleCellClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    const time = getTimeFromCell(event, containerRef);
+    if (time) {
+      setClickedDateTime(time);
+    }
+    setDialogOpen(true);
+  };
 
   return (
-    <DndContext>
-      <Box display="flex" height={24 * 60}>
-        {/* Time column */}
-        <Box width={60} borderRight="1px solid #ddd">
-          {Array.from({ length: 24 }).map((_, h) => (
-            <Box key={h} height={60} px={0.5}>
-              <Typography variant="caption">{h}:00</Typography>
-            </Box>
-          ))}
-        </Box>
-
-        {/* Events */}
-        <Box flex={1} position="relative" border="1px solid #eee">
-          <TimeMarker offset="0px" />
-          {/* Hour Divider */}
-          <Box display={"flex"} flexDirection={"column"}>
+    <>
+      <DndContext>
+        <Box display="flex" height={24 * 60}>
+          {/* Time column */}
+          <Box width={60} borderRight="1px solid #ddd">
             {Array.from({ length: 24 }).map((_, h) => (
               <Box key={h} height={60} px={0.5}>
-                <Divider />
+                <Typography variant="caption">{h}:00</Typography>
               </Box>
             ))}
           </Box>
-          {dayEvents.map((e) => (
-            <CalendarEventCard key={e.id} event={e} onClick={() => {}} />
-          ))}
+
+          {/* Events */}
+          <Box
+            flex={1}
+            position="relative"
+            border="1px solid #eee"
+            ref={containerRef}
+          >
+            <TimeMarker offset="0px" />
+            {/* Hour Divider */}
+            <Box display={"flex"} flexDirection={"column"}>
+              {Array.from({ length: 24 }).map((_, h) => (
+                <Box
+                  data-date={date.format("YYYY-MM-DD")}
+                  onClick={handleCellClick}
+                  key={h}
+                  height={60}
+                  px={0.5}
+                  sx={{
+                    cursor: "pointer",
+                  }}
+                >
+                  <Divider />
+                </Box>
+              ))}
+            </Box>
+            {dayEvents.map((e) => (
+              <CalendarEventCard key={e.id} event={e} onClick={() => {}} />
+            ))}
+          </Box>
         </Box>
-      </Box>
-    </DndContext>
+      </DndContext>
+      {dialogOpen && (
+        <CalendarEventEdit
+          open={dialogOpen}
+          event={null}
+          initialDateTime={clickedDateTime}
+          onClose={() => setDialogOpen(false)}
+          mode="create"
+        />
+      )}
+    </>
   );
 }

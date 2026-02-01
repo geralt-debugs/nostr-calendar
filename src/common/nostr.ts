@@ -208,6 +208,7 @@ export async function publishPrivateCalendarEvent({
   end,
   participants,
   repeat,
+  image,
 }: ICalendarEvent) {
   const viewSecretKey = generateSecretKey();
   const uniqueCalId = uuid();
@@ -219,6 +220,7 @@ export async function publishPrivateCalendarEvent({
     ["description", description],
     ["start", start / 1000],
     ["end", end / 1000],
+    ["image", image],
     ["d", uniqueCalId],
   ];
   if (repeat && repeat.frequency) {
@@ -529,6 +531,7 @@ export const publishPublicCalendarEvent = async (
     ["d", id],
     ["start", String(Math.floor(event.begin / 1000))],
     ["end", String(Math.floor(event.end / 1000))],
+    ["image", event.image],
   ];
   if (event.image) {
     tags.push(["image", event.image]);

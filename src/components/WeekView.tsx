@@ -5,13 +5,15 @@ import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import { ICalendarEvent } from "../utils/types";
 import { DndContext, DragEndEvent } from "@dnd-kit/core";
-import { layoutDayEvents } from "../common/calendarEngine";
+import { getTimeFromCell, layoutDayEvents } from "../common/calendarEngine";
 import { CalendarEventCard } from "./CalendarEvent";
 import { DateLabel } from "./DateLabel";
 import { useDateWithRouting } from "../hooks/useDateWithRouting";
 import { isWeekend } from "../utils/dateHelper";
 import { StyledSecondaryHeader } from "./StyledComponents";
 import { TimeMarker } from "./TimeMarker";
+import { useRef, useState } from "react";
+import CalendarEventEdit from "./CalendarEventEdit";
 
 dayjs.extend(weekday);
 dayjs.extend(isSameOrBefore);
@@ -24,7 +26,20 @@ interface WeekViewProps {
 export function WeekView({ events }: WeekViewProps) {
   const { date } = useDateWithRouting();
   const start = date.startOf("week");
+
   const days = Array.from({ length: 7 }, (_, i) => start.add(i, "day"));
+
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [clickedDateTime, setClickedDateTime] = useState<number | undefined>();
+
+  const handleCellClick = (event: React.MouseEvent<HTMLDivElement>) => {
+    const time = getTimeFromCell(event, containerRef, 1);
+    if (time) {
+      setClickedDateTime(time);
+    }
+    setDialogOpen(true);
+  };
 
   const onDragEnd = ({ delta, active }: DragEndEvent) => {
     if (!delta.y) return;
@@ -72,7 +87,9 @@ export function WeekView({ events }: WeekViewProps) {
                 key={day.toString()}
                 position="relative"
                 borderLeft="1px solid #eee"
+                ref={containerRef}
                 sx={{
+                  cursor: "pointer",
                   background: isWeekend(day)
                     ? alpha(theme.palette.primary.main, 0.1)
                     : "transparent",
@@ -96,13 +113,28 @@ export function WeekView({ events }: WeekViewProps) {
                 </StyledSecondaryHeader>
                 <TimeMarker offset={"76px"} />
                 {Array.from({ length: 24 }).map((_, h) => (
-                  <Box key={h} height={60} px={0.5}>
+                  <Box
+                    onClick={handleCellClick}
+                    data-date={day.format("YYYY-MM-DD")}
+                    key={h}
+                    height={60}
+                    px={0.5}
+                  >
                     <Divider />
                   </Box>
                 ))}
                 {laidOut.map((e) => (
                   <CalendarEventCard offset={"76px"} key={e.id} event={e} />
                 ))}
+                {dialogOpen && (
+                  <CalendarEventEdit
+                    open={dialogOpen}
+                    event={null}
+                    initialDateTime={clickedDateTime}
+                    onClose={() => setDialogOpen(false)}
+                    mode="create"
+                  />
+                )}
               </Box>
             );
           })}

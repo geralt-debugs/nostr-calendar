@@ -4,6 +4,7 @@ import weekday from "dayjs/plugin/weekday";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import { PX_PER_MINUTE } from "../utils/constants";
+import { RefObject } from "react";
 
 dayjs.extend(weekday);
 dayjs.extend(isSameOrBefore);
@@ -57,3 +58,32 @@ export function layoutDayEvents(events: ICalendarEvent[]): PositionedEvent[] {
     }),
   );
 }
+
+export const getTimeFromCell = (
+  event: React.MouseEvent<HTMLDivElement>,
+  containerRef: RefObject<HTMLDivElement | null>,
+  offsetHours = 0,
+) => {
+  if (containerRef.current) {
+    // Calculate date/time from click position
+    const rect = containerRef.current.getBoundingClientRect();
+    const clickY = event.clientY - rect.top;
+
+    // Assuming 60px per hour
+    const hour = Math.floor(clickY / 60) - offsetHours;
+    const minute = Math.floor((clickY % 60) / 30) * 30; // Round to nearest 30 min
+
+    // Get date from the cell's data
+    const cellDate = new Date(event.currentTarget.dataset.date!);
+    const clickedDate = new Date(
+      cellDate.getFullYear(),
+      cellDate.getMonth(),
+      cellDate.getDate(),
+      hour,
+      minute,
+    );
+
+    return clickedDate.getTime();
+  }
+  return null;
+};
