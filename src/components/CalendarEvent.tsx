@@ -13,6 +13,7 @@ import {
   Theme,
   Tooltip,
   Typography,
+  useMediaQuery,
   useTheme,
 } from "@mui/material";
 import { ICalendarEvent } from "../utils/types";
@@ -63,6 +64,7 @@ export function CalendarEventCard({
   const maxDescLength = 20;
   const theme = useTheme();
   const colorScheme = getColorScheme(event, theme);
+  const fullScreen = useMediaQuery(theme.breakpoints.down("sm"));
   const title =
     event.title ??
     (event.description.length > maxDescLength
@@ -100,6 +102,7 @@ export function CalendarEventCard({
       <Dialog
         fullWidth
         maxWidth="lg"
+        fullScreen={fullScreen}
         slotProps={{
           paper: {
             sx: {
@@ -176,13 +179,14 @@ function ActionButtons({
 
 function CalendarEvent({ event }: CalendarEventViewProps) {
   const theme = useTheme();
-  console.log(event);
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   return (
     <Box
       sx={{
         display: "flex",
         gap: theme.spacing(4),
         height: "100%",
+        flexDirection: isMobile ? "column" : "row",
       }}
     >
       {event.image && (

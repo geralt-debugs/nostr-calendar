@@ -162,7 +162,13 @@ export function CalendarEventEdit({
   }
 
   return (
-    <Dialog open={open} onClose={handleClose} maxWidth="md" fullWidth>
+    <Dialog
+      fullScreen={isMobile}
+      open={open}
+      onClose={handleClose}
+      maxWidth="md"
+      fullWidth
+    >
       <DialogTitle>
         <Box
           style={{
