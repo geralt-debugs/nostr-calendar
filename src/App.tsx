@@ -1,6 +1,11 @@
-import Calendar from "./components/Calendar";
 import ModeSelectionModal from "./components/ModeSelectionModal";
-import { ThemeProvider, CssBaseline, Box, Typography } from "@mui/material";
+import {
+  ThemeProvider,
+  CssBaseline,
+  Box,
+  Typography,
+  Toolbar,
+} from "@mui/material";
 import { theme } from "./theme";
 import { useEffect, useState } from "react";
 import { useUser } from "./stores/user";
@@ -10,6 +15,9 @@ import dictionary from "./common/dictionary";
 import LoginModal from "./components/LoginModal";
 import { BrowserRouter } from "react-router";
 import { Routing } from "./components/Routing";
+import { Header } from "./components/Header";
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 
 let _locale =
   (navigator.languages && navigator.languages[0]) ||
@@ -59,53 +67,51 @@ function Application() {
 
   return (
     <>
-
-        {/* Mode Selection Modal */}
-        <ModeSelectionModal
-          isOpen={showModeSelection}
-          onModeSelect={handleModeSelection}
-        />
-
-        {/* Main App Content */}
-        {(appMode || user) && !showModeSelection && (
-          <div className="App">
-            <Calendar />
-          </div>
-        )}
-
-        {/* Loading State */}
-        {!showModeSelection && !appMode && !user && (
-          <Box
-            display="flex"
-            justifyContent="center"
-            alignItems="center"
-            minHeight="100vh"
-          >
-            <Typography>Loading...</Typography>
-          </Box>
-        )}
-        <LoginModal
-          open={showLoginModal}
-          onClose={() => updateLoginModal(false)}
-        />
-      </>
+      <Header />
+      {/* Mode Selection Modal */}
+      <ModeSelectionModal
+        isOpen={showModeSelection}
+        onModeSelect={handleModeSelection}
+      />
+      {/* Loading State */}
+      {!showModeSelection && !appMode && !user && (
+        <Box
+          display="flex"
+          justifyContent="center"
+          alignItems="center"
+          minHeight="100vh"
+        >
+          <Typography>Loading...</Typography>
+        </Box>
+      )}
+      <LoginModal
+        open={showLoginModal}
+        onClose={() => updateLoginModal(false)}
+      />
+      <Toolbar />
+      <Box>
+        <Routing />
+      </Box>
+    </>
   );
 }
 
 export default function App() {
-    const i18nLocale = _locale;
+  const i18nLocale = _locale;
   const locale_dictionary = {
     ...flattenMessages(dictionary["en-US"]),
     ...flattenMessages(dictionary[i18nLocale]),
   };
   return (
     <IntlProvider locale={i18nLocale} messages={locale_dictionary}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-    <BrowserRouter>
-      <Routing indexNode={<Application />} />
-    </BrowserRouter>
-    </ThemeProvider>
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <BrowserRouter>
+            <Application />
+          </BrowserRouter>
+        </ThemeProvider>
+      </LocalizationProvider>
     </IntlProvider>
   );
 }

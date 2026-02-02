@@ -53,6 +53,8 @@ export default async function createEditEvent({
     begin: eventBeginDate.getTime(),
     end: eventEndDate.getTime(),
     id: TEMP_CALENDAR_ID,
+    eventId: TEMP_CALENDAR_ID,
+    kind: 0,
     title: "",
     createdAt: Date.now(),
     description: "",

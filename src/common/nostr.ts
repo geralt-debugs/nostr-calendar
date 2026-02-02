@@ -16,7 +16,13 @@ import { ICalendarEvent } from "../stores/events";
 import { TEMP_CALENDAR_ID } from "../stores/eventDetails";
 import { AbstractRelay } from "nostr-tools/abstract-relay";
 import * as nip59 from "./nip59";
-import { AddressPointer, NAddr, NPub, NSec, decode, naddrEncode } from "nostr-tools/nip19";
+import {
+  AddressPointer,
+  NAddr,
+  NSec,
+  decode,
+  naddrEncode,
+} from "nostr-tools/nip19";
 import { signerManager } from "./signer";
 import { RSVPStatus } from "../utils/types";
 import { EventKinds } from "./EventConfigs";
@@ -201,6 +207,8 @@ export async function publishPrivateCalendarEvent({
   end,
   participants,
   repeat,
+  image,
+  location,
 }: ICalendarEvent) {
   const viewSecretKey = generateSecretKey();
   const uniqueCalId = uuid();
@@ -212,7 +220,9 @@ export async function publishPrivateCalendarEvent({
     ["description", description],
     ["start", start / 1000],
     ["end", end / 1000],
+    ["image", image],
     ["d", uniqueCalId],
+    ["location", location],
   ];
   if (repeat && repeat.frequency) {
     eventData.push(["L", "recurring"]);
@@ -522,6 +532,8 @@ export const publishPublicCalendarEvent = async (
     ["d", id],
     ["start", String(Math.floor(event.begin / 1000))],
     ["end", String(Math.floor(event.end / 1000))],
+    ["image", event.image],
+    ["location", event.location],
   ];
   if (event.image) {
     tags.push(["image", event.image]);
@@ -567,28 +579,28 @@ export const encodeNAddr = (address: Omit<AddressPointer, "relays">) => {
 };
 
 export const fetchCalendarEvent = (naddr: NAddr): Promise<Event> => {
-  const {data} = decode(naddr as NAddr);
-  console.log(data)
+  const { data } = decode(naddr as NAddr);
+  console.log(data);
   return new Promise((resolve, reject) => {
-    const relays = data.relays ?? defaultRelays
-  const filter: Filter = {
-    ids: [data.identifier],
-    kinds: [data.kind],
-    authors: [data.pubkey],
-  };
+    const relays = data.relays ?? defaultRelays;
+    const filter: Filter = {
+      ids: [data.identifier],
+      kinds: [data.kind],
+      authors: [data.pubkey],
+    };
 
-  const maxWait = 10000
+    const maxWait = 10000;
 
-  const closer = pool.subscribeMany(relays, [filter], {
-    maxWait,
-    onevent: (event: Event) => {
-      resolve(event);
-      closer.close()
-    },
+    const closer = pool.subscribeMany(relays, [filter], {
+      maxWait,
+      onevent: (event: Event) => {
+        resolve(event);
+        closer.close();
+      },
+    });
+    setTimeout(() => {
+      reject(new Error("EVENT_NOT_FOUND"));
+      closer.close();
+    }, maxWait);
   });
-  setTimeout(() => {
-    reject(new Error('EVENT_NOT_FOUND'))
-    closer.close()
-  }, maxWait)
-  })
-}
+};

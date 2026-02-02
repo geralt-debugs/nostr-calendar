@@ -1,7 +1,6 @@
 import { create } from "zustand";
 import { fetchUserInfo } from "../common/nostr";
 import { SubCloser } from "nostr-tools/abstract-pool";
-import { useState } from "react";
 
 export interface IParticipant {
   publicKey: string;

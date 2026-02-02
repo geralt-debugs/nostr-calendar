@@ -113,9 +113,6 @@ export const ViewEventPage = () => {
   const viewKey = queryParams.get("viewKey");
   const [calendarEventLoadState, updateCalendarEventLoadState] =
     React.useState<ILoadState>(getInitialLoadState);
-  if (!naddr) {
-    return null;
-  }
 
   React.useEffect(() => {
     updateCalendarEventLoadState(getInitialLoadState);
@@ -146,7 +143,9 @@ export const ViewEventPage = () => {
         console.error(e);
       });
   }, [naddr, viewKey, updateCalendarEventLoadState]);
-
+  if (!naddr) {
+    return null;
+  }
   return (
     <>
       <Header />
