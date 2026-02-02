@@ -69,7 +69,7 @@ export function WeekView({ events, date }: ViewProps) {
     setDialogOpen(true);
   };
 
-  const onDragEnd = ({ delta, active }: DragEndEvent) => {
+  const onDragEnd = ({ delta }: DragEndEvent) => {
     if (!delta.y) return;
     // setEvents((prev) =>
     //   prev.map((e) =>

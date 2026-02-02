@@ -11,12 +11,14 @@
   font-weight: bold;
   font-style: normal;
 }
+
 @font-face {
   font-family: "Menlo";
   src: url("/fonts/Menlo-Italic.ttf");
   font-weight: normal;
   font-style: italic;
 }
+
 @font-face {
   font-family: "Menlo";
   src: url("/fonts/Menlo-BoldItalic.ttf");
@@ -27,6 +29,7 @@
 html {
   width: 100vw;
   height: 100vh;
+  scroll-padding-top: 240px;
 }
 
 body {

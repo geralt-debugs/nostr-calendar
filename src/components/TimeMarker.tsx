@@ -50,7 +50,6 @@ export const TimeMarker = ({ offset = "0px" }: { offset?: string }) => {
         height: "4px",
         display: "flex",
         alignItems: "center",
-        zIndex: 1,
       }}
     >
       <Dot />

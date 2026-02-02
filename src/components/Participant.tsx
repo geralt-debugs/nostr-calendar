@@ -1,4 +1,4 @@
-import { Skeleton, useTheme, Tooltip, IconButton } from "@mui/material";
+import { Skeleton, useTheme, Tooltip, IconButton, Theme } from "@mui/material";
 import { useGetParticipant } from "../stores/participants";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
@@ -15,7 +15,7 @@ interface ParticipantProps {
   rsvpResponse?: RSVPResponse;
 }
 
-const getRSVPIcon = (response: RSVPResponse, theme: any) => {
+const getRSVPIcon = (response: RSVPResponse, theme: Theme) => {
   switch (response) {
     case RSVPResponse.accepted:
       return (
