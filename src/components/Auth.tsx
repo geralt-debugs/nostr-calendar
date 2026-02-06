@@ -38,10 +38,12 @@ export const Auth = () => {
     npub = `${npub.substring(0, 8)}...${npub.slice(-5)}`;
   }
 
+  const name = user?.name;
+
   const logoutElem = (
     <MenuItem onClick={handleLogout}>
       {intl.formatMessage({ id: "navigation.logout" })}
-      {npub && <>({npub})</>}
+      {npub && <>({name || npub})</>}
     </MenuItem>
   );
 

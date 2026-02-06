@@ -96,14 +96,14 @@ class Signer {
     const pubkey = await this.signer.getPublicKey();
 
     const kind0 = await fetchUserProfile(pubkey);
-    const userData: IUser = kind0
+    const userData = kind0
       ? { ...JSON.parse(kind0.content), pubkey }
       : { pubkey, name: ANONYMOUS_USER_NAME, picture: DEFAULT_IMAGE_URL };
+    this.user = userData;
 
     await saveNsec(nsec);
     setUserDataInLocalStorage(userData);
 
-    this.user = userData;
     this.notify();
   }
 
@@ -120,12 +120,22 @@ class Signer {
     this.notify();
   }
 
+  private async saveUser(pubkey: string) {
+    const kind0 = await fetchUserProfile(pubkey);
+    const userData = kind0
+      ? { ...JSON.parse(kind0.content), pubkey }
+      : { pubkey, name: ANONYMOUS_USER_NAME, picture: DEFAULT_IMAGE_URL };
+    this.user = userData;
+    return userData;
+  }
+
   async loginWithNip07() {
     console.log("LOGGIN IN WITH NIP07");
     if (!window.nostr) throw new Error("NIP-07 extension not found");
     this.signer = nip07Signer;
     const pubkey = await window.nostr.getPublicKey();
     setKeysInLocalStorage(pubkey);
+    await this.saveUser(pubkey);
     this.notify();
     console.log("LOGGIN IN WITH NIP07 IS NOW COMPLETE");
   }
@@ -135,6 +145,8 @@ class Signer {
     const pubkey = await remoteSigner.getPublicKey();
     setKeysInLocalStorage(pubkey);
     setBunkerUriInLocalStorage(bunkerUri);
+    await this.saveUser(pubkey);
+
     this.signer = remoteSigner;
     this.notify();
     console.log("LOGIN WITH BUNKER COMPLETE");
@@ -147,14 +159,11 @@ class Signer {
     const pubkey = await signer.getPublicKey();
 
     // Step 2: fetch kind0 profile
-    const kind0 = await fetchUserProfile(pubkey);
-    const userData = kind0
-      ? { ...JSON.parse(kind0.content), pubkey }
-      : { pubkey, name: ANONYMOUS_USER_NAME, picture: DEFAULT_IMAGE_URL };
+    const userData = await this.saveUser(pubkey);
 
     // Step 3: save signer and user
     this.signer = signer;
-    this.user = userData;
+
     await saveNip55Credentials(packageName, pubkey);
 
     setUserDataInLocalStorage(userData);

@@ -8,6 +8,7 @@ import { useLayout } from "../hooks/useLayout";
 import { CalendarHeader } from "./CalendarHeader";
 import { Box } from "@mui/material";
 import { SwipeableView } from "./SwipeableView";
+import { isMobile } from "../common/utils";
 
 function Calendar() {
   // const { history, match } = props
@@ -17,7 +18,7 @@ function Calendar() {
   } = useSettings((state) => state);
   const { user } = useUser();
   const events = useTimeBasedEvents((state) => state);
-  if (filters?.showPublicEvents) {
+  if (filters?.showPublicEvents && !isMobile) {
     events.fetchEvents();
   }
   if (user) {
