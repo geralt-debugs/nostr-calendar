@@ -26,6 +26,7 @@ import {
 import { signerManager } from "./signer";
 import { RSVPStatus } from "../utils/types";
 import { EventKinds } from "./EventConfigs";
+import { nostrRuntime } from "./nostrRuntime";
 
 const defaultRelays = [
   "wss://relay.damus.io/",
@@ -602,5 +603,15 @@ export const fetchCalendarEvent = (naddr: NAddr): Promise<Event> => {
       reject(new Error("EVENT_NOT_FOUND"));
       closer.close();
     }, maxWait);
+  });
+};
+
+export const fetchUserProfile = async (
+  pubkey: string,
+  relays: string[] = defaultRelays,
+) => {
+  return await nostrRuntime.fetchOne(relays, {
+    kinds: [0],
+    authors: [pubkey],
   });
 };

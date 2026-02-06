@@ -1,9 +1,11 @@
 import { generateSecretKey } from "nostr-tools";
 import { bytesToHex, hexToBytes } from "@noble/hashes/utils";
+import { IUser } from "../../stores/user";
 
 const LOCAL_APP_SECRET_KEY = "calendar:client-secret";
 const LOCAL_BUNKER_URI = "calendar:bunkerUri";
 const LOCAL_STORAGE_KEYS = "calendar:keys";
+const LOCAL_USER_DATA = "calendar:userData";
 
 type BunkerUri = { bunkerUri: string };
 
@@ -36,6 +38,46 @@ export const setBunkerUriInLocalStorage = (bunkerUri: string) => {
 
 export const setKeysInLocalStorage = (pubkey: string, secret?: string) => {
   localStorage.setItem(LOCAL_STORAGE_KEYS, JSON.stringify({ pubkey, secret }));
+};
+
+export const setUserDataInLocalStorage = (
+  user: IUser,
+  ttlInHours = USER_DATA_TTL_HOURS,
+) => {
+  const now = new Date();
+  const expiresAt = now.setHours(now.getHours() + ttlInHours);
+
+  const userData: UserData = {
+    user,
+    expiresAt,
+  };
+
+  localStorage.setItem(LOCAL_USER_DATA, JSON.stringify(userData));
+};
+
+export const getUserDataFromLocalStorage = (): { user: User } | null => {
+  const data = localStorage.getItem(LOCAL_USER_DATA);
+  if (!data) return null;
+
+  try {
+    const { user, expiresAt } = JSON.parse(data) as UserData;
+    const isExpired = Date.now() > expiresAt;
+
+    // Remove expired data
+    if (isExpired) {
+      localStorage.removeItem(LOCAL_USER_DATA);
+      return null;
+    }
+
+    return { user };
+  } catch (error) {
+    console.error("Failed to parse user data from localStorage", error);
+    return null;
+  }
+};
+
+export const removeUserDataFromLocalStorage = () => {
+  localStorage.removeItem(LOCAL_USER_DATA);
 };
 
 export const removeKeysFromLocalStorage = () => {

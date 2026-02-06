@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import { signerManager } from "../common/signer";
 import { getAppSecretKeyFromLocalStorage } from "../common/signer/utils";
@@ -21,7 +21,9 @@ import {
 } from "@mui/material";
 import KeyIcon from "@mui/icons-material/VpnKey";
 import LinkIcon from "@mui/icons-material/Link";
-// import { ThemedUniversalModal } from "./ThemedUniversalModal";
+import { NostrSignerPlugin } from "nostr-signer-capacitor-plugin";
+import { SignerAppInfo } from "nostr-signer-capacitor-plugin/dist/esm/definitions";
+import { isAndroidNative, isNative } from "../utils/platform";
 
 // NIP-46 Section (Manual + QR)
 interface Nip46SectionProps {
@@ -216,6 +218,41 @@ const LoginOptionButton: React.FC<{
   </Button>
 );
 
+function Nip55Section({ onClose }: { onClose: () => void }) {
+  const [installedSigners, setInstalledSigners] = useState<{
+    apps: SignerAppInfo[];
+  }>();
+
+  useEffect(() => {
+    const initialize = async () => {
+      const installedSigners = await NostrSignerPlugin.getInstalledSignerApps();
+      setInstalledSigners(installedSigners);
+    };
+    initialize();
+  }, []);
+  return (
+    <>
+      {installedSigners?.apps.map((app) => {
+        return (
+          <Button
+            onClick={async () => {
+              await signerManager.loginWithNip55(app.packageName);
+              onClose();
+            }}
+            startIcon={
+              <img src={app.iconUrl} height={24} width={24} alt={app.name} />
+            }
+            variant="contained"
+            fullWidth
+          >
+            Log In with {app.name}
+          </Button>
+        );
+      })}
+    </>
+  );
+}
+
 const LoginModal: React.FC<LoginModalProps> = ({ open, onClose }) => {
   const [showNip46, setShowNip46] = useState(false);
 
@@ -272,13 +309,16 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onClose }) => {
         </DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ width: "100%" }}>
-            <LoginOptionButton
-              icon={<KeyIcon />}
-              text="Sign in with Nostr Extension (NIP-07)"
-              type="contained"
-              onClick={handleNip07}
-              loading={loadingNip07}
-            />
+            {isAndroidNative() && <Nip55Section onClose={onClose} />}
+            {!isNative && (
+              <LoginOptionButton
+                icon={<KeyIcon />}
+                text="Sign in with Nostr Extension (NIP-07)"
+                type="contained"
+                onClick={handleNip07}
+                loading={loadingNip07}
+              />
+            )}
             <LoginOptionButton
               icon={<LinkIcon />}
               text="Connect with Remote Signer (NIP-46)"

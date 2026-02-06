@@ -4,7 +4,13 @@ import { signerManager } from "../common/signer";
 import { useTimeBasedEvents } from "./events";
 
 export interface IUser {
-  publicKey: string;
+  name?: string;
+  picture?: string;
+  pubkey: string;
+  privateKey?: string;
+  follows?: string[];
+  webOfTrust?: Set<string>;
+  about?: string;
 }
 
 let isInitializing = false;
@@ -57,17 +63,17 @@ const onUserChange = async () => {
     useUser.setState({
       isInitialized: true,
       user: {
-        publicKey: user,
+        pubkey: user,
       },
     });
-    hasUserChanged = currentUser?.publicKey !== user;
+    hasUserChanged = currentUser?.pubkey !== user;
   } catch (e) {
     if (e.message === "NO_SIGNER_AVAILABLE_AND_NO_LOGIN_REQUEST_REGISTERED") {
       useUser.setState({
         isInitialized: true,
         user: null,
       });
-      hasUserChanged = currentUser?.publicKey !== null;
+      hasUserChanged = currentUser?.pubkey !== null;
     }
     throw e;
   }

@@ -2,7 +2,7 @@ import { MenuItem } from "@mui/material";
 import { useUser } from "../stores/user";
 import { useIntl } from "react-intl";
 import { useEffect } from "react";
-import {npubEncode} from 'nostr-tools/nip19'
+import { npubEncode } from "nostr-tools/nip19";
 
 export const Auth = () => {
   const { user, updateLoginModal, logout, initializeUser } = useUser(
@@ -32,10 +32,10 @@ export const Auth = () => {
     }
   };
 
-  let npub: string | null = null
-  if(user?.publicKey){
-    npub = npubEncode(user.publicKey)
-    npub = `${npub.substring(0, 8)}...${npub.slice(-5)}`
+  let npub: string | null = null;
+  if (user?.pubkey) {
+    npub = npubEncode(user.pubkey);
+    npub = `${npub.substring(0, 8)}...${npub.slice(-5)}`;
   }
 
   const logoutElem = (
