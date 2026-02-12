@@ -69,30 +69,10 @@ export function WeekView({ events, date }: ViewProps) {
     setDialogOpen(true);
   };
 
-  const onDragEnd = ({ delta }: DragEndEvent) => {
-    if (!delta.y) return;
-    // setEvents((prev) =>
-    //   prev.map((e) =>
-    //     e.id === active.id
-    //       ? {
-    //           ...e,
-    //           start: dayjs(e.begin)
-    //             .add(delta.y / PX_PER_MINUTE, "minute")
-    //             .toDate()
-    //             .getTime(),
-    //           end: dayjs(e.end)
-    //             .add(delta.y / PX_PER_MINUTE, "minute")
-    //             .toDate()
-    //             .getTime(),
-    //         }
-    //       : e,
-    //   ),
-    // );
-  };
   const theme = useTheme();
 
   return (
-    <DndContext onDragEnd={onDragEnd}>
+    <DndContext>
       <Box display="flex" height={24 * 60}>
         {/* Time column */}
         <Box width={60}>
@@ -140,20 +120,20 @@ export function WeekView({ events, date }: ViewProps) {
                 {laidOut.map((e) => (
                   <CalendarEventCard key={e.id} event={e} />
                 ))}
-                {dialogOpen && (
-                  <CalendarEventEdit
-                    open={dialogOpen}
-                    event={null}
-                    initialDateTime={clickedDateTime}
-                    onClose={() => setDialogOpen(false)}
-                    mode="create"
-                  />
-                )}
               </Box>
             );
           })}
         </Box>
       </Box>
+      {dialogOpen && (
+        <CalendarEventEdit
+          open={dialogOpen}
+          event={null}
+          initialDateTime={clickedDateTime}
+          onClose={() => setDialogOpen(false)}
+          mode="create"
+        />
+      )}
     </DndContext>
   );
 }
