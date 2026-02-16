@@ -1,6 +1,7 @@
 import { generateSecretKey } from "nostr-tools";
 import { bytesToHex, hexToBytes } from "@noble/hashes/utils";
 import { IUser } from "../../stores/user";
+import { USER_DATA_TTL_HOURS } from "../../utils/constants";
 
 const LOCAL_APP_SECRET_KEY = "calendar:client-secret";
 const LOCAL_BUNKER_URI = "calendar:bunkerUri";
@@ -8,6 +9,11 @@ const LOCAL_STORAGE_KEYS = "calendar:keys";
 const LOCAL_USER_DATA = "calendar:userData";
 
 type BunkerUri = { bunkerUri: string };
+
+type UserData = {
+  user: IUser;
+  expiresAt: number;
+};
 
 type Keys = { pubkey: string; secret?: string };
 
@@ -55,7 +61,7 @@ export const setUserDataInLocalStorage = (
   localStorage.setItem(LOCAL_USER_DATA, JSON.stringify(userData));
 };
 
-export const getUserDataFromLocalStorage = (): { user: User } | null => {
+export const getUserDataFromLocalStorage = (): { user: IUser } | null => {
   const data = localStorage.getItem(LOCAL_USER_DATA);
   if (!data) return null;
 

@@ -23,7 +23,8 @@ export async function createNip46Signer(
     console.log("BUNKER CONNECTED");
     return wrapBunkerSigner(bunker);
   } else if (parsedUri.protocol === "nostrconnect:") {
-    return BunkerSigner.fromURI(clientSecretKey, uri, params);
+    const bunker = await BunkerSigner.fromURI(clientSecretKey, uri, params);
+    return wrapBunkerSigner(bunker);
   } else {
     console.log("URL PROTOCOL IS", parsedUri.protocol);
     throw new Error("INVALID URI");
