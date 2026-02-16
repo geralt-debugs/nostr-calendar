@@ -27,7 +27,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import ContentCopy from "@mui/icons-material/ContentCopy";
 import OpenInNew from "@mui/icons-material/OpenInNew";
 import Download from "@mui/icons-material/Download";
-import { exportICS } from "../common/utils";
+import { exportICS, isMobile } from "../common/utils";
 import { encodeNAddr } from "../common/nostr";
 import { getEventPage } from "../utils/routingHelper";
 
@@ -153,17 +153,21 @@ function ActionButtons({
   };
   return (
     <Box minWidth={"160px"}>
-      <IconButton onClick={copyLinkToEvent}>
-        <Tooltip title="Copy link to this event">
-          <ContentCopy />
-        </Tooltip>
-      </IconButton>
+      {!isMobile && (
+        <>
+          <IconButton onClick={copyLinkToEvent}>
+            <Tooltip title="Copy link to this event">
+              <ContentCopy />
+            </Tooltip>
+          </IconButton>
 
-      <IconButton component={Link} href={linkToEvent}>
-        <Tooltip title="Open event in new tab">
-          <OpenInNew />
-        </Tooltip>
-      </IconButton>
+          <IconButton component={Link} href={linkToEvent}>
+            <Tooltip title="Open event in new tab">
+              <OpenInNew />
+            </Tooltip>
+          </IconButton>
+        </>
+      )}
 
       <IconButton onClick={() => exportICS(event)}>
         <Tooltip title="Download event details">
