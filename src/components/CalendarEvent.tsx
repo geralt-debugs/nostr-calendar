@@ -30,6 +30,7 @@ import Download from "@mui/icons-material/Download";
 import { exportICS, isMobile } from "../common/utils";
 import { encodeNAddr } from "../common/nostr";
 import { getEventPage } from "../utils/routingHelper";
+import { isNative } from "../utils/platform";
 
 interface CalendarEventCardProps {
   event: PositionedEvent;
@@ -152,7 +153,7 @@ function ActionButtons({
     navigator.clipboard.writeText(`${window.location.origin}${linkToEvent}`);
   };
   return (
-    <Box minWidth={"160px"}>
+    <Box minWidth={isMobile ? "inherit" : "160px"}>
       {!isMobile && (
         <>
           <IconButton onClick={copyLinkToEvent}>
@@ -169,11 +170,13 @@ function ActionButtons({
         </>
       )}
 
-      <IconButton onClick={() => exportICS(event)}>
-        <Tooltip title="Download event details">
-          <Download />
-        </Tooltip>
-      </IconButton>
+      {!isNative && (
+        <IconButton onClick={() => exportICS(event)}>
+          <Tooltip title="Download event details">
+            <Download />
+          </Tooltip>
+        </IconButton>
+      )}
       <IconButton aria-label="close" onClick={closeModal}>
         <CloseIcon />
       </IconButton>

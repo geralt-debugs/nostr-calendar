@@ -13,6 +13,7 @@ import { DateLabel } from "./DateLabel";
 import { useDateWithRouting } from "../hooks/useDateWithRouting";
 import { isWeekend } from "../utils/dateHelper";
 import ShortcutIcon from "@mui/icons-material/Shortcut";
+import { isMobile } from "../common/utils";
 
 interface MonthViewProps {
   events: ICalendarEvent[];
@@ -85,20 +86,22 @@ export function MonthView({ events }: MonthViewProps) {
                 </Typography>
               ))}
           </Box>
-          <IconButton
-            className="goto-week"
-            sx={{
-              position: "absolute",
-              top: 0,
-              right: 0,
-            }}
-            title="go to week"
-            onClick={() => {
-              setDate(day, "week");
-            }}
-          >
-            <ShortcutIcon />
-          </IconButton>
+          {!isMobile && (
+            <IconButton
+              className="goto-week"
+              sx={{
+                position: "absolute",
+                top: 0,
+                right: 0,
+              }}
+              title="go to week"
+              onClick={() => {
+                setDate(day, "week");
+              }}
+            >
+              <ShortcutIcon />
+            </IconButton>
+          )}
         </StyledPaper>
       ))}
     </Box>
