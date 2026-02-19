@@ -269,7 +269,7 @@ export class BunkerSigner implements Signer {
     clientSecretKey: Uint8Array,
     connectionURI: string,
     params: BunkerSignerParams = {},
-    maxWait: number = 30 * 1000,
+    maxWait: number = 60 * 1000,
   ): Promise<BunkerSigner> {
     const signer = new BunkerSigner(clientSecretKey, params);
     const parsedURI = parseNostrConnectURI(connectionURI);
@@ -342,30 +342,35 @@ export class BunkerSigner implements Signer {
         kinds: [NostrConnect],
         authors: [this.bp.pubkey],
         "#p": [getPublicKey(this.secretKey)],
+        since: Math.floor(Date.now() / 1000) - 10,
       },
       {
         onevent: async (event: NostrEvent) => {
-          const o = JSON.parse(decrypt(event.content, convKey));
-          const { id, result, error } = o;
+          try {
+            const o = JSON.parse(decrypt(event.content, convKey));
+            const { id, result, error } = o;
 
-          if (result === "auth_url" && waitingForAuth[id]) {
-            delete waitingForAuth[id];
+            if (result === "auth_url" && waitingForAuth[id]) {
+              delete waitingForAuth[id];
 
-            if (params.onauth) {
-              params.onauth(error);
-            } else {
-              console.warn(
-                `nostr-tools/nip46: remote signer ${this.bp.pubkey} tried to send an "auth_url"='${error}' but there was no onauth() callback configured.`,
-              );
+              if (params.onauth) {
+                params.onauth(error);
+              } else {
+                console.warn(
+                  `nostr-tools/nip46: remote signer ${this.bp.pubkey} tried to send an "auth_url"='${error}' but there was no onauth() callback configured.`,
+                );
+              }
+              return;
             }
-            return;
-          }
 
-          const handler = listeners[id];
-          if (handler) {
-            if (error) handler.reject(error);
-            else if (result) handler.resolve(result);
-            delete listeners[id];
+            const handler = listeners[id];
+            if (handler) {
+              if (error) handler.reject(error);
+              else if (result) handler.resolve(result);
+              delete listeners[id];
+            }
+          } catch (e) {
+            console.warn("NIP-46: failed to process event from bunker", e);
           }
         },
         onclose: () => {
@@ -382,7 +387,11 @@ export class BunkerSigner implements Signer {
     this.subCloser!.close();
   }
 
-  async sendRequest(method: string, params: string[]): Promise<string> {
+  async sendRequest(
+    method: string,
+    params: string[],
+    timeout: number = 60_000,
+  ): Promise<string> {
     return new Promise(async (resolve, reject) => {
       try {
         if (!this.isOpen)
@@ -391,6 +400,16 @@ export class BunkerSigner implements Signer {
 
         this.serial++;
         const id = `${this.idPrefix}-${this.serial}`;
+
+        const timer = setTimeout(() => {
+          delete this.listeners[id];
+          delete this.waitingForAuth[id];
+          reject(
+            new Error(
+              `NIP-46 request "${method}" timed out after ${timeout / 1000}s (id=${id})`,
+            ),
+          );
+        }, timeout);
 
         const encryptedContent = encrypt(
           JSON.stringify({ id, method, params }),
@@ -409,7 +428,16 @@ export class BunkerSigner implements Signer {
         );
 
         // setup callback listener
-        this.listeners[id] = { resolve, reject };
+        this.listeners[id] = {
+          resolve: (result: string) => {
+            clearTimeout(timer);
+            resolve(result);
+          },
+          reject: (err: string) => {
+            clearTimeout(timer);
+            reject(new Error(err));
+          },
+        };
         this.waitingForAuth[id] = true;
 
         // publish the event
@@ -444,7 +472,12 @@ export class BunkerSigner implements Signer {
    */
   async getPublicKey(): Promise<string> {
     if (!this.cachedPubKey) {
-      this.cachedPubKey = await this.sendRequest("get_public_key", []);
+      this.cachedPubKey = await new Promise<string>((resolve, reject) => {
+        setTimeout(() => {
+          this.sendRequest("get_public_key", []).then(resolve, reject);
+        }, 5000);
+      });
+      // this.cachedPubKey = await this.sendRequest("get_public_key", []);
     }
     return this.cachedPubKey;
   }
@@ -616,3 +649,5 @@ export type BunkerProfile = {
   website: string;
   local: boolean;
 };
+
+export const Nip46Relays = ["wss://relay.nsec.app", "wss://nostr.oxtr.dev"];

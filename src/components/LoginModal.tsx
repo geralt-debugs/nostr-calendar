@@ -1,9 +1,9 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { QRCodeCanvas } from "qrcode.react";
 import { signerManager } from "../common/signer";
 import { getAppSecretKeyFromLocalStorage } from "../common/signer/utils";
 import { getPublicKey } from "nostr-tools";
-import { createNostrConnectURI } from "../common/signer/nip46";
+import { createNostrConnectURI, Nip46Relays } from "../common/signer/nip46";
 import {
   Button,
   Dialog,
@@ -17,11 +17,16 @@ import {
   Typography,
   Snackbar,
   Alert,
+  IconButton,
+  Box,
   // Link,
 } from "@mui/material";
 import KeyIcon from "@mui/icons-material/VpnKey";
 import LinkIcon from "@mui/icons-material/Link";
-// import { ThemedUniversalModal } from "./ThemedUniversalModal";
+import ContentCopyIcon from "@mui/icons-material/ContentCopy";
+import { NostrSignerPlugin } from "nostr-signer-capacitor-plugin";
+import { SignerAppInfo } from "nostr-signer-capacitor-plugin/dist/esm/definitions";
+import { isAndroidNative, isNative } from "../utils/platform";
 
 // NIP-46 Section (Manual + QR)
 interface Nip46SectionProps {
@@ -53,7 +58,7 @@ const Nip46Section: React.FC<Nip46SectionProps> = ({ onSuccess }) => {
     // Build query params
     const params = {
       clientPubkey,
-      relays: ["wss://relay.nsec.app"],
+      relays: Nip46Relays,
       secret,
       perms,
       name: "Calendar",
@@ -95,7 +100,8 @@ const Nip46Section: React.FC<Nip46SectionProps> = ({ onSuccess }) => {
     setLoadingConnect(true);
     try {
       await connectToBunkerUri(bunkerUri);
-    } catch {
+    } catch (e) {
+      console.log(e);
       showMessage("Connection failed.", "error");
     } finally {
       setLoadingConnect(false);
@@ -135,12 +141,47 @@ const Nip46Section: React.FC<Nip46SectionProps> = ({ onSuccess }) => {
         </Stack>
       )}
       {activeTab === "qr" && (
-        <div style={{ textAlign: "center", marginTop: 16 }}>
+        <Box style={{ textAlign: "center", marginTop: 16 }}>
           <QRCodeCanvas value={qrPayload} size={180} />
+          <Box
+            color="textSecondary"
+            sx={{
+              fontSize: 12,
+              marginTop: 1,
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            <IconButton
+              size="small"
+              sx={{ marginTop: 1 }}
+              onClick={() => {
+                navigator.clipboard.writeText(qrPayload);
+                showMessage("Copied to clipboard", "success");
+              }}
+            >
+              <ContentCopyIcon fontSize="small" />
+            </IconButton>
+            <Typography
+              color="textSecondary"
+              sx={{
+                fontSize: 12,
+                marginTop: 1,
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              Copy the nostrconnect URI
+            </Typography>
+          </Box>
           <Typography color="textSecondary" sx={{ fontSize: 12, marginTop: 1 }}>
-            Using relay.nsec.app for communication
+            Using{" "}
+            {Nip46Relays.map((relay) => relay.replace("wss://", "")).join(", ")}{" "}
+            for communication
           </Typography>
-        </div>
+        </Box>
       )}
       <Snackbar
         open={snackbar.open}
@@ -216,6 +257,51 @@ const LoginOptionButton: React.FC<{
   </Button>
 );
 
+function Nip55Section({
+  onClose,
+  onError,
+}: {
+  onClose: () => void;
+  onError: (error: string) => void;
+}) {
+  const [installedSigners, setInstalledSigners] = useState<{
+    apps: SignerAppInfo[];
+  }>();
+
+  useEffect(() => {
+    const initialize = async () => {
+      const installedSigners = await NostrSignerPlugin.getInstalledSignerApps();
+      setInstalledSigners(installedSigners);
+    };
+    initialize();
+  }, []);
+  return (
+    <>
+      {installedSigners?.apps.map((app) => {
+        return (
+          <Button
+            onClick={async () => {
+              try {
+                await signerManager.loginWithNip55(app.packageName);
+                onClose();
+              } catch (e: Error) {
+                onError(e.message);
+              }
+            }}
+            startIcon={
+              <img src={app.iconUrl} height={24} width={24} alt={app.name} />
+            }
+            variant="contained"
+            fullWidth
+          >
+            Log In with {app.name}
+          </Button>
+        );
+      })}
+    </>
+  );
+}
+
 const LoginModal: React.FC<LoginModalProps> = ({ open, onClose }) => {
   const [showNip46, setShowNip46] = useState(false);
 
@@ -272,13 +358,23 @@ const LoginModal: React.FC<LoginModalProps> = ({ open, onClose }) => {
         </DialogTitle>
         <DialogContent>
           <Stack spacing={2} sx={{ width: "100%" }}>
-            <LoginOptionButton
-              icon={<KeyIcon />}
-              text="Sign in with Nostr Extension (NIP-07)"
-              type="contained"
-              onClick={handleNip07}
-              loading={loadingNip07}
-            />
+            {isAndroidNative() && (
+              <Nip55Section
+                onClose={onClose}
+                onError={() =>
+                  showMessage("Could not login due to some error", "error")
+                }
+              />
+            )}
+            {!isNative && (
+              <LoginOptionButton
+                icon={<KeyIcon />}
+                text="Sign in with Nostr Extension (NIP-07)"
+                type="contained"
+                onClick={handleNip07}
+                loading={loadingNip07}
+              />
+            )}
             <LoginOptionButton
               icon={<LinkIcon />}
               text="Connect with Remote Signer (NIP-46)"

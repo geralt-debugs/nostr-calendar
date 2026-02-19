@@ -5,6 +5,8 @@ import {
   Box,
   Typography,
   Toolbar,
+  Dialog,
+  DialogContent,
 } from "@mui/material";
 import { theme } from "./theme";
 import { useEffect, useState } from "react";
@@ -75,14 +77,13 @@ function Application() {
       />
       {/* Loading State */}
       {!showModeSelection && !appMode && !user && (
-        <Box
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          minHeight="100vh"
-        >
-          <Typography>Loading...</Typography>
-        </Box>
+        <Dialog open>
+          <DialogContent>
+            <Box display="flex" justifyContent="center" alignItems="center">
+              <Typography>Logging in...</Typography>
+            </Box>
+          </DialogContent>
+        </Dialog>
       )}
       <LoginModal
         open={showLoginModal}
