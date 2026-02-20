@@ -1,14 +1,51 @@
 apply plugin: 'com.android.application'
 
+def keystorePropertiesPath = project.hasProperty('keystorePropertiesFile')
+    ? project.property('keystorePropertiesFile')
+    : null
+def keystoreProperties = new Properties()
+if (keystorePropertiesPath) {
+    def f = new File(keystorePropertiesPath)
+    if (f.exists()) {
+        keystoreProperties.load(new FileInputStream(f))
+    }
+}
+
+def envNames = [
+    storePassword: 'ANDROID_STORE_PASSWORD',
+    keyPassword:   'ANDROID_KEY_PASSWORD',
+]
+
+def prop = { String name ->
+    if (envNames[name]) {
+        def value = System.getenv(envNames[name])
+        if (value) return value
+    }
+    return keystoreProperties[name] ?: ''
+}
+
 android {
     namespace = "app.formstr.calendar"
     compileSdk = rootProject.ext.compileSdkVersion
+
+    signingConfigs {
+        release {
+            storeFile = file(prop('storeFile'))
+            storePassword = prop('storePassword')
+            keyAlias = prop('keyAlias')
+            keyPassword = prop('keyPassword')
+        }
+    }
+
     defaultConfig {
         applicationId "app.formstr.calendar"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+
+        def packageJson = new groovy.json.JsonSlurper().parse(file('../../package.json'))
+        def (major, minor, patch) = packageJson.version.tokenize('.').collect { it.toInteger() }
+        versionCode = major * 10000 + minor * 100 + patch
+        versionName = packageJson.version
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -18,6 +55,7 @@ android {
     }
     buildTypes {
         release {
+            signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
