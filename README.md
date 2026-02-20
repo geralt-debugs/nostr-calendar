@@ -1,4 +1,4 @@
-# Calendar by Formstr
+# Calendar by Form\*
 
 A decentralized calendar app built on [Nostr](https://nostr.com). No accounts, no servers, no data harvesting — just your keys and your events.
 
@@ -7,7 +7,7 @@ A decentralized calendar app built on [Nostr](https://nostr.com). No accounts, n
 
 ## Why
 
-Every calendar app today stores your schedule on someone else's server. Calendar by Formstr uses the Nostr protocol as its backend — your events live on relays you choose, signed with your keys, and only you control access.
+Every calendar app today stores your schedule on someone else's server. Calendar by Form\* uses the Nostr protocol as its backend — your events live on relays you choose, signed with your keys, and only you control access.
 
 Private events use **NIP-59 Gift Wrap encryption** — a three-layer envelope scheme where the event content is encrypted with a one-time view key, sealed with your identity, and wrapped for each recipient individually. Not even the relays can read your private events. This is a capability unique to Nostr that traditional calendar apps simply cannot offer.
 
@@ -44,16 +44,16 @@ The view key can also be embedded in a shareable URL (`/event/{naddr}?viewKey={n
 
 ## Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Framework | React 19 + TypeScript |
-| Build | Vite 7 |
-| UI | Material UI 7 |
-| State | Zustand 5 |
-| Routing | React Router 7 |
-| Nostr | nostr-tools 2.15 |
-| Mobile | Capacitor 8 (Android) |
-| Animations | Framer Motion |
+| Layer      | Technology            |
+| ---------- | --------------------- |
+| Framework  | React 19 + TypeScript |
+| Build      | Vite 7                |
+| UI         | Material UI 7         |
+| State      | Zustand 5             |
+| Routing    | React Router 7        |
+| Nostr      | nostr-tools 2.15      |
+| Mobile     | Capacitor 8 (Android) |
+| Animations | Framer Motion         |
 
 ## Getting Started
 
@@ -87,15 +87,15 @@ pnpm release-android     # signed APK + GitHub release
 
 ## Nostr Event Kinds
 
-| Kind | Purpose |
-|---|---|
-| 31923 | Public calendar event |
-| 31925 | Public RSVP |
-| 32678 | Encrypted private calendar event |
+| Kind  | Purpose                           |
+| ----- | --------------------------------- |
+| 31923 | Public calendar event             |
+| 31925 | Public RSVP                       |
+| 32678 | Encrypted private calendar event  |
 | 32679 | Encrypted private recurring event |
-| 32069 | Encrypted private RSVP |
-| 1052 | Gift wrap for private events |
-| 1055 | Gift wrap for private RSVPs |
+| 32069 | Encrypted private RSVP            |
+| 1052  | Gift wrap for private events      |
+| 1055  | Gift wrap for private RSVPs       |
 
 ## Contributing
 
