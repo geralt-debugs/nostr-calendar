@@ -37,12 +37,15 @@ ANDROID_KEY_PASSWORD="$KEY_PASS" \
     ./android/gradlew -p android assembleRelease \
     -PkeystorePropertiesFile="$KEYSTORE_PROPS"
 
-APK_PATH="android/app/build/outputs/apk/release/app-release.apk"
+APK_BUILD_PATH="android/app/build/outputs/apk/release/app-release.apk"
 
-if [ ! -f "$APK_PATH" ]; then
-    echo "Error: APK not found at $APK_PATH"
+if [ ! -f "$APK_BUILD_PATH" ]; then
+    echo "Error: APK not found at $APK_BUILD_PATH"
     exit 1
 fi
+
+APK_PATH="android/app/build/outputs/apk/release/nostr-calendar-${VERSION}.apk"
+cp "$APK_BUILD_PATH" "$APK_PATH"
 
 echo ""
 echo "APK built: $APK_PATH"
