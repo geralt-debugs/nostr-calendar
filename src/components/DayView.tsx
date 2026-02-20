@@ -10,6 +10,7 @@ import { TimeMarker } from "./TimeMarker";
 import { useRef, useState } from "react";
 import CalendarEventEdit from "./CalendarEventEdit";
 import { ViewProps } from "./SwipeableView";
+import { isEventInDateRange } from "../utils/repeatingEventsHelper";
 
 dayjs.extend(weekday);
 dayjs.extend(isSameOrBefore);
@@ -17,7 +18,13 @@ dayjs.extend(isSameOrAfter);
 
 export function DayView({ events, date }: ViewProps) {
   const dayEvents = layoutDayEvents(
-    events.filter((e) => dayjs(e.begin).isSame(date, "day")),
+    events.filter((e) =>
+      isEventInDateRange(
+        e,
+        date.unix() * 1000,
+        date.unix() * 1000 + 24 * 60 * 60 * 1000,
+      ),
+    ),
   );
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
