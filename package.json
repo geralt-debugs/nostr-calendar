@@ -1,15 +1,17 @@
 {
   "name": "nostr-calendar",
-  "private": true,
-  "version": "0.0.2",
+  "version": "0.0.3",
   "type": "module",
+  "repository": {
+    "url": "https://github.com/formstr-hq/nostr-calendar"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
     "preview": "vite preview",
     "simulate-android": "pnpm build && ANDROID_SDK_ROOT=/home/rama/Android/Sdk pnpm cap run android",
-    "build-android": "pnpm build && ANDROID_SDK_ROOT=/home/rama/Android/Sdk pnpm cap build android",
+    "release-android": "./scripts/build-release.sh",
     "simulate-ios": "pnpm cap run ios",
     "build-ios": "pnpm cap build ios"
   },

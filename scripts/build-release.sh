@@ -44,7 +44,7 @@ if [ ! -f "$APK_BUILD_PATH" ]; then
     exit 1
 fi
 
-APK_PATH="android/app/build/outputs/apk/release/nostr-calendar-${VERSION}.apk"
+APK_PATH="android/app/build/outputs/apk/release/formstr-calendar-${VERSION}.apk"
 cp "$APK_BUILD_PATH" "$APK_PATH"
 
 echo ""
