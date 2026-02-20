@@ -2,7 +2,7 @@
 
 ## App Name
 
-Calendar by Form\*
+Calendar by Form\*(beta)
 
 ## Short Description (80 chars)
 
