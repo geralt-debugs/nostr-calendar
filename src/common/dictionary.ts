@@ -38,7 +38,7 @@ const dictionary: NestedObject = {
       showPublicEvents: "Show Public Events",
     },
     message: {
-      title: "Calendar by Formstr",
+      title: "Calendar by Form*",
       modeSelection_description: "Choose how you'd like to use the calendar",
       modeSelection_loginButton: "Login with Nostr",
       modeSelection_guestButton: "Continue as Guest",

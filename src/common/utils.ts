@@ -49,7 +49,7 @@ export const exportICS = (calendarEvent: ICalendarEvent) => {
 
   let icsContent = `BEGIN:VCALENDAR
 VERSION:2.0
-PRODID:-//Formstr Inc//Calendar By Formstr//EN
+PRODID:-//Formstr Inc//Calendar By Form*//EN
 BEGIN:VEVENT
 UID:${uid}
 DTSTAMP:${dtstamp}

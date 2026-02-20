@@ -28,12 +28,14 @@ android {
     namespace = "app.formstr.calendar"
     compileSdk = rootProject.ext.compileSdkVersion
 
-    signingConfigs {
-        release {
-            storeFile = file(prop('storeFile'))
-            storePassword = prop('storePassword')
-            keyAlias = prop('keyAlias')
-            keyPassword = prop('keyPassword')
+    if (keystorePropertiesPath) {
+        signingConfigs {
+            release {
+                storeFile = file(prop('storeFile'))
+                storePassword = prop('storePassword')
+                keyAlias = prop('keyAlias')
+                keyPassword = prop('keyPassword')
+            }
         }
     }
 
@@ -55,7 +57,9 @@ android {
     }
     buildTypes {
         release {
-            signingConfig signingConfigs.release
+            if (keystorePropertiesPath) {
+                signingConfig signingConfigs.release
+            }
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }

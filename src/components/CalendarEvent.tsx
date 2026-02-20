@@ -123,7 +123,9 @@ export function CalendarEventCard({
             justifyContent: "space-between",
           }}
         >
-          <Typography variant="h5">{title}</Typography>
+          <Typography component={"p"} variant="h5">
+            {title}
+          </Typography>
           <ActionButtons event={event} closeModal={handleClose} />
         </DialogTitle>
         <DialogContent dividers>
@@ -187,6 +189,7 @@ function ActionButtons({
 function CalendarEvent({ event }: CalendarEventViewProps) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
+  const locations = event.location.filter((location) => !!location?.trim?.());
   return (
     <Box
       sx={{
@@ -234,20 +237,24 @@ function CalendarEvent({ event }: CalendarEventViewProps) {
             </>
           )}
 
-          {event.location.length > 0 && (
+          {locations.length > 0 && (
             <>
               <Typography variant="subtitle1">Location</Typography>
-              <Typography>{event.location.join(", ")}</Typography>
+              <Typography>{locations.join(", ")}</Typography>
 
               <Divider />
             </>
           )}
 
-          <Box>
-            <Typography fontWeight={600}>Participants</Typography>
-            <Stack direction="row" spacing={1} flexWrap="wrap">
+          <Box display={"flex"} flexWrap={"wrap"} gap={1}>
+            <Typography width={"100%"} fontWeight={600}>
+              Participants
+            </Typography>
+            <Stack direction="row" gap={0.5} flexWrap="wrap">
               {event.participants.map((p) => (
-                <Participant pubKey={p} />
+                <Box width={"100%"} key={p}>
+                  <Participant pubKey={p} />
+                </Box>
               ))}
             </Stack>
           </Box>
