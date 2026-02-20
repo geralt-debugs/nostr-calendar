@@ -13,6 +13,7 @@ import { TimeMarker } from "./TimeMarker";
 import { useRef, useState } from "react";
 import CalendarEventEdit from "./CalendarEventEdit";
 import { ViewProps } from "./SwipeableView";
+import { isEventInDateRange } from "../utils/repeatingEventsHelper";
 
 dayjs.extend(weekday);
 dayjs.extend(isSameOrBefore);
@@ -87,7 +88,13 @@ export function WeekView({ events, date }: ViewProps) {
         <Box flex={1} display="grid" gridTemplateColumns="repeat(7, 1fr)">
           {days.map((day) => {
             const laidOut = layoutDayEvents(
-              events.filter((e) => dayjs(e.begin).isSame(day, "day")),
+              events.filter((e) =>
+                isEventInDateRange(
+                  e,
+                  day.unix() * 1000,
+                  day.unix() * 1000 + 24 * 60 * 60 * 1000,
+                ),
+              ),
             );
 
             return (

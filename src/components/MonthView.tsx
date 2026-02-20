@@ -14,6 +14,7 @@ import { useDateWithRouting } from "../hooks/useDateWithRouting";
 import { isWeekend } from "../utils/dateHelper";
 import ShortcutIcon from "@mui/icons-material/Shortcut";
 import { isMobile } from "../common/utils";
+import { isEventInDateRange } from "../utils/repeatingEventsHelper";
 
 interface MonthViewProps {
   events: ICalendarEvent[];
@@ -78,7 +79,13 @@ export function MonthView({ events }: MonthViewProps) {
           <DateLabel day={day} />
           <Box display={"flex"} flexDirection={"column"}>
             {events
-              .filter((e) => dayjs(e.begin).isSame(day, "day"))
+              .filter((e) =>
+                isEventInDateRange(
+                  e,
+                  day.unix() * 1000,
+                  day.unix() * 1000 + 24 * 60 * 60 * 1000,
+                ),
+              )
               .slice(0, 3)
               .map((e) => (
                 <Typography key={e.id} variant="caption" noWrap>
