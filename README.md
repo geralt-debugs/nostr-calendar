@@ -18,13 +18,13 @@ Private events use **NIP-59 Gift Wrap encryption** — a three-layer envelope sc
 - **Shareable view links** — share private events via URL with an embedded view key, no login required for recipients
 - **Public events** — browse and create events visible to the global Nostr network
 - **Participant invites** — add people by npub, they receive encrypted gift wraps with the event details
-- **RSVP system** — accept, decline, or mark tentative, with encrypted RSVPs for private events
+- **RSVP system**(Coming Soon) — accept, decline, or mark tentative, with encrypted RSVPs for private events
 - **Recurring events** — daily, weekly, weekdays, monthly, quarterly, yearly
 - **ICS export** — download any event as `.ics` for import into other calendar apps
 - **Markdown descriptions** — full GitHub-flavored Markdown support in event descriptions
 - **Multiple sign-in methods** — browser extensions (NIP-07), remote signers/bunkers (NIP-46), Android signer apps like Amber (NIP-55), or local keys
 - **Guest mode** — browse public events without logging in
-- **i18n** — English and German
+- **i18n** — English and German(Partial)
 
 ## How Private Events Work
 

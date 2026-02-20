@@ -15,19 +15,14 @@ Your calendar is one of the most personal things you own — it knows where you'
 Calendar by Form\* is a fully decentralized calendar app built on the Nostr protocol. There are no accounts to create, no servers storing your data, and no company reading your schedule. You sign in with your Nostr keys, and your events are stored across relays that you choose.
 
 TRULY PRIVATE EVENTS
-Most "private" calendar apps just hide events behind a login. Calendar by Form\* goes further — private events are end-to-end encrypted using NIP-59 Gift Wrap, a three-layer encryption scheme where not even the relays that store your events can read them. Each participant receives their own individually encrypted copy. This level of privacy is unique to Nostr and simply isn't possible with traditional calendar services.
-
-SHARE WITHOUT COMPROMISING
-Need to share a private event with someone? Generate a shareable link with an embedded view key. Recipients can see the event details without needing an account or logging in — but only if they have the link.
+Most "private" calendar apps just hide events behind a login. Calendar by Form\* goes further — private events are end-to-end encrypted using NIP-59 Gift Wrap, a three-layer encryption scheme where not even the relays that store your events can read them. Each participant receives their own encrypted copy. This level of privacy is unique to Nostr and simply isn't possible with traditional calendar services.
 
 EVERYTHING YOU EXPECT FROM A CALENDAR
 
 - Day, Week, and Month views with smooth swipe navigation
 - Create public or private events with rich Markdown descriptions
 - Invite participants by their Nostr public key
-- RSVP to events — accept, decline, or mark as tentative
 - Recurring events: daily, weekly, weekdays, monthly, quarterly, yearly
-- Export any event as .ics for import into other apps
 - Add locations, images, and categories to events
 
 WORKS WITH YOUR NOSTR IDENTITY
