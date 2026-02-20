@@ -9,6 +9,9 @@ images:
   - assets/month-view.png
   - assets/day-view.png
   - assets/event-create.png
+blossom_servers:
+  - https://cdn.zapstore.dev
+  - https://blossom.band
 tags:
   - calendar
   - schedule
