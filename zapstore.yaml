@@ -4,11 +4,11 @@ summary: A private, decentralized calendar powered by Nostr. Your schedule, your
 website: https://calendar.formstr.app
 images:
   - assets/login.png
+  - assets/event-view.png
   - assets/week-view.png
   - assets/month-view.png
   - assets/day-view.png
   - assets/event-create.png
-  - assets/event-view.png
 tags:
   - calendar
   - schedule
