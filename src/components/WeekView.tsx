@@ -63,7 +63,7 @@ export function WeekView({ events, date }: ViewProps) {
   const [clickedDateTime, setClickedDateTime] = useState<number | undefined>();
 
   const handleCellClick = (event: React.MouseEvent<HTMLDivElement>) => {
-    const time = getTimeFromCell(event, containerRef, 1);
+    const time = getTimeFromCell(event, containerRef);
     if (time) {
       setClickedDateTime(time);
     }

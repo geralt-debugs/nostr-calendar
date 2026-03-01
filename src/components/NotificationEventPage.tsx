@@ -1,0 +1,33 @@
+import { useNavigate, useParams } from "react-router";
+import { useTimeBasedEvents } from "../stores/events";
+import { CalendarEvent } from "./CalendarEvent";
+import { Box, IconButton, Toolbar, Typography } from "@mui/material";
+import ArrowBack from "@mui/icons-material/ArrowBack";
+import { Header } from "./Header";
+
+export const NotificationEventPage = () => {
+  const { eventId } = useParams<{ eventId: string }>();
+  const navigate = useNavigate();
+  const events = useTimeBasedEvents((s) => s.events);
+  const event = events.find((e) => e.eventId === eventId);
+
+  return (
+    <>
+      <Header />
+      <Toolbar />
+      <Box sx={{ p: 2 }}>
+        <Box sx={{ display: "flex", alignItems: "center", gap: 1, mb: 2 }}>
+          <IconButton onClick={() => navigate(-1)}>
+            <ArrowBack />
+          </IconButton>
+          <Typography variant="h5">{event?.title ?? "Event"}</Typography>
+        </Box>
+        {event ? (
+          <CalendarEvent event={event} />
+        ) : (
+          <Typography>Event not found. It may not have loaded yet.</Typography>
+        )}
+      </Box>
+    </>
+  );
+};

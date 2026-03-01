@@ -30,7 +30,7 @@ export const TimeRenderer = ({
       <Box sx={{ display: "flex", alignItems: "center", gap: "8px" }}>
         <AccessTimeIcon />
         <Typography>
-          {dayjs(begin).format("ddd, d MMMM YYYY ⋅ HH:mm -")}{" "}
+          {dayjs(begin).format("ddd, DD MMMM YYYY ⋅ HH:mm -")}{" "}
           {dayjs(end).format("HH:mm")}
         </Typography>
       </Box>

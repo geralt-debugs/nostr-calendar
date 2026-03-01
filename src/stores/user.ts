@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { setItem } from "../common/localStorage";
 import { signerManager } from "../common/signer";
 import { useTimeBasedEvents } from "./events";
+import { cancelAllNotifications } from "../utils/notifications";
 
 export interface IUser {
   name?: string;
@@ -39,6 +40,7 @@ export const useUser = create<{
   },
   logout: () => {
     signerManager.logout();
+    cancelAllNotifications();
     set({ user: null });
     localStorage.removeItem(USER_STORAGE_KEY);
   },
