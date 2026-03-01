@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { setItem } from "../common/localStorage";
 import { signerManager } from "../common/signer";
-import { useTimeBasedEvents } from "./events";
+import { useTimeBasedEvents, EVENTS_STORAGE_KEY } from "./events";
 import { cancelAllNotifications } from "../utils/notifications";
 
 export interface IUser {
@@ -43,6 +43,7 @@ export const useUser = create<{
     cancelAllNotifications();
     set({ user: null });
     localStorage.removeItem(USER_STORAGE_KEY);
+    localStorage.removeItem(EVENTS_STORAGE_KEY);
   },
 
   initializeUser: async () => {

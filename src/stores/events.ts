@@ -19,6 +19,15 @@ import { nostrEventToCalendar } from "../utils/parser";
 import { RSVPResponse } from "../utils/types";
 import type { ICalendarEvent } from "../utils/types";
 import { scheduleEventNotifications } from "../utils/notifications";
+import { getItem, setItem } from "../common/localStorage";
+
+export const EVENTS_STORAGE_KEY = "cal:events";
+
+const cachedEvents: ICalendarEvent[] = getItem(EVENTS_STORAGE_KEY, []);
+
+const saveEventsToStorage = (events: ICalendarEvent[]) => {
+  setItem(EVENTS_STORAGE_KEY, events);
+};
 
 let subscriptionCloser: SubCloser | undefined;
 let privateSubloser: SubCloser | undefined;
@@ -91,9 +100,11 @@ const processPrivateEvent = (
   }
   console.log(parsedEvent);
   scheduleEventNotifications(parsedEvent);
+  const updatedEvents = denormalize(store);
+  saveEventsToStorage(updatedEvents);
   useTimeBasedEvents.setState({
     eventById: store.byKey,
-    events: denormalize(store),
+    events: updatedEvents,
   });
 };
 
@@ -139,9 +150,11 @@ export const useTimeBasedEvents = create<{
       };
     });
   },
-  events: [],
+  events: cachedEvents,
   eventIds: [],
-  eventById: {},
+  eventById: Object.fromEntries(
+    cachedEvents.map((e: ICalendarEvent) => [e.id, e]),
+  ),
   getTimeRangeConfig,
   updateTimeRangeConfig: (newConfig) => {
     Object.assign(getTimeRangeConfig(), newConfig);
@@ -214,9 +227,11 @@ export const useTimeBasedEvents = create<{
             store = appendOne(store, parsedEvent.id, parsedEvent);
           }
           scheduleEventNotifications(parsedEvent);
+          const updatedEvents = denormalize(store);
+          saveEventsToStorage(updatedEvents);
           return {
             eventById: store.byKey,
-            events: denormalize(store),
+            events: updatedEvents,
           };
         });
       },
