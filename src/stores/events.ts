@@ -18,6 +18,7 @@ import { SubCloser } from "nostr-tools/abstract-pool";
 import { nostrEventToCalendar } from "../utils/parser";
 import { RSVPResponse } from "../utils/types";
 import type { ICalendarEvent } from "../utils/types";
+import { scheduleEventNotifications } from "../utils/notifications";
 
 let subscriptionCloser: SubCloser | undefined;
 let privateSubloser: SubCloser | undefined;
@@ -88,6 +89,7 @@ const processPrivateEvent = (
       store = appendOne(store, parsedEvent.id, parsedEvent);
     }
   }
+  scheduleEventNotifications(parsedEvent);
   useTimeBasedEvents.setState({
     eventById: store.byKey,
     events: denormalize(store),
@@ -210,6 +212,7 @@ export const useTimeBasedEvents = create<{
           } else {
             store = appendOne(store, parsedEvent.id, parsedEvent);
           }
+          scheduleEventNotifications(parsedEvent);
           return {
             eventById: store.byKey,
             events: denormalize(store),

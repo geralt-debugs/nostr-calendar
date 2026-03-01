@@ -25,12 +25,13 @@ export const TimeRenderer = ({
   end: number;
   repeat: ICalendarEvent["repeat"];
 }) => {
+  console.log(begin);
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: "8px" }}>
       <Box sx={{ display: "flex", alignItems: "center", gap: "8px" }}>
         <AccessTimeIcon />
         <Typography>
-          {dayjs(begin).format("ddd, d MMMM YYYY ⋅ HH:mm -")}{" "}
+          {dayjs(begin).format("ddd, DD MMMM YYYY ⋅ HH:mm -")}{" "}
           {dayjs(end).format("HH:mm")}
         </Typography>
       </Box>
