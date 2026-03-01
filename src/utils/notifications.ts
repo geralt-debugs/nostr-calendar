@@ -94,6 +94,41 @@ export async function scheduleEventNotifications(
   }
 }
 
+export function addNotificationClickListener(
+  onEventClick: (eventId: string) => void,
+): () => void {
+  if (!isNative) return () => {};
+
+  const listener = LocalNotifications.addListener(
+    "localNotificationActionPerformed",
+    (action) => {
+      const eventId = (
+        action.notification.extra as Record<string, string> | undefined
+      )?.eventId;
+      if (eventId) {
+        onEventClick(eventId);
+      }
+    },
+  );
+
+  return () => {
+    listener.then((l) => l.remove());
+  };
+}
+
+export async function cancelAllNotifications(): Promise<void> {
+  if (!isNative) return;
+  try {
+    const { notifications } = await LocalNotifications.getPending();
+    if (notifications.length > 0) {
+      await LocalNotifications.cancel({ notifications });
+    }
+    scheduledEventIds.clear();
+  } catch (err) {
+    console.warn("Failed to cancel all notifications", err);
+  }
+}
+
 export async function cancelEventNotifications(eventId: string): Promise<void> {
   if (!isNative) return;
   if (!scheduledEventIds.has(eventId)) return;

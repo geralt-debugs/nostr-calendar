@@ -15,11 +15,12 @@ import { IntlProvider } from "react-intl";
 import { flattenMessages } from "./common/utils";
 import dictionary from "./common/dictionary";
 import LoginModal from "./components/LoginModal";
-import { BrowserRouter } from "react-router";
+import { BrowserRouter, useNavigate } from "react-router";
 import { Routing } from "./components/Routing";
 import { Header } from "./components/Header";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import { addNotificationClickListener } from "./utils/notifications";
 
 let _locale =
   (navigator.languages && navigator.languages[0]) ||
@@ -37,10 +38,17 @@ function Application() {
   } = useUser();
   const [appMode, setAppMode] = useState<"login" | "guest" | null>(null);
   const [showModeSelection, setShowModeSelection] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     initializeUser();
   }, []);
+
+  useEffect(() => {
+    return addNotificationClickListener((eventId) => {
+      navigate(`/notification-event/${eventId}`);
+    });
+  }, [navigate]);
 
   useEffect(() => {
     if (!user && !appMode && isInitialized) {

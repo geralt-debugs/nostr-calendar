@@ -25,7 +25,6 @@ export const TimeRenderer = ({
   end: number;
   repeat: ICalendarEvent["repeat"];
 }) => {
-  console.log(begin);
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: "8px" }}>
       <Box sx={{ display: "flex", alignItems: "center", gap: "8px" }}>

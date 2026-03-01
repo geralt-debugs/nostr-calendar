@@ -37,7 +37,7 @@ interface CalendarEventCardProps {
   offset?: string;
 }
 
-interface CalendarEventViewProps {
+export interface CalendarEventViewProps {
   event: ICalendarEvent;
 }
 
@@ -186,7 +186,7 @@ function ActionButtons({
   );
 }
 
-function CalendarEvent({ event }: CalendarEventViewProps) {
+export function CalendarEvent({ event }: CalendarEventViewProps) {
   const theme = useTheme();
   const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
   const locations = event.location.filter((location) => !!location?.trim?.());
