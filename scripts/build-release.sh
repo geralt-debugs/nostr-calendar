@@ -22,8 +22,6 @@ fi
 
 read -s -p "Enter keystore password: " STORE_PASS
 echo
-read -s -p "Enter key password: " KEY_PASS
-echo
 
 echo "Building web assets..."
 pnpm build
@@ -33,7 +31,7 @@ pnpm cap sync android
 
 echo "Building signed APK..."
 ANDROID_STORE_PASSWORD="$STORE_PASS" \
-ANDROID_KEY_PASSWORD="$KEY_PASS" \
+ANDROID_KEY_PASSWORD="$STORE_PASS" \
     ./android/gradlew -p android assembleRelease \
     -PkeystorePropertiesFile="$KEYSTORE_PROPS"
 
