@@ -83,6 +83,16 @@ class Signer {
   }
   private async loginWithGuestKey(pubkey: string, privkey: string) {
     this.signer = createLocalSigner(privkey);
+
+    // Restore user data from localStorage cache if not already set
+    if (!this.user) {
+      const cached = getUserDataFromLocalStorage();
+      this.user = cached?.user ?? {
+        pubkey,
+        name: ANONYMOUS_USER_NAME,
+        picture: DEFAULT_IMAGE_URL,
+      };
+    }
   }
 
   async loginWithNsec(nsec: string) {
@@ -95,14 +105,8 @@ class Signer {
 
     const pubkey = await this.signer.getPublicKey();
 
-    const kind0 = await fetchUserProfile(pubkey);
-    const userData = kind0
-      ? { ...JSON.parse(kind0.content), pubkey }
-      : { pubkey, name: ANONYMOUS_USER_NAME, picture: DEFAULT_IMAGE_URL };
-    this.user = userData;
-
+    await this.saveUser(pubkey);
     await saveNsec(nsec);
-    setUserDataInLocalStorage(userData);
 
     this.notify();
   }
@@ -115,8 +119,17 @@ class Signer {
 
     const pubkey = await this.signer.getPublicKey();
 
+    const userData: IUser = {
+      pubkey,
+      name: userMetadata.name || ANONYMOUS_USER_NAME,
+      picture: userMetadata.picture || DEFAULT_IMAGE_URL,
+      about: userMetadata.about,
+    };
+    this.user = userData;
+
     // Save keys and user data
     setKeysInLocalStorage(pubkey, privkey);
+    setUserDataInLocalStorage(userData);
     this.notify();
   }
 
@@ -126,6 +139,7 @@ class Signer {
       ? { ...JSON.parse(kind0.content), pubkey }
       : { pubkey, name: ANONYMOUS_USER_NAME, picture: DEFAULT_IMAGE_URL };
     this.user = userData;
+    setUserDataInLocalStorage(userData);
     return userData;
   }
 
@@ -159,14 +173,12 @@ class Signer {
     const pubkey = await signer.getPublicKey();
 
     // Step 2: fetch kind0 profile
-    const userData = await this.saveUser(pubkey);
+    await this.saveUser(pubkey);
 
     // Step 3: save signer and user
     this.signer = signer;
 
     await saveNip55Credentials(packageName, pubkey);
-
-    setUserDataInLocalStorage(userData);
     this.notify();
   }
 
