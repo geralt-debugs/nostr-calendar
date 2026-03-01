@@ -13,7 +13,9 @@
     "simulate-android": "pnpm build && ANDROID_SDK_ROOT=/home/rama/Android/Sdk pnpm cap run android",
     "release-android": "./scripts/build-release.sh",
     "simulate-ios": "pnpm cap run ios",
-    "build-ios": "pnpm cap build ios"
+    "build-ios": "pnpm cap build ios",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "@capacitor/android": "^8.0.0",
@@ -47,6 +49,7 @@
     "react-select": "^5.10.2",
     "remark-gfm": "^4.0.1",
     "uuid": "^11.1.0",
+    "vitest": "^4.0.18",
     "zustand": "^5.0.6"
   },
   "devDependencies": {

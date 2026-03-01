@@ -1,8 +1,10 @@
 import { LocalNotifications } from "@capacitor/local-notifications";
 import { isNative } from "./platform";
 import type { ICalendarEvent } from "./types";
+import { RepeatingFrequency } from "./types";
+import { getNextOccurrenceInRange } from "./repeatingEventsHelper";
 
-const scheduledEventIds = new Set<string>();
+const scheduledNotificationKeys = new Set<string>();
 let initialized = false;
 
 /**
@@ -15,9 +17,10 @@ async function initScheduledIds(): Promise<void> {
   try {
     const { notifications } = await LocalNotifications.getPending();
     for (const n of notifications) {
-      const eventId = (n.extra as Record<string, string> | undefined)?.eventId;
-      if (eventId) {
-        scheduledEventIds.add(eventId);
+      const key = (n.extra as Record<string, string> | undefined)
+        ?.notificationKey;
+      if (key) {
+        scheduledNotificationKeys.add(key);
       }
     }
   } catch (err) {
@@ -26,8 +29,8 @@ async function initScheduledIds(): Promise<void> {
 }
 
 /**
- * Generate a stable numeric ID from a string event ID.
- * Uses two IDs per event: base for "10 min before", base+1 for "at event time".
+ * Generate a stable numeric ID from a string key.
+ * Uses two IDs per occurrence: base for "10 min before", base+1 for "at event time".
  */
 function hashToNumber(str: string): number {
   let hash = 0;
@@ -38,6 +41,20 @@ function hashToNumber(str: string): number {
   return (Math.abs(hash) >> 1) * 2;
 }
 
+/**
+ * Build a unique key for a specific occurrence of an event.
+ * For non-repeating events, this is just the eventId.
+ * For repeating events, it includes the occurrence start time.
+ */
+function buildNotificationKey(
+  eventId: string,
+  occurrenceStart: number,
+  isRepeating: boolean,
+): string {
+  if (!isRepeating) return eventId;
+  return `${eventId}:${occurrenceStart}`;
+}
+
 export async function scheduleEventNotifications(
   event: ICalendarEvent,
 ): Promise<void> {
@@ -45,21 +62,46 @@ export async function scheduleEventNotifications(
 
   await initScheduledIds();
 
-  if (scheduledEventIds.has(event.eventId)) return;
-
   const now = Date.now();
-  const tenMinBefore = event.begin - 10 * 60 * 1000;
+  const twoDaysFromNow = now + 2 * 24 * 60 * 60 * 1000;
 
-  // Skip if the event has already started
-  if (event.begin <= now) return;
+  const isRepeating =
+    !!event.repeat?.frequency &&
+    event.repeat.frequency !== RepeatingFrequency.None;
 
-  const baseId = hashToNumber(event.eventId);
+  // Determine the occurrence start time to schedule for
+  let occurrenceStart: number;
+
+  if (isRepeating) {
+    const nextOccurrence = getNextOccurrenceInRange(event, now, twoDaysFromNow);
+    if (nextOccurrence === null) return;
+    occurrenceStart = nextOccurrence;
+  } else {
+    // Non-repeating: skip if already started
+    if (event.begin <= now) return;
+    // Skip if more than 2 days away
+    if (event.begin > twoDaysFromNow) return;
+    occurrenceStart = event.begin;
+  }
+
+  const notificationKey = buildNotificationKey(
+    event.eventId,
+    occurrenceStart,
+    isRepeating,
+  );
+
+  // Already scheduled for this specific occurrence
+  if (scheduledNotificationKeys.has(notificationKey)) return;
+
+  const baseId = hashToNumber(notificationKey);
+  const tenMinBefore = occurrenceStart - 10 * 60 * 1000;
+
   const notifications: Array<{
     id: number;
     title: string;
     body: string;
     schedule: { at: Date; allowWhileIdle: boolean };
-    extra: { eventId: string };
+    extra: { eventId: string; notificationKey: string };
   }> = [];
 
   if (tenMinBefore > now) {
@@ -68,17 +110,19 @@ export async function scheduleEventNotifications(
       title: `Upcoming: ${event.title}`,
       body: `Starts in 10 minutes`,
       schedule: { at: new Date(tenMinBefore), allowWhileIdle: true },
-      extra: { eventId: event.eventId },
+      extra: { eventId: event.eventId, notificationKey },
     });
   }
 
-  notifications.push({
-    id: baseId + 1,
-    title: event.title,
-    body: `Starting now`,
-    schedule: { at: new Date(event.begin), allowWhileIdle: true },
-    extra: { eventId: event.eventId },
-  });
+  if (occurrenceStart > now) {
+    notifications.push({
+      id: baseId + 1,
+      title: event.title,
+      body: `Starting now`,
+      schedule: { at: new Date(occurrenceStart), allowWhileIdle: true },
+      extra: { eventId: event.eventId, notificationKey },
+    });
+  }
 
   if (notifications.length === 0) return;
 
@@ -87,8 +131,10 @@ export async function scheduleEventNotifications(
     if (permResult.display !== "granted") return;
 
     await LocalNotifications.schedule({ notifications });
-    scheduledEventIds.add(event.eventId);
-    console.log(`Scheduling notifications for ${event.eventId}`);
+    scheduledNotificationKeys.add(notificationKey);
+    console.log(
+      `Scheduled notifications for ${event.eventId} (occurrence: ${new Date(occurrenceStart).toISOString()})`,
+    );
   } catch (err) {
     console.warn("Failed to schedule notification", err);
   }
@@ -123,7 +169,7 @@ export async function cancelAllNotifications(): Promise<void> {
     if (notifications.length > 0) {
       await LocalNotifications.cancel({ notifications });
     }
-    scheduledEventIds.clear();
+    scheduledNotificationKeys.clear();
   } catch (err) {
     console.warn("Failed to cancel all notifications", err);
   }
@@ -131,14 +177,26 @@ export async function cancelAllNotifications(): Promise<void> {
 
 export async function cancelEventNotifications(eventId: string): Promise<void> {
   if (!isNative) return;
-  if (!scheduledEventIds.has(eventId)) return;
 
-  const baseId = hashToNumber(eventId);
+  // Find and cancel all notifications belonging to this event
+  // (covers all occurrences for recurring events)
   try {
-    await LocalNotifications.cancel({
-      notifications: [{ id: baseId }, { id: baseId + 1 }],
+    const { notifications } = await LocalNotifications.getPending();
+    const toCancel = notifications.filter((n) => {
+      const extra = n.extra as Record<string, string> | undefined;
+      return extra?.eventId === eventId;
     });
-    scheduledEventIds.delete(eventId);
+
+    if (toCancel.length > 0) {
+      await LocalNotifications.cancel({ notifications: toCancel });
+    }
+
+    // Remove all keys for this event from the tracking set
+    for (const key of scheduledNotificationKeys) {
+      if (key === eventId || key.startsWith(`${eventId}:`)) {
+        scheduledNotificationKeys.delete(key);
+      }
+    }
   } catch (err) {
     console.warn("Failed to cancel notification", err);
   }
