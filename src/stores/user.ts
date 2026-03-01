@@ -3,6 +3,8 @@ import { setItem } from "../common/localStorage";
 import { signerManager } from "../common/signer";
 import { useTimeBasedEvents, EVENTS_STORAGE_KEY } from "./events";
 import { cancelAllNotifications } from "../utils/notifications";
+import { fetchRelayList } from "../common/nostr";
+import { useRelayStore } from "./relays";
 
 export interface IUser {
   name?: string;
@@ -41,6 +43,7 @@ export const useUser = create<{
   logout: () => {
     signerManager.logout();
     cancelAllNotifications();
+    useRelayStore.getState().resetRelays();
     set({ user: null });
     localStorage.removeItem(USER_STORAGE_KEY);
     localStorage.removeItem(EVENTS_STORAGE_KEY);
@@ -67,6 +70,12 @@ const onUserChange = async () => {
     if (currentUser?.pubkey !== cachedUser.pubkey) {
       const eventManager = useTimeBasedEvents.getState();
       eventManager.resetPrivateEvents();
+      // Fetch user's relay list (NIP-65)
+      fetchRelayList(cachedUser.pubkey).then((relays) => {
+        if (relays.length > 0) {
+          useRelayStore.getState().setRelays(relays);
+        }
+      });
     }
   } else {
     useUser.setState({

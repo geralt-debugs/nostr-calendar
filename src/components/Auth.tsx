@@ -3,6 +3,7 @@ import { useUser } from "../stores/user";
 import { useIntl } from "react-intl";
 import { useEffect } from "react";
 import { npubEncode } from "nostr-tools/nip19";
+import { useRelayStore } from "../stores/relays";
 
 export const Auth = () => {
   const { user, updateLoginModal, logout, initializeUser } = useUser(
@@ -40,11 +41,18 @@ export const Auth = () => {
 
   const name = user?.name;
 
+  const handleOpenRelays = () => {
+    useRelayStore.getState().updateRelayModal(true);
+  };
+
   const logoutElem = (
-    <MenuItem onClick={handleLogout}>
-      {intl.formatMessage({ id: "navigation.logout" })}
-      {npub && <>({name || npub})</>}
-    </MenuItem>
+    <>
+      <MenuItem onClick={handleOpenRelays}>Relays</MenuItem>
+      <MenuItem onClick={handleLogout}>
+        {intl.formatMessage({ id: "navigation.logout" })}
+        {npub && <>({name || npub})</>}
+      </MenuItem>
+    </>
   );
 
   const loginElem = (

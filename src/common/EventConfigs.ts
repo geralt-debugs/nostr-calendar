@@ -12,4 +12,7 @@ export enum EventKinds {
 
   // User Profile
   UserProfile = 0,
+
+  // Relay List (NIP-65)
+  RelayList = 10002,
 }

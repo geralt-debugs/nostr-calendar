@@ -15,6 +15,7 @@ import { IntlProvider } from "react-intl";
 import { flattenMessages } from "./common/utils";
 import dictionary from "./common/dictionary";
 import LoginModal from "./components/LoginModal";
+import RelayManager from "./components/RelayManager";
 import { BrowserRouter, useNavigate } from "react-router";
 import { Routing } from "./components/Routing";
 import { Header } from "./components/Header";
@@ -97,6 +98,7 @@ function Application() {
         open={showLoginModal}
         onClose={() => updateLoginModal(false)}
       />
+      <RelayManager />
       <Toolbar />
       <Box>
         <Routing />

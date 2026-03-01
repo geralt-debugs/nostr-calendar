@@ -27,8 +27,9 @@ import { signerManager } from "./signer";
 import { RSVPStatus } from "../utils/types";
 import { EventKinds } from "./EventConfigs";
 import { nostrRuntime } from "./nostrRuntime";
+import { useRelayStore } from "../stores/relays";
 
-const defaultRelays = [
+export const defaultRelays = [
   "wss://relay.damus.io/",
   "wss://relay.primal.net/",
   "wss://nos.lol",
@@ -46,8 +47,9 @@ const _onAcceptedRelays = console.log.bind(
 
 export const pool = new SimplePool();
 
-export const getRelays = () => {
-  return defaultRelays;
+export const getRelays = (): string[] => {
+  const userRelays = useRelayStore.getState().relays;
+  return userRelays.length > 0 ? userRelays : defaultRelays;
 };
 
 export async function getUserPublicKey() {
@@ -614,4 +616,56 @@ export const fetchUserProfile = async (
     kinds: [0],
     authors: [pubkey],
   });
+};
+
+export const fetchRelayList = async (pubkey: string): Promise<string[]> => {
+  const event = await nostrRuntime.fetchOne(defaultRelays, {
+    kinds: [EventKinds.RelayList],
+    authors: [pubkey],
+  });
+  if (!event) return [];
+  return event.tags
+    .filter((tag) => tag[0] === "r" && tag[1])
+    .map((tag) => tag[1]);
+};
+
+export const publishRelayList = async (relays: string[]): Promise<void> => {
+  const pubKey = await getUserPublicKey();
+  const tags = relays.map((url) => ["r", url]);
+  const baseEvent: UnsignedEvent = {
+    kind: EventKinds.RelayList,
+    pubkey: pubKey,
+    tags,
+    content: "",
+    created_at: Math.floor(Date.now() / 1000),
+  };
+  const signer = await signerManager.getSigner();
+  const fullEvent = await signer.signEvent(baseEvent);
+  fullEvent.id = getEventHash(baseEvent);
+  // Publish to both user relays and default relays so the list is discoverable
+  const allRelays = [...new Set([...relays, ...defaultRelays])];
+  await Promise.any(
+    allRelays
+      .map(normalizeURL)
+      .map(async (url) => {
+        let relay: AbstractRelay | null = null;
+        try {
+          relay = await ensureRelay(url, { connectionTimeout: 5000 });
+          return await Promise.race<string>([
+            relay.publish(fullEvent).then((reason) => reason),
+            new Promise<string>((_, reject) =>
+              setTimeout(() => reject("timeout"), 5000),
+            ),
+          ]);
+        } finally {
+          if (relay) {
+            try {
+              await relay.close();
+            } catch {
+              // Ignore closing errors
+            }
+          }
+        }
+      }),
+  );
 };

@@ -36,6 +36,9 @@ import DescriptionIcon from "@mui/icons-material/Description";
 import { EventAttributeEditContainer } from "./StyledComponents";
 import LockIcon from "@mui/icons-material/Lock";
 import PublicIcon from "@mui/icons-material/Public";
+import SettingsInputAntennaIcon from "@mui/icons-material/SettingsInputAntenna";
+import { getRelays } from "../common/nostr";
+import { useRelayStore } from "../stores/relays";
 
 interface CalendarEventEditProps {
   open: boolean;
@@ -373,6 +376,23 @@ export function CalendarEventEdit({
       </DialogContent>
 
       <DialogActions style={{ padding: 16 }}>
+        <Box
+          style={{
+            flex: 1,
+            display: "flex",
+            alignItems: "center",
+          }}
+        >
+          <IconButton
+            size="small"
+            onClick={() => useRelayStore.getState().updateRelayModal(true)}
+          >
+            <SettingsInputAntennaIcon fontSize="small" />
+          </IconButton>
+          <Typography variant="caption" color="textSecondary">
+            Publishing to {getRelays().length} relay(s)
+          </Typography>
+        </Box>
         <Button onClick={handleClose} color="inherit">
           Cancel
         </Button>
