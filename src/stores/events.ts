@@ -89,6 +89,7 @@ const processPrivateEvent = (
       store = appendOne(store, parsedEvent.id, parsedEvent);
     }
   }
+  console.log(parsedEvent);
   scheduleEventNotifications(parsedEvent);
   useTimeBasedEvents.setState({
     eventById: store.byKey,

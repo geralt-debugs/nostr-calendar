@@ -48,39 +48,33 @@ export const useUser = create<{
   initializeUser: async () => {
     if (!isInitializing) {
       isInitializing = true;
-      setTimeout(() => {
-        signerManager.onChange(onUserChange);
-        signerManager.restoreFromStorage();
-      }, 500);
+      signerManager.onChange(onUserChange);
+      signerManager.restoreFromStorage();
     }
   },
 }));
 
 const onUserChange = async () => {
-  let hasUserChanged = false;
   const currentUser = useUser.getState().user;
-  try {
-    const signer = await signerManager.getSigner();
-    const user = await signer.getPublicKey();
+  const cachedUser = signerManager.getUser();
+
+  if (cachedUser) {
     useUser.setState({
       isInitialized: true,
-      user: {
-        pubkey: user,
-      },
+      user: cachedUser,
     });
-    hasUserChanged = currentUser?.pubkey !== user;
-  } catch (e) {
-    if (e.message === "NO_SIGNER_AVAILABLE_AND_NO_LOGIN_REQUEST_REGISTERED") {
-      useUser.setState({
-        isInitialized: true,
-        user: null,
-      });
-      hasUserChanged = currentUser?.pubkey !== null;
+    if (currentUser?.pubkey !== cachedUser.pubkey) {
+      const eventManager = useTimeBasedEvents.getState();
+      eventManager.resetPrivateEvents();
     }
-    throw e;
-  }
-  if (hasUserChanged) {
-    const eventManager = useTimeBasedEvents.getState();
-    eventManager.resetPrivateEvents();
+  } else {
+    useUser.setState({
+      isInitialized: true,
+      user: null,
+    });
+    if (currentUser?.pubkey !== undefined) {
+      const eventManager = useTimeBasedEvents.getState();
+      eventManager.resetPrivateEvents();
+    }
   }
 };
